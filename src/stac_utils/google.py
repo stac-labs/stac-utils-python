@@ -12,6 +12,7 @@ from . import listify
 
 def get_credentials(
   service_account_blob: Mapping = None,
+  service_account_env_name: str = "SERVICE_ACCOUNT",
   scopes: Union[Sequence[str], str] = None,
   subject: str = None,
 ) -> service_account.Credentials:
@@ -19,7 +20,7 @@ def get_credentials(
 
     if not service_account_blob:
         try:
-            service_account_blob = json.loads(os.environ["SERVICE_ACCOUNT"])
+            service_account_blob = json.loads(os.environ[service_account_env_name])
         except (json.JSONDecodeError, KeyError):
             pass
 
@@ -129,3 +130,36 @@ def make_gmail_client(
 
     credentials = get_credentials(service_account_blob, scopes=scopes, subject=subject)
     return build("gmail", "v1", credentials=credentials)
+
+def _sanitize_name(string: str) -> str:
+    valid_chars = "abcdefghijklmnopqrstuvwxyz1234567890._"
+
+    # crudely prevent sql injection
+    return "".join([s for s in string.lower() if s in valid_chars])
+
+
+def get_table(
+    table_name: str, 
+    service_account_blob: Mapping[str, str] = None, 
+    service_account_env_name: str = "SERVICE_ACCOUNT",
+    subject: str = None
+) -> list[dict]:
+    """ Performs a select * from the given table """
+    if not service_account_blob:
+        try:
+            service_account_blob = json.loads(os.environ[service_account_env_name])
+        except json.JSONDecodeError:
+            pass
+
+    credentials = get_credentials(
+        service_account_blob, scopes=["bigquery", "drive"], subject=subject
+    )
+    client = bigquery.Client(credentials=credentials)
+
+    # sadly bq's parameterized queries don't support table names
+    sql = f"SELECT * FROM `{_sanitize_name(table_name)}`;"
+    job = client.query(sql).result()
+
+    results = [{k: v for k, v in row.items()} for row in job]
+
+    return results
