@@ -2,7 +2,7 @@ import json
 import os
 import sys
 
-from typing import List, Union, Mapping, Sequence
+from typing import Any, List, Union, Mapping, Sequence
 
 from google.cloud import storage, bigquery
 from google.oauth2 import service_account
@@ -10,12 +10,13 @@ from googleapiclient.discovery import build
 
 from . import listify
 
-
 def get_credentials(
-    service_account_blob: Mapping = None,
-    scopes: Union[Sequence[str], str] = None,
-    subject: str = None,
+  service_account_blob: Mapping = None,
+  scopes: Union[Sequence[str], str] = None,
+  subject: str = None,
 ) -> service_account.Credentials:
+    """ Loads a Google Service Account into a Credentials object with the given scopes """
+
     if not service_account_blob:
         try:
             service_account_blob = json.loads(os.environ["SERVICE_ACCOUNT"])
@@ -36,7 +37,9 @@ def get_credentials(
     return credentials
 
 
-def auth_bq():
+def auth_bq() -> bigquery.Client:
+    """ Returns an initialized BigQuery client object """
+
     scopes = ["cloud-platform"]
     credentials = get_credentials(scopes=scopes)
 
@@ -48,14 +51,21 @@ def auth_bq():
     return client
 
 
-def run_query(client, query_string):
+def run_query(client: bigquery.Client, query_string: str):
+    """ Runs the specified raw query using the BigQuery client specified """
 
     query_job = client.query(query_string)
     query_job.result()
 
 
-def load_data_from_dataframe(client, dataframe, project_name, dataset_name, table_name):
-
+def load_data_from_dataframe(
+    client: bigquery.Client, 
+    dataframe: Any, 
+    project_name: str, 
+    dataset_name: str, 
+    table_name: str
+):
+    """ Loads data from the specified dataframe into the specified table in BigQuery """
     dataset_ref = bigquery.Dataset(project_name + "." + dataset_name)
     table_ref = dataset_ref.table(table_name)
 
@@ -70,7 +80,9 @@ def load_data_from_dataframe(client, dataframe, project_name, dataset_name, tabl
     print(results)
 
 
-def auth_gcs():
+def auth_gcs() -> storage.Client:
+    """ Returns an initialized Storage client object """
+
     scopes = ["cloud-platform"]
     credentials = get_credentials(scopes=scopes)
 
@@ -82,7 +94,13 @@ def auth_gcs():
     return client
 
 
-def upload_data_to_gcs(bucket_name, filename, destination_filename, destination_path):
+def upload_data_to_gcs(
+    bucket_name: str, 
+    filename: str, 
+    destination_filename: str, 
+    destination_path: str
+):
+    """ Uploads the given file to a specified path in a GCS Bucket """
     destination_path = destination_path.strip("/")
     destination_blob_name = destination_path + "/" + destination_filename
 
@@ -101,10 +119,12 @@ def upload_data_to_gcs(bucket_name, filename, destination_filename, destination_
 
 
 def make_gmail_client(
-    service_account_blob: Mapping[str, str] = None,
-    subject: str = None,
-    scopes: List[str] = None,
+  service_account_blob: Mapping[str, str] = None,
+  subject: str = None,
+  scopes: List[str] = None,
 ):
+    """ Returns an initialized Gmail Client object """
+    
     scopes = scopes or ["gmail.labels", "gmail.modify", "gmail.readonly"]
 
     credentials = get_credentials(service_account_blob, scopes=scopes, subject=subject)
