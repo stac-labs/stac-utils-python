@@ -24,5 +24,5 @@ def secrets(
         )
 
     # the patcher doesn't like non-string keys OR values
-    values = {str(k): str(v) for k, v in values.items()}
+    values = {str(k): str(v) if v is not None else "" for k, v in values.items()}
     return patch.dict(os.environ, values=values)
