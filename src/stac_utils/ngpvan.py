@@ -118,6 +118,8 @@ class HTTPClient(Client):
         params: dict = None,
         body: dict = None,
         return_headers: bool = False,
+        use_snake_case: bool = True,
+        override_error_logging: bool = False,
         **kwargs,
     ) -> Any:
         """Basic API request, retries on failures, parses errors"""
@@ -135,9 +137,13 @@ class HTTPClient(Client):
                 resp = self.session.request(
                     method, url, params=params, json=body, **kwargs
                 )
-                data = self.transform_response(resp, return_headers=return_headers)
+                data = self.transform_response(
+                    resp,
+                    return_headers=return_headers,
+                    use_snake_case=use_snake_case
+                )
 
-                self.check_for_error(resp, data)
+                self.check_for_error(resp, data, override_error_logging)
 
                 if resp.status_code in [429]:
                     print("429: Rate limit")
@@ -177,6 +183,9 @@ class HTTPClient(Client):
     def post(self, *args, **kwargs):
         return self.call_api("POST", *args, **kwargs)
 
+    def put(self, *args, **kwargs):
+        return self.call_api("PUT", *args, **kwargs)
+
     def delete(self, *args, **kwargs):
         return self.call_api("DELETE", *args, **kwargs)
 
@@ -211,6 +220,8 @@ class HTTPClient(Client):
 class NGPVANException(Exception):
     pass
 
+class NGPVANLocationException(Exception):
+    pass
 
 class NGPVANClient(HTTPClient):
     base_url = "https://api.securevan.com/v4"
@@ -238,7 +249,10 @@ class NGPVANClient(HTTPClient):
         return 2
 
     def transform_response(
-        self, response: requests.Response, return_headers: bool = False
+        self, 
+        response: requests.Response, 
+        return_headers: bool = False,
+        use_snake_case: bool = True
     ) -> dict:
         try:
             data = response.json() or {}
@@ -246,7 +260,8 @@ class NGPVANClient(HTTPClient):
             if type(data) is not dict:
                 data = {str(response.url).split("/")[-1].lower(): data}
 
-            data = convert_to_snake_case(data)
+            if use_snake_case:
+                data = convert_to_snake_case(data)
 
         except requests.RequestException:
             data = {}
@@ -264,11 +279,17 @@ class NGPVANClient(HTTPClient):
 
         return data
 
-    def check_for_error(self, response: requests.Response, data: dict):
+    def check_for_error(self, response: requests.Response, data: dict, override_error_logging: bool = False):
         errors = data.get("errors")
         if errors:
-            logger.error(response.content)
-            raise NGPVANException(errors)
+            LOCATION_ERROR_TEXT = "'location' is required by the specified Event"
+            if len(errors) == 1 and errors[0].get("text") == LOCATION_ERROR_TEXT and override_error_logging:
+                ## This error means that the existing event needs a new location added
+                ## so we will do that first, without logging an error, and then retry the signup
+                raise NGPVANLocationException(errors)
+            else:
+                logger.error(response.content)
+                raise NGPVANException(errors)
 
     def get_paginated_items(self, url, **kwargs):
         all_items = []
