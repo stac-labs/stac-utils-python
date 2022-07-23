@@ -6,7 +6,7 @@ Stac Labs python utilities library
 To use this library in your project, place the following line in your `requirements.txt` file:
 
 ```
-stac_utils_python @ git+ssh://git@github.com/stac-labs/stac-utils-python.git@[version]
+stac_utils_python @ git+https://github.com/stac-labs/stac-utils-python.git@[version]
 ```
 
 where `version` can be used to match a tag for the version of the code you'd like to use. If not specified, the latest version on main will be used. 
