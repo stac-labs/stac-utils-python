@@ -1,4 +1,3 @@
-
 def listify(
     string: str,
     type_: type = str,
@@ -6,7 +5,7 @@ def listify(
     ignore_errors: bool = False,
     ignore_empty: bool = True,
 ) -> list:
-    """ Split a string into a list, converting to a type as necessary """
+    """Split a string into a list, converting to a type as necessary"""
 
     if not string.strip():
         return []

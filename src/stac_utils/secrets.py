@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 from .aws import get_secret
 
+
 def secrets(
     file_name: str = None,
     secret_name: str = None,

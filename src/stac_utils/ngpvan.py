@@ -138,9 +138,7 @@ class HTTPClient(Client):
                     method, url, params=params, json=body, **kwargs
                 )
                 data = self.transform_response(
-                    resp,
-                    return_headers=return_headers,
-                    use_snake_case=use_snake_case
+                    resp, return_headers=return_headers, use_snake_case=use_snake_case
                 )
 
                 self.check_for_error(resp, data, override_error_logging)
@@ -220,8 +218,10 @@ class HTTPClient(Client):
 class NGPVANException(Exception):
     pass
 
+
 class NGPVANLocationException(Exception):
     pass
+
 
 class NGPVANClient(HTTPClient):
     base_url = "https://api.securevan.com/v4"
@@ -249,10 +249,10 @@ class NGPVANClient(HTTPClient):
         return 2
 
     def transform_response(
-        self, 
-        response: requests.Response, 
+        self,
+        response: requests.Response,
         return_headers: bool = False,
-        use_snake_case: bool = True
+        use_snake_case: bool = True,
     ) -> dict:
         try:
             data = response.json() or {}
@@ -279,11 +279,20 @@ class NGPVANClient(HTTPClient):
 
         return data
 
-    def check_for_error(self, response: requests.Response, data: dict, override_error_logging: bool = False):
+    def check_for_error(
+        self,
+        response: requests.Response,
+        data: dict,
+        override_error_logging: bool = False,
+    ):
         errors = data.get("errors")
         if errors:
             LOCATION_ERROR_TEXT = "'location' is required by the specified Event"
-            if len(errors) == 1 and errors[0].get("text") == LOCATION_ERROR_TEXT and override_error_logging:
+            if (
+                len(errors) == 1
+                and errors[0].get("text") == LOCATION_ERROR_TEXT
+                and override_error_logging
+            ):
                 ## This error means that the existing event needs a new location added
                 ## so we will do that first, without logging an error, and then retry the signup
                 raise NGPVANLocationException(errors)

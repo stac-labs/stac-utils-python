@@ -1,6 +1,6 @@
-
 import re
 from typing import Union
+
 
 def _convert(camel_input: str) -> str:
     # from https://stackoverflow.com/a/46493824
@@ -14,7 +14,7 @@ def convert_to_snake_case(data: Union[dict, list]) -> Union[dict, list]:
         return [convert_to_snake_case(row) for row in data]
     elif type(data) is str:
         return _convert(data)
-        
+
     new_data = {}
     for k, v in data.items():
         k = _convert(k)

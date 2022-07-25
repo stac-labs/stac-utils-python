@@ -4,6 +4,7 @@ import requests
 
 from . import listify
 
+
 class Emailer:
     def __init__(
         self,
