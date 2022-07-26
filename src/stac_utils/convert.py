@@ -9,7 +9,7 @@ def _convert(camel_input: str) -> str:
     return "_".join(map(str.lower, words))
 
 
-def convert_to_snake_case(data: Union[dict, list]) -> Union[dict, list]:
+def convert_to_snake_case(data: Union[str, dict, list]) -> Union[str, dict, list]:
     if type(data) is list:
         return [convert_to_snake_case(row) for row in data]
     elif type(data) is str:
