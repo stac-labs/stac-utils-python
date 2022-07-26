@@ -171,8 +171,6 @@ def get_table(
 
     # sadly bq's parameterized queries don't support table names
     sql = f"SELECT * FROM `{_sanitize_name(table_name)}`;"
-    job = client.query(sql).result()
-
-    results = [{k: v for k, v in row.items()} for row in job]
+    results = run_query(sql, service_account_blob=service_account_blob, subject=subject)
 
     return results
