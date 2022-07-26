@@ -164,11 +164,6 @@ def get_table(
         except json.JSONDecodeError:
             pass
 
-    credentials = get_credentials(
-        service_account_blob, scopes=["bigquery", "drive"], subject=subject
-    )
-    client = bigquery.Client(credentials=credentials)
-
     # sadly bq's parameterized queries don't support table names
     sql = f"SELECT * FROM `{_sanitize_name(table_name)}`;"
     results = run_query(sql, service_account_blob=service_account_blob, subject=subject)
