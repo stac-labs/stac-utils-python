@@ -8,7 +8,7 @@ from google.cloud import storage, bigquery
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
-from . import listify
+from .listify import listify
 
 
 def get_credentials(
