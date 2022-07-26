@@ -53,11 +53,25 @@ def auth_bq() -> bigquery.Client:
     return client
 
 
-def run_query(client: bigquery.Client, query_string: str):
-    """Runs the specified raw query using the BigQuery client specified"""
+def run_query(
+    sql: str, service_account_blob: Mapping[str, str] = None, subject: str = None
+) -> List[dict]:
+    if not service_account_blob:
+        try:
+            service_account_blob = json.loads(os.environ["BQ_SERVICE_ACCOUNT"])
+        except (json.JSONDecodeError, KeyError):
+            pass
 
-    query_job = client.query(query_string)
-    query_job.result()
+    credentials = get_credentials(
+        service_account_blob, scopes=["bigquery", "drive"], subject=subject
+    )
+    client = bigquery.Client(credentials=credentials)
+
+    job = client.query(sql).result()
+
+    results = [{k: v for k, v in row.items()} for row in job]
+
+    return results
 
 
 def load_data_from_dataframe(
