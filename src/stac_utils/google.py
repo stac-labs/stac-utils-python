@@ -2,7 +2,7 @@ import json
 import os
 import sys
 
-from typing import Any, List, Union, Mapping, Sequence
+from typing import Any, List, Dict, Union, Mapping, Sequence
 
 from google.cloud import storage, bigquery
 from google.oauth2 import service_account
@@ -55,7 +55,7 @@ def auth_bq() -> bigquery.Client:
 
 def run_query(
     sql: str, service_account_blob: Mapping[str, str] = None, subject: str = None, client: bigquery.Client = None,
-) -> List[dict]:
+) -> List[Dict]:
     if not client:
         if not service_account_blob:
             try:
@@ -157,7 +157,7 @@ def get_table(
     service_account_blob: Mapping[str, str] = None,
     service_account_env_name: str = "SERVICE_ACCOUNT",
     subject: str = None,
-) -> List[dict]:
+) -> List[Dict]:
     """Performs a select * from the given table"""
     if not service_account_blob:
         try:
