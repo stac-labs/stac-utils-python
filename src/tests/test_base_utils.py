@@ -18,6 +18,9 @@ class TestBaseUtils(unittest.TestCase):
         self.assertListEqual(listify("foo"), ["foo"])
         self.assertListEqual(listify(""), [])
 
+    def test_listify_none(self):
+        self.assertEquals(listify(None), [])
+
     def test_listify_other_types(self):
         self.assertListEqual(listify("foo,bar", type_=str), ["foo", "bar"])
         self.assertListEqual(listify("1,2", type_=int), [1, 2])

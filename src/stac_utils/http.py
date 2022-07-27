@@ -9,8 +9,6 @@ from contextlib import contextmanager
 from typing import Any, Union, Tuple, Dict
 import requests
 
-from convert import convert_to_snake_case
-
 logger = logging.getLogger(__name__)
 
 

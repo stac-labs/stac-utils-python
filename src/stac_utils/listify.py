@@ -6,6 +6,8 @@ def listify(
     ignore_empty: bool = True,
 ) -> list:
     """Split a string into a list, converting to a type as necessary"""
+    if string is None:
+        return []
 
     if not string.strip():
         return []
