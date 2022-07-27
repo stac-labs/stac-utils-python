@@ -157,7 +157,7 @@ def get_table(
     service_account_blob: Mapping[str, str] = None,
     service_account_env_name: str = "SERVICE_ACCOUNT",
     subject: str = None,
-) -> list[dict]:
+) -> List[dict]:
     """Performs a select * from the given table"""
     if not service_account_blob:
         try:
