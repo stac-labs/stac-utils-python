@@ -1,4 +1,5 @@
 import logging
+import os
 import requests
 
 from typing import List
@@ -10,14 +11,26 @@ logger = logging.getLogger(__name__)
 '''
 Sample code:
 from stac_utils.ticker_request import TickerRequest
-ticker = TickerRequest()
-ticker.add_data('FL', 'AWS Lambda', 'event-sync', 'events created', 155)
-ticker.add_data('FL', 'AWS Lambda', 'event-sync', 'signups created', 1342)
-result = ticker.send_to_ticker()
+from stac_utils import secrets
+
+with secrets(secret_name = 'TICKER_SECRET_NAME'):
+    ticker = TickerRequest()
+    ticker.add_data('FL', 'AWS Lambda', 'event-sync', 'events created', 155)
+    ticker.add_data('FL', 'AWS Lambda', 'event-sync', 'signups created', 1342)
+    result = ticker.send_to_ticker()
 '''
 
 class TickerRequest(HTTPClient):
-    base_url = 'https://08w3lag5lj.execute-api.us-west-1.amazonaws.com'
+    if (
+        os.environ['TICKER_URL']
+        and os.environ['AUTH_USER']
+        and os.environ['AUTH_PASS']
+    ):
+        base_url = os.environ['TICKER_URL']
+    else:
+        error = 'Ticker authentication or URL missing from environment'
+        logger.error(error)
+        raise Exception(error)
 
     def __init__(self, *args, **kwargs):
         self.data: List[dict] = []
@@ -25,7 +38,7 @@ class TickerRequest(HTTPClient):
     
     def create_session(self) -> requests.Session:
         session = requests.Session()
-        session.auth = ('TODO', 'TODO') # TODO from secrets
+        session.auth = (os.environ['AUTH_USER'], os.environ['AUTH_PASS'])
 
         return session
     
