@@ -1,5 +1,7 @@
 # stac-utils-python
-Stac Labs python utilities library
+Python utilities library for stac labs.
+
+Copyright 2022 stac labs. See LICENSE.md for licensing.
 
 ## Usage
 
@@ -18,4 +20,3 @@ Run `pip install -r requirements.txt` to install dependencies into your virtual 
 Run `python -m build .` to build both a `.tar` and `.whl` package in the `dist` folder.
 
 Running the `pytest` command will run all tests in `src/tests`.
-
