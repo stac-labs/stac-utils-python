@@ -11,9 +11,9 @@ logger = logging.getLogger(__name__)
 '''
 Sample code:
 from stac_utils.ticker_request import TickerRequest
-from stac_utils import secrets
+from stac_utils import secrets # only necessary in AWS
 
-with secrets(secret_name = 'TICKER_SECRET_NAME'):
+with secrets(secret_name = 'TICKER_SECRET_NAME'): # with secrets() only in AWS
     ticker = TickerRequest()
     ticker.add_data('FL', 'AWS Lambda', 'event-sync', 'events created', 155)
     ticker.add_data('FL', 'AWS Lambda', 'event-sync', 'signups created', 1342)
