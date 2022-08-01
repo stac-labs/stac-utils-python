@@ -17,7 +17,10 @@ with secrets(secret_name = 'TICKER_SECRET_NAME'): # with secrets() only in AWS
     ticker = TickerRequest()
     ticker.add_data('FL', 'AWS Lambda', 'event-sync', 'events created', 155)
     ticker.add_data('FL', 'AWS Lambda', 'event-sync', 'signups created', 1342)
+
     result = ticker.send_to_ticker()
+    if result.status_code != 200:
+        raise Exception('Metrics not sent to ticker')
 '''
 
 class TickerRequest(HTTPClient):
