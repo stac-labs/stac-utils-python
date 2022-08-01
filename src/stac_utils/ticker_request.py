@@ -19,24 +19,23 @@ with secrets(secret_name = os.environ['TICKER_SECRET_NAME']):
     ticker.add_data('FL', 'AWS Lambda', 'event-sync', 'events created', 155)
     ticker.add_data('FL', 'AWS Lambda', 'event-sync', 'signups created', 1342)
 
-    result = ticker.send_to_ticker()
-    if result.status_code != 200:
-        raise Exception('Metrics not sent to ticker')
+    ticker.send_to_ticker()
 '''
 
 class TickerRequest(HTTPClient):
-    if (
-        os.environ['TICKER_URL']
-        and os.environ['AUTH_USER']
-        and os.environ['AUTH_PASS']
-    ):
-        base_url = os.environ['TICKER_URL']
-    else:
-        error = 'Ticker authentication or URL missing from environment'
-        logger.error(error)
-        raise Exception(error)
 
     def __init__(self, *args, **kwargs):
+        if (
+            os.environ['TICKER_URL']
+            and os.environ['AUTH_USER']
+            and os.environ['AUTH_PASS']
+        ):
+            base_url = os.environ['TICKER_URL']
+        else:
+            error = 'Ticker authentication or URL missing from environment'
+            logger.error(error)
+            raise Exception(error)
+
         self.data: List[dict] = []
         super().__init__(*args, **kwargs)
     
@@ -81,4 +80,10 @@ class TickerRequest(HTTPClient):
         })
 
     def send_to_ticker(self):
-        return self.post('/ticker', body = self.data)
+        result = self.post('/ticker', body = self.data)
+
+        if result.status_code == 200:
+            self.data = []
+            return result
+        else:
+            raise Exception('Metrics not sent to ticker')
