@@ -31,6 +31,7 @@ class TickerRequest(HTTPClient):
             and os.environ['AUTH_PASS']
         ):
             base_url = os.environ['TICKER_URL']
+            print(base_url[0:3])
         else:
             error = 'Ticker authentication or URL missing from environment'
             logger.error(error)
@@ -86,4 +87,5 @@ class TickerRequest(HTTPClient):
             self.data = []
             return result
         else:
+            print(result)
             raise Exception('Metrics not sent to ticker')
