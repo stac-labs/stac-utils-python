@@ -22,8 +22,8 @@ def get_credentials(
     if not service_account_blob:
         try:
             service_account_blob = json.loads(os.environ[service_account_env_name])
-        except (json.JSONDecodeError, KeyError):
-            pass
+        except (json.JSONDecodeError, KeyError) as error:
+            raise Exception("Service account did not load correctly", error)
 
     if isinstance(scopes, str):
         scopes = listify(scopes)
@@ -59,9 +59,10 @@ def run_query(
     if not client:
         if not service_account_blob:
             try:
-                service_account_blob = json.loads(os.environ["BQ_SERVICE_ACCOUNT"])
-            except (json.JSONDecodeError, KeyError):
-                pass
+                service_account_string = os.environ["BQ_SERVICE_ACCOUNT"] or os.environ["SERVICE_ACCOUNT"]
+                service_account_blob = json.loads(service_account_string)
+            except (json.JSONDecodeError, KeyError) as error:
+                raise Exception("Service account did not load correctly", error)
 
         credentials = get_credentials(
             service_account_blob, scopes=["bigquery", "drive"], subject=subject
