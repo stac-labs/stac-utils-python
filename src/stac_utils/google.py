@@ -20,7 +20,10 @@ def get_credentials(
     """Loads a Google Service Account into a Credentials object with the given scopes"""
 
     if not service_account_blob:
-        service_account_blob = json.loads(os.environ[service_account_env_name])
+        try:
+            service_account_blob = json.loads(os.environ[service_account_env_name])
+        except (json.JSONDecodeError, KeyError) as error:
+            raise Exception("Service account did not load correctly", error)
 
     if isinstance(scopes, str):
         scopes = listify(scopes)
@@ -55,7 +58,11 @@ def run_query(
 ) -> List[dict]:
     if not client:
         if not service_account_blob:
-            service_account_blob = json.loads(os.environ["BQ_SERVICE_ACCOUNT"])
+            try:
+                service_account_string = os.environ["BQ_SERVICE_ACCOUNT"] or os.environ["SERVICE_ACCOUNT"]
+                service_account_blob = json.loads(service_account_string)
+            except (json.JSONDecodeError, KeyError) as error:
+                raise Exception("Service account did not load correctly", error)
 
         credentials = get_credentials(
             service_account_blob, scopes=["bigquery", "drive"], subject=subject
