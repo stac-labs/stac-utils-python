@@ -11,7 +11,8 @@ class Downloader:
 
         Later calls will not return files that have already been given.
 
-        Useful
+        Useful for Selenium where it's the only way to check
+        whether a file finished downloading or not.
 
     """
     def __init__(self, directory: str, polling: float = 10.0, pattern: str = None):
