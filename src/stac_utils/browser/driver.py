@@ -35,6 +35,11 @@ class ChromeDriver:
         path = ChromeDriverManager().install()
 
         self.driver = Chrome(options=options, executable_path=path)
+
+        """ Tack the (temp) download directory onto the driver object
+            so it can be referenced by the script
+        """
+
         self.driver.download_directory = self.download_directory
 
         return self.driver
