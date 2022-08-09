@@ -79,11 +79,15 @@ class TickerRequest(HTTPClient):
         })
 
     def send_to_ticker(self):
-        result = self.post('/ticker', body = self.data)
+        if len(self.data) > 0:
+            result = self.post('/ticker', body = self.data)
 
-        if result.status_code == 200:
-            self.data = []
-            return result
+            if result.status_code == 200:
+                self.data = []
+                return result
+            else:
+                print(result)
+                raise Exception('Metrics not sent to ticker')
         else:
-            print(result)
-            raise Exception('Metrics not sent to ticker')
+            print('No data to send to ticker')
+            return
