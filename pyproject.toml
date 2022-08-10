@@ -9,7 +9,7 @@ testpaths = [
   "src/tests"
 ]
 
-[project.optional-dependencies]
+[stac-utils-python.optional-dependencies]
 browser = [
   "selenium >= 4.3",
   "pandas >= 1.4",
