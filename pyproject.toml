@@ -8,3 +8,11 @@ addopts = "-ra -q"
 testpaths = [
   "src/tests"
 ]
+
+[project.optional-dependencies]
+browser = [
+  "selenium >= 4.3",
+  "pandas >= 1.4",
+  "undetected_chromedriver",
+  "webdriver-manager >= 3.8"
+]
