@@ -1,3 +1,4 @@
+import os
 import tempfile
 
 from selenium.webdriver import ChromeOptions
@@ -29,6 +30,15 @@ class ChromeDriver:
         options.add_argument("--disable-extensions")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--no-sandbox")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--window-size=1280x1696")
+        options.add_argument("--single-process")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-dev-tools")
+        options.add_argument("--no-zygote")
+
+        if os.environ.get("CHROME_BINARY"):
+            options.binary_location = os.environ.get("CHROME_BINARY")
         if self.is_headless:
             options.add_argument("--headless")
 
