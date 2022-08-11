@@ -14,7 +14,8 @@ class ChromeDriver:
 
         By default, it'll use a temporary directory for downloaded files.
     """
-    def __init__(self, download_directory: str = None, is_headless: bool = True):
+    def __init__(self, chrome_binary: str = None, download_directory: str = None, is_headless: bool = True):
+        self.chrome_binary = chrome_binary or os.environ.get("CHROME_BINARY")
         self.temp_dir = None
         self.download_directory = download_directory
         self.is_headless = is_headless
@@ -39,8 +40,8 @@ class ChromeDriver:
         options.add_argument("--disable-dev-tools")
         options.add_argument("--no-zygote")
 
-        if os.environ.get("CHROME_BINARY"):
-            options.binary_location = os.environ.get("CHROME_BINARY")
+        if self.chrome_binary:
+            options.binary_location = self.chrome_binary
         if self.is_headless:
             options.add_argument("--headless")
 
