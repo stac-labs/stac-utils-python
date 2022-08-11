@@ -2,8 +2,10 @@ import os
 import tempfile
 
 from selenium.webdriver import ChromeOptions
-from undetected_chromedriver._compat import Chrome
+# from undetected_chromedriver._compat import Chrome
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium import webdriver
 
 
 class ChromeDriver:
@@ -42,9 +44,10 @@ class ChromeDriver:
         if self.is_headless:
             options.add_argument("--headless")
 
-        path = ChromeDriverManager().install()
-
-        self.driver = Chrome(options=options, executable_path=path)
+        self.driver = webdriver.Chrome(
+            options=options,
+            service=ChromeService(ChromeDriverManager().install())
+        )
 
         """ Tack the (temp) download directory onto the driver object
             so it can be referenced by the script
