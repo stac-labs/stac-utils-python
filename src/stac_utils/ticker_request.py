@@ -22,19 +22,19 @@ with secrets(secret_name = os.environ['TICKER_SECRET_NAME']):
     ticker.send_to_ticker()
 '''
 
-class TickerRequest(HTTPClient):
-    if (
-        os.environ['TICKER_URL']
-        and os.environ['AUTH_USER']
-        and os.environ['AUTH_PASS']
-    ):
-        base_url = os.environ['TICKER_URL']
-    else:
-        error = 'Ticker authentication or URL missing from environment'
-        logger.error(error)
-        raise Exception(error)
-        
+class TickerRequest(HTTPClient):        
     def __init__(self, *args, **kwargs):
+        if (
+            os.environ['TICKER_URL']
+            and os.environ['AUTH_USER']
+            and os.environ['AUTH_PASS']
+        ):
+            self.base_url = os.environ['TICKER_URL']
+        else:
+            error = 'Ticker authentication or URL missing from environment'
+            logger.error(error)
+            raise Exception(error)
+
         self.data: List[dict] = []
         super().__init__(*args, **kwargs)
     
