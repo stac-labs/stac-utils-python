@@ -48,12 +48,14 @@ class ChromeDriver:
         options.add_argument("--no-zygote")
 
         if self.chrome_binary:
+            print(f"binary location: {self.chrome_binary}")
             options.binary_location = self.chrome_binary
         if self.is_headless:
             options.add_argument("--headless")
 
         # automatically retrieve a chrome driver if one isn't specified
         driver_path = self.chrome_driver or ChromeDriverManager().install()
+        print(f"driver location: {driver_path}")
         self.driver = webdriver.Chrome(
             options=options,
             service=ChromeService(
