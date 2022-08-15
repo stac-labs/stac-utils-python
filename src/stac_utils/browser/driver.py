@@ -50,7 +50,10 @@ class ChromeDriver:
         driver_path = self.chrome_driver or ChromeDriverManager().install()
         self.driver = webdriver.Chrome(
             options=options,
-            service=ChromeService(driver_path)
+            service=ChromeService(
+                executable_path=driver_path,
+                service_args=['--enable-logging=stdout'],
+            )
         )
 
         """ Tack the (temp) download directory onto the driver object
