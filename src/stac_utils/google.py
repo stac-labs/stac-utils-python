@@ -147,10 +147,10 @@ def make_gmail_client(
 
 
 def _sanitize_name(string: str) -> str:
-    valid_chars = "abcdefghijklmnopqrstuvwxyz1234567890._"
+    valid_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890._"
 
     # crudely prevent sql injection
-    return "".join([s for s in string.lower() if s in valid_chars])
+    return "".join([s for s in string if s in valid_chars])
 
 
 def get_table(
