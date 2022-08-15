@@ -2,19 +2,25 @@ import os
 import tempfile
 
 from selenium.webdriver import ChromeOptions
-# from undetected_chromedriver._compat import Chrome
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 class ChromeDriver:
-    """ Chrome drive sugar that loads in some intelligent defaults for setting up
-        a headless version for scripts.
+    """Chrome drive sugar that loads in some intelligent defaults for setting up
+    a headless version for scripts.
 
-        By default, it'll use a temporary directory for downloaded files.
+    By default, it'll use a temporary directory for downloaded files.
     """
-    def __init__(self, chrome_binary: str = None, chrome_driver: str = None, download_directory: str = None, is_headless: bool = True):
+
+    def __init__(
+        self,
+        chrome_binary: str = None,
+        chrome_driver: str = None,
+        download_directory: str = None,
+        is_headless: bool = True,
+    ):
         self.chrome_binary = chrome_binary or os.environ.get("CHROME_BINARY")
         self.chrome_driver = chrome_driver or os.environ.get("CHROME_DRIVER")
         self.temp_dir = None
@@ -52,8 +58,8 @@ class ChromeDriver:
             options=options,
             service=ChromeService(
                 executable_path=driver_path,
-                service_args=['--enable-logging=stdout'],
-            )
+                service_args=["--enable-logging=stdout"],
+            ),
         )
 
         """ Tack the (temp) download directory onto the driver object
