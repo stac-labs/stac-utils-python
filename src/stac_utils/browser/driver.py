@@ -14,8 +14,9 @@ class ChromeDriver:
 
         By default, it'll use a temporary directory for downloaded files.
     """
-    def __init__(self, chrome_binary: str = None, download_directory: str = None, is_headless: bool = True):
+    def __init__(self, chrome_binary: str = None, chrome_driver: str = None, download_directory: str = None, is_headless: bool = True):
         self.chrome_binary = chrome_binary or os.environ.get("CHROME_BINARY")
+        self.chrome_driver = chrome_driver or os.environ.get("CHROME_DRIVER")
         self.temp_dir = None
         self.download_directory = download_directory
         self.is_headless = is_headless
@@ -45,9 +46,11 @@ class ChromeDriver:
         if self.is_headless:
             options.add_argument("--headless")
 
+        # automatically retrieve a chrome driver if one isn't specified
+        driver_path = self.chrome_driver or ChromeDriverManager().install()
         self.driver = webdriver.Chrome(
             options=options,
-            service=ChromeService(ChromeDriverManager().install())
+            service=ChromeService(driver_path)
         )
 
         """ Tack the (temp) download directory onto the driver object
