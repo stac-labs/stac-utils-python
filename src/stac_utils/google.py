@@ -59,7 +59,7 @@ def run_query(
     if not client:
         if not service_account_blob:
             try:
-                service_account_string = os.environ["BQ_SERVICE_ACCOUNT"] or os.environ["SERVICE_ACCOUNT"]
+                service_account_string = os.environ.get("BQ_SERVICE_ACCOUNT") or os.environ.get("SERVICE_ACCOUNT")
                 service_account_blob = json.loads(service_account_string)
             except (json.JSONDecodeError, KeyError) as error:
                 raise Exception("Service account did not load correctly", error)
