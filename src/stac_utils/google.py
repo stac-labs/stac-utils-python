@@ -56,6 +56,7 @@ def auth_bq() -> bigquery.Client:
 def run_query(
     sql: str, service_account_blob: Mapping[str, str] = None, subject: str = None, client: bigquery.Client = None,
 ) -> List[dict]:
+    """Performs a SQL query in BigQuery"""
     if not client:
         if not service_account_blob:
             try:
@@ -72,6 +73,26 @@ def run_query(
     job = client.query(sql).result()
 
     results = [{k: v for k, v in row.items()} for row in job]
+
+    return results
+
+
+def get_table(
+    table_name: str,
+    service_account_blob: Mapping[str, str] = None,
+    service_account_env_name: str = "SERVICE_ACCOUNT",
+    subject: str = None,
+) -> List[dict]:
+    """Performs a select * from the given table in BigQuery"""
+    if not service_account_blob:
+        try:
+            service_account_blob = json.loads(os.environ[service_account_env_name])
+        except json.JSONDecodeError:
+            pass
+
+    # sadly bq's parameterized queries don't support table names
+    sql = f"SELECT * FROM `{_sanitize_name(table_name)}`;"
+    results = run_query(sql, service_account_blob=service_account_blob, subject=subject)
 
     return results
 
@@ -146,28 +167,21 @@ def make_gmail_client(
     return build("gmail", "v1", credentials=credentials)
 
 
+def auth_sheets(
+    service_account_blob: Mapping[str, str] = None,
+    subject: str = None,
+    scopes: List[str] = None,
+):
+    """Returns an initialized Sheets client object"""
+
+    scopes = scopes or ["drive"]
+    credentials = get_credentials(service_account_blob, scopes=scopes, subject=subject)
+
+    return build('sheets', 'v4', credentials=credentials, cache_discovery=False)
+
+
 def _sanitize_name(string: str) -> str:
     valid_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890._"
 
     # crudely prevent sql injection
     return "".join([s for s in string if s in valid_chars])
-
-
-def get_table(
-    table_name: str,
-    service_account_blob: Mapping[str, str] = None,
-    service_account_env_name: str = "SERVICE_ACCOUNT",
-    subject: str = None,
-) -> List[dict]:
-    """Performs a select * from the given table"""
-    if not service_account_blob:
-        try:
-            service_account_blob = json.loads(os.environ[service_account_env_name])
-        except json.JSONDecodeError:
-            pass
-
-    # sadly bq's parameterized queries don't support table names
-    sql = f"SELECT * FROM `{_sanitize_name(table_name)}`;"
-    results = run_query(sql, service_account_blob=service_account_blob, subject=subject)
-
-    return results
