@@ -177,7 +177,7 @@ def auth_sheets(
     scopes = scopes or ["drive"]
     credentials = get_credentials(service_account_blob, scopes=scopes, subject=subject)
 
-    return build('sheets', 'v4', credentials=credentials)
+    return build('sheets', 'v4', credentials=credentials, cache_discovery=False)
 
 
 def _sanitize_name(string: str) -> str:
