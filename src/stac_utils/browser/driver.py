@@ -7,14 +7,20 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 
 class ChromeDriver:
-    """ Chrome drive sugar that loads in some intelligent defaults for setting up
-        a headless version for scripts.
+    """Chrome drive sugar that loads in some intelligent defaults for setting up
+    a headless version for scripts.
 
-        By default, it'll use a temporary directory for downloaded files.
+    By default, it'll use a temporary directory for downloaded files.
     """
-    def __init__(self, download_directory: str = None, is_headless: bool = True, run_locally: bool = False,
-                 binary_location: str = None, driver_location: str = None
-                 ):
+
+    def __init__(
+        self,
+        download_directory: str = None,
+        is_headless: bool = True,
+        run_locally: bool = False,
+        binary_location: str = None,
+        driver_location: str = None,
+    ):
         self.temp_dir = None
         self.download_directory = download_directory
         self.binary_location = binary_location or os.environ.get("CHROME_BINARY")
