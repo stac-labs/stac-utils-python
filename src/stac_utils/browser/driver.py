@@ -44,7 +44,7 @@ class ChromeDriver:
             service_args=["--enable-logging=stdout"],
             log_path=None if self.run_locally else "/tmp/chromedriver.log",
         )
-        if not self.download_directory:
+        if self.download_directory is None:
             self.temp_dir = tempfile.TemporaryDirectory()
             self.download_directory = self.temp_dir.name
 
