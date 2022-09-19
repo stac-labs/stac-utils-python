@@ -69,6 +69,10 @@ class ChromeDriver:
         )
 
         self.driver = webdriver.Chrome(service=service, options=options)
+
+        """ Tack the (temp) download directory onto the driver object
+            so it can be referenced by the script
+        """
         self.driver.download_directory = self.download_directory
 
         return self.driver
