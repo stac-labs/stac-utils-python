@@ -1,5 +1,5 @@
 import os
-from tempfile import mkdtemp
+import tempfile
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -44,6 +44,9 @@ class ChromeDriver:
             service_args=["--enable-logging=stdout"],
             log_path=None if self.run_locally else "/tmp/chromedriver.log",
         )
+        if not self.download_directory:
+            self.temp_dir = tempfile.TemporaryDirectory()
+            self.download_directory = self.temp_dir.name
 
         options = webdriver.ChromeOptions()
         if self.binary_location:
@@ -58,9 +61,9 @@ class ChromeDriver:
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-dev-tools")
         options.add_argument("--no-zygote")
-        options.add_argument(f"--user-data-dir={mkdtemp()}")
-        options.add_argument(f"--data-path={mkdtemp()}")
-        options.add_argument(f"--disk-cache-dir={mkdtemp()}")
+        options.add_argument(f"--user-data-dir={tempfile.mkdtemp()}")
+        options.add_argument(f"--data-path={tempfile.mkdtemp()}")
+        options.add_argument(f"--disk-cache-dir={tempfile.mkdtemp()}")
         options.add_experimental_option(
             "prefs", {"download.default_directory": self.download_directory}
         )
