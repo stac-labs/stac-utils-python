@@ -33,7 +33,7 @@ class ChromeDriver:
         if not self.run_locally and not self.binary_location:
             self.binary_location = "/opt/chrome/chrome"
         if not self.run_locally and not self.driver_location:
-            self.binary_location = "/opt/chromedriver"
+            self.driver_location = "/opt/chromedriver"
         elif not self.driver_location:
             self.driver_location = ChromeDriverManager().install()
         self.driver = None
