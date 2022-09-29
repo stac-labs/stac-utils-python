@@ -180,6 +180,46 @@ def auth_sheets(
     return build('sheets', 'v4', credentials=credentials, cache_discovery=False)
 
 
+def get_data_from_sheets(
+    spreadsheet_id: str,
+    range: str,
+    client = None
+) -> List[List]:
+    """Returns the sheet data in the form of a list of lists"""
+
+    if client is None:
+        client = auth_sheets()
+
+    request = client.spreadsheets().values().get(
+        spreadsheetId = spreadsheet_id,
+        range = range
+    )
+    response = request.execute()
+    return response.get('values')
+
+
+def send_data_to_sheets(
+    data: List[List],
+    spreadsheet_id: str,
+    range: str,
+    input_option: str = 'RAW',
+    client = None
+) -> dict:
+    """Posts the data to the Google Sheet and returns the API response"""
+
+    if client is None:
+        client = auth_sheets()
+
+    request = client.spreadsheets().values().update(
+        spreadsheetId = spreadsheet_id,
+        range = range,
+        valueInputOption = input_option,
+        body = { 'values': data }
+    )
+    response = request.execute()
+    return response
+
+
 def _sanitize_name(string: str) -> str:
     valid_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890._"
 
