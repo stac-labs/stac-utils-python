@@ -203,22 +203,32 @@ def send_data_to_sheets(
     spreadsheet_id: str,
     range: str,
     input_option: str = 'RAW',
-    client = None
+    client = None,
+    is_overwrite = True
 ) -> dict:
     """Posts the data to the Google Sheet and returns the API response"""
 
     if client is None:
         client = auth_sheets()
 
-    request = client.spreadsheets().values().update(
-        spreadsheetId = spreadsheet_id,
-        range = range,
-        valueInputOption = input_option,
-        body = { 'values': data }
-    )
+    sheet_modifier = client.spreadsheets().values()
+
+    if is_overwrite:
+        request = sheet_modifier.update(
+            spreadsheetId = spreadsheet_id,
+            range = range,
+            valueInputOption = input_option,
+            body = { 'values': data }
+        )
+    else:
+        request = sheet_modifier.append(
+            spreadsheetId = spreadsheet_id,
+            range = range,
+            valueInputOption = input_option,
+            body = { 'values': data }
+        )
     response = request.execute()
     return response
-
 
 def _sanitize_name(string: str) -> str:
     valid_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890._"
