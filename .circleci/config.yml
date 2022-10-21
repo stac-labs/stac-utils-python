@@ -17,11 +17,10 @@ jobs:
     steps:
       - checkout
       - run: python3 -m pip install -r requirements.txt
-      - release/bump_version
+      - run: python3 -m bumpversion patch
 
 orbs:
   codecov: codecov/codecov@3.2.4
-  release: dialogue/release@2.6.1
 
 workflows:
   testing:
