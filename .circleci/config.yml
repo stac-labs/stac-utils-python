@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   buildandtest:
     docker:
-      - image: cimg/base:stable
+      - image: cimg/python:3.10
     steps:
       - checkout
       - run: python3 -m pip install .
