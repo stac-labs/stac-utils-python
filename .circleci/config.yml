@@ -16,6 +16,7 @@ jobs:
       - image: cimg/python:3.10
     steps:
       - checkout
+      - run: git fetch origin main
       # - run: python3 -m pip install -r requirements.txt
       - run: git diff origin/main setup.cfg | grep "+version" | grep -o "\d.*\d"
       - run: NEW_VERSION=$(git diff origin/main setup.cfg | grep "+version" | grep -o "\d.*\d")
