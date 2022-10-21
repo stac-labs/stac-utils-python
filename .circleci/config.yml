@@ -21,7 +21,7 @@ jobs:
           name: tag new version which should exist
           command: |
             git diff origin/main setup.cfg | grep "+version" | grep -o "\d.*\d"
-            echo "hi"
+# echo "hi"
 # NEW_VERSION=$(git diff origin/main setup.cfg | grep "+version" | grep -o "\d.*\d")
 # echo "hey"
 # echo ${NEW_VERSION}
