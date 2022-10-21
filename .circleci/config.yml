@@ -20,12 +20,14 @@ jobs:
       - run:
           name: tag new version which should exist
           command: |
-            git diff origin/main setup.cfg | grep "+version"
-            VERSION=$(git diff origin/main setup.cfg | grep "+version" | grep -o "\d.*\d")
-            echo ${VERSION}
+            git diff origin/main setup.cfg | grep "+version" | grep -o "\d.*\d"
+            echo "hi"
+            NEW_VERSION=$(git diff origin/main setup.cfg | grep "+version" | grep -o "\d.*\d")
+            echo "hey"
+            echo ${NEW_VERSION}
             git config user.email "engineering@staclabs.io"
             git config user.name "stac engineering"
-            git tag "v${VERSION}"
+            git tag "v${NEW_VERSION}"
             git push origin --tags
             
 # python3 -m bumpversion patch
