@@ -3,11 +3,14 @@ version: 2.1
 jobs:
   buildandtest:
     docker:
-      - image: 'cimg/base:stable'
+      - image: cimg/base:stable
     steps:
       - checkout
       - run: python3 -m pip install .
       - run: python3 -m pytest
+
+orbs:
+  codecov: codecov/codecov
 
 workflows:
   main:
