@@ -8,9 +8,8 @@ jobs:
       - checkout
       - run: python3 -m pip install .
       - run: python3 -m pip install -r requirements.txt
-      - run: python -m pytest --cov
-      - codecov/upload:
-          file: '.coverage'
+      - run: python -m pytest --cov --cov-report xml
+      - codecov/upload
 
 orbs:
   codecov: codecov/codecov@3.2.4
@@ -18,8 +17,5 @@ orbs:
 workflows:
   mergeToMain:
     jobs:
-      - buildandtest:
-          filters:
-            branches:
-              ignore: main
+      - buildandtest
 #TODO versioning
