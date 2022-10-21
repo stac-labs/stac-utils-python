@@ -8,15 +8,17 @@ jobs:
       - checkout
       - run: python3 -m pip install .
       - run: python3 -m pytest
+      - codecov/upload
 
 orbs:
-  codecov: codecov/codecov
+  codecov: codecov/codecov@3.2.4
 
 workflows:
   main:
     jobs:
       - buildandtest:
-        context: CodeCov
+        context:
+          - CodeCov
         filters:
           branches:
             ignore: main
