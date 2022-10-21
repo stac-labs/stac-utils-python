@@ -32,7 +32,8 @@ workflows:
       - tagAndRelease: # TODO REMOVE
           filters:
             <<: *filters-testing
-          requires: buildAndTest
+          requires:
+            - buildAndTest
   
   production:
     jobs:
@@ -43,4 +44,5 @@ workflows:
       - tagAndRelease:
           filters:
             <<: *filters-production
-          requires: buildAndTest
+          requires:
+            - buildAndTest
