@@ -1,0 +1,72 @@
+version: 2.1
+
+jobs:
+  buildAndTest:
+    docker:
+      - image: cimg/python:3.10
+    steps:
+      - checkout
+      - run: python3 -m pip install .
+      - run: python3 -m pip install -r requirements.txt
+      - run: python3 -m pytest --cov src/ --cov-report xml
+      - codecov/upload
+  
+  tagToVersion:
+    docker:
+      - image: cimg/python:3.10
+    steps:
+      - checkout
+      - run: git fetch origin main
+      # - run: python3 -m pip install -r requirements.txt
+      - run: git diff FETCH_HEAD setup.cfg | grep "+version" | grep -o "\d.*\d"
+      - run: NEW_VERSION=$(git diff origin/main setup.cfg | grep "+version" | grep -o "\d.*\d")
+      - run: echo "found new version different from main ${NEW_VERSION}"
+      - run:
+          name: tag new version
+          command: |
+            git config user.email "engineering@staclabs.io"
+            git config user.name "stac engineering"
+            git tag "v${NEW_VERSION}"
+            git push origin --tags
+
+# echo "hi"
+# NEW_VERSION=$(git diff origin/main setup.cfg | grep "+version" | grep -o "\d.*\d")
+# echo "hey"
+# echo ${NEW_VERSION}
+# git config user.email "engineering@staclabs.io"
+# git config user.name "stac engineering"
+# git tag "v${NEW_VERSION}"
+# git push origin --tags
+            
+# python3 -m bumpversion patch
+# git config --add --bool push.autoSetupRemote true
+# git push && git push --tags
+
+orbs:
+  codecov: codecov/codecov@3.2.4
+
+workflows:
+  testing:
+    jobs:
+      # - buildAndTest:
+      #     filters:
+      #       branches:
+      #         ignore: main
+      - tagToVersion: # TODO REMOVE
+          filters: &filters-testing
+            branches:
+              ignore: main
+      #     requires:
+      #       - buildAndTest
+  
+  production:
+    jobs:
+      - buildAndTest:
+          filters: &filters-production
+            branches:
+              only: main
+      - tagToVersion:
+          filters:
+            <<: *filters-production
+          requires:
+            - buildAndTest
