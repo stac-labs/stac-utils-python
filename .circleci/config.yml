@@ -1,0 +1,22 @@
+version: 2.1
+
+jobs:
+  buildandtest:
+    docker:
+      - image: 'cimg/base:stable'
+    steps:
+      - checkout
+      - run: python3 -m pip install .
+      - run: python3 -m pytest
+
+workflows:
+  main:
+    jobs:
+      - buildandtest
+        context:
+          - CodeCov
+        filters:
+          branches:
+            ignore:
+              - main
+#TODO versioning
