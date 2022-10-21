@@ -17,6 +17,5 @@ workflows:
           - CodeCov
         filters:
           branches:
-            ignore:
-              - main
+            ignore: main
 #TODO versioning
