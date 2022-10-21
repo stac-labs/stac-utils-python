@@ -17,7 +17,7 @@ jobs:
     steps:
       - checkout
       - run: python3 -m pip install -r requirements.txt
-      - run: bumpversion part setup.cfg
+      - run: python3 -m bumpversion part setup.cfg
 
 orbs:
   codecov: codecov/codecov@3.2.4
