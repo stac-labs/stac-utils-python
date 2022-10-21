@@ -16,7 +16,7 @@ jobs:
       - image: cimg/python:3.10
     steps:
       - checkout
-      - run: sh update_version.sh
+      - run: bash update_version.sh
       # TODO make sure the version in cfg matches
 
 orbs:
