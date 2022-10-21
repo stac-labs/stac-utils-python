@@ -8,7 +8,7 @@ jobs:
       - checkout
       - run: python3 -m pip install .
       - run: python3 -m pip install -r requirements.txt
-      - run: python -m pytest --cov --cov-report xml
+      - run: python3 -m pytest --cov --cov-report xml
       - codecov/upload
   
   tagAndRelease:
@@ -16,8 +16,8 @@ jobs:
       - image: cimg/python:3.10
     steps:
       - checkout
-      - run: bash update_version.sh
-      # TODO make sure the version in cfg matches
+      - run: python3 -m pip install -r requirements.txt
+      - run: python3 -m bump
 
 orbs:
   codecov: codecov/codecov@3.2.4
