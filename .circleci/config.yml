@@ -40,6 +40,8 @@ workflows:
           filters: &filters-testing
             branches:
               ignore: main
+            tags:
+              ignore: /.*/
           # requires:
           #   - buildAndTest
   
@@ -49,6 +51,8 @@ workflows:
           filters: &filters-production
             branches:
               only: main
+            tags:
+              ignore: /.*/
       - tagAndRelease:
           filters:
             <<: *filters-production
