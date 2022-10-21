@@ -22,7 +22,7 @@ jobs:
           command: |
             git config user.email "engineering@staclabs.io"
             git config user.name "stac engineering"
-            python3 -m bumpversion --tag-message '[ci skip] Bump version {current_version} → {new_version}' patch
+            python3 -m bumpversion --tag-message '[ci skip] Bump version {new_version}' patch
             git config --add --bool push.autoSetupRemote true
             git push && git push --tags
 
