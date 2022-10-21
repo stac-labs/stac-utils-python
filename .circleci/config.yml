@@ -17,7 +17,7 @@ jobs:
     steps:
       - checkout
       - run: python3 -m pip install -r requirements.txt
-      - run: python3 -m bump
+      - run: bumpversion part setup.cfg
 
 orbs:
   codecov: codecov/codecov@3.2.4
@@ -25,15 +25,16 @@ orbs:
 workflows:
   testing:
     jobs:
-      - buildAndTest:
+      # - buildAndTest:
+      #     filters:
+      #       branches:
+      #         ignore: main
+      - tagAndRelease: # TODO REMOVE
           filters: &filters-testing
             branches:
               ignore: main
-      - tagAndRelease: # TODO REMOVE
-          filters:
-            <<: *filters-testing
-          requires:
-            - buildAndTest
+          # requires:
+          #   - buildAndTest
   
   production:
     jobs:
