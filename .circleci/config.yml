@@ -18,7 +18,7 @@ jobs:
       - checkout
       - run: git fetch origin main
       # - run: python3 -m pip install -r requirements.txt
-      - run: git diff main setup.cfg | grep "+version" | grep -o "\d.*\d"
+      - run: git diff FETCH_HEAD setup.cfg | grep "+version" | grep -o "\d.*\d"
       - run: NEW_VERSION=$(git diff origin/main setup.cfg | grep "+version" | grep -o "\d.*\d")
       - run: echo "found new version different from main ${NEW_VERSION}"
       - run:
