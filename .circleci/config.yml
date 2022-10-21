@@ -37,12 +37,12 @@ workflows:
           filters:
             branches:
               ignore: main
-      - tagAndRelease: # TODO REMOVE
-          filters: &filters-testing
-            branches:
-              ignore: main
-          requires:
-            - buildAndTest
+      # - tagAndRelease: # TODO REMOVE
+      #     filters: &filters-testing
+      #       branches:
+      #         ignore: main
+      #     requires:
+      #       - buildAndTest
   
   production:
     jobs:
