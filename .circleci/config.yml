@@ -8,7 +8,7 @@ jobs:
       - checkout
       - run: python3 -m pip install .
       - run: python3 -m pip install -r requirements.txt
-      - run: python3 -m pytest --cov --cov-report xml
+      - run: python3 -m pytest --cov src/ --cov-report xml
       - codecov/upload
   
   tagAndRelease:
@@ -23,8 +23,9 @@ jobs:
             git config user.email "engineering@staclabs.io"
             git config user.name "stac engineering"
             python3 -m bumpversion patch
-            git config --add --bool push.autoSetupRemote true
-            git push && git push --tags
+
+# git config --add --bool push.autoSetupRemote true
+# git push && git push --tags
 
 orbs:
   codecov: codecov/codecov@3.2.4
@@ -32,18 +33,16 @@ orbs:
 workflows:
   testing:
     jobs:
-      # - buildAndTest:
-      #     filters:
-      #       branches:
-      #         ignore: main
+      - buildAndTest:
+          filters:
+            branches:
+              ignore: main
       - tagAndRelease: # TODO REMOVE
           filters: &filters-testing
             branches:
               ignore: main
-            tags:
-              ignore: /.*/
-          # requires:
-          #   - buildAndTest
+          requires:
+            - buildAndTest
   
   production:
     jobs:
@@ -51,8 +50,6 @@ workflows:
           filters: &filters-production
             branches:
               only: main
-            tags:
-              ignore: /.*/
       - tagAndRelease:
           filters:
             <<: *filters-production
