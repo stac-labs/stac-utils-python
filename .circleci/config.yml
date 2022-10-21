@@ -20,7 +20,11 @@ jobs:
       - run:
           name: tag new version which should exist
           command: |
-            git diff origin/main setup.cfg | grep "+version" | grep -o "\d.*\d"
+            NEW_VERSION=$(git diff origin/main setup.cfg | grep "+version" | grep -o "\d.*\d")
+            git config user.email "engineering@staclabs.io"
+            git config user.name "stac engineering"
+            git tag "v${NEW_VERSION}"
+            git push origin --tags
 # echo "hi"
 # NEW_VERSION=$(git diff origin/main setup.cfg | grep "+version" | grep -o "\d.*\d")
 # echo "hey"
