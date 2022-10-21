@@ -17,9 +17,8 @@ workflows:
   main:
     jobs:
       - buildandtest:
-        context:
-          - CodeCov
-        filters:
-          branches:
-            ignore: main
+          context: CodeCov
+          filters:
+            branches:
+              ignore: main
 #TODO versioning
