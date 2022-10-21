@@ -22,13 +22,13 @@ jobs:
           command: |
             git diff origin/main setup.cfg | grep "+version" | grep -o "\d.*\d"
             echo "hi"
-            NEW_VERSION=$(git diff origin/main setup.cfg | grep "+version" | grep -o "\d.*\d")
-            echo "hey"
-            echo ${NEW_VERSION}
-            git config user.email "engineering@staclabs.io"
-            git config user.name "stac engineering"
-            git tag "v${NEW_VERSION}"
-            git push origin --tags
+            # NEW_VERSION=$(git diff origin/main setup.cfg | grep "+version" | grep -o "\d.*\d")
+            # echo "hey"
+            # echo ${NEW_VERSION}
+            # git config user.email "engineering@staclabs.io"
+            # git config user.name "stac engineering"
+            # git tag "v${NEW_VERSION}"
+            # git push origin --tags
             
 # python3 -m bumpversion patch
 # git config --add --bool push.autoSetupRemote true
