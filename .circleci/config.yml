@@ -23,6 +23,7 @@ jobs:
             git config user.email "engineering@staclabs.io"
             git config user.name "stac engineering"
             python3 -m bumpversion patch
+            git push origin --tags
 
 orbs:
   codecov: codecov/codecov@3.2.4
