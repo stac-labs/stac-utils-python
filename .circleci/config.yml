@@ -36,12 +36,6 @@ workflows:
           filters:
             branches:
               ignore: main
-      - tagToVersion: # TODO REMOVE
-          filters: &filters-testing
-            branches:
-              ignore: main
-          requires:
-            - buildAndTest
   
   production:
     jobs:
