@@ -35,14 +35,14 @@ orbs:
 workflows:
   testing:
     jobs:
-      - buildAndTest:
-          filters:
-            branches:
-              ignore: main
-      # - tagAndRelease: # TODO REMOVE
-      #     filters: &filters-testing
+      # - buildAndTest:
+      #     filters:
       #       branches:
       #         ignore: main
+      - tagAndRelease: # TODO REMOVE
+          filters: &filters-testing
+            branches:
+              ignore: main
       #     requires:
       #       - buildAndTest
   
