@@ -15,37 +15,16 @@ jobs:
     docker:
       - image: cimg/python:3.10
     steps:
-      # - checkout
+      - checkout
+      - run: python3 -m pip install -r requirements.txt
       - run:
-          name: get main branch to compare versions
-          command: |
-            git clone https://github.com/stac-labs/stac-utils-python.git
-            git checkout $CIRCLE_BRANCH
-            git diff main setup.cfg
-      # - run: python3 -m pip install -r requirements.txt
-      - run: git diff main setup.cfg | grep "+version" | grep -o "\d.*\d"
-      - run: NEW_VERSION=$(git diff origin/main setup.cfg | grep "+version" | grep -o "\d.*\d")
-      - run: echo "found new version different from main ${NEW_VERSION}"
-      - run:
-          name: tag new version
+          name: bump version
           command: |
             git config user.email "engineering@staclabs.io"
             git config user.name "stac engineering"
-            git tag "v${NEW_VERSION}"
-            git push origin --tags
-
-# echo "hi"
-# NEW_VERSION=$(git diff origin/main setup.cfg | grep "+version" | grep -o "\d.*\d")
-# echo "hey"
-# echo ${NEW_VERSION}
-# git config user.email "engineering@staclabs.io"
-# git config user.name "stac engineering"
-# git tag "v${NEW_VERSION}"
-# git push origin --tags
-            
-# python3 -m bumpversion patch
-# git config --add --bool push.autoSetupRemote true
-# git push && git push --tags
+            python3 -m bumpversion patch
+            git config --add --bool push.autoSetupRemote true
+            git push && git push --tags
 
 orbs:
   codecov: codecov/codecov@3.2.4
