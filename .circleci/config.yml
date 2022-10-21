@@ -23,7 +23,8 @@ jobs:
             VERSION=$(git diff main setup.cfg | grep "+version" | grep -o "\d.*\d")
             git config user.email "engineering@staclabs.io"
             git config user.name "stac engineering"
-            git tag v${VERSION}
+            git tag "v${VERSION}"
+            git push origin --tags
             
 # python3 -m bumpversion patch
 # git config --add --bool push.autoSetupRemote true
