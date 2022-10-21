@@ -12,7 +12,7 @@ jobs:
 workflows:
   main:
     jobs:
-      - buildandtest
+      - buildandtest:
         context:
           - CodeCov
         filters:
