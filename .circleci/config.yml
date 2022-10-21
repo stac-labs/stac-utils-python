@@ -17,7 +17,12 @@ jobs:
     steps:
       - checkout
       - run: python3 -m pip install -r requirements.txt
-      - run: python3 -m bumpversion patch
+      - run:
+          name: bump version
+          command: |
+            git config user.email "engineering@staclabs.io"
+            git config user.name "stac engineering"
+            python3 -m bumpversion patch
 
 orbs:
   codecov: codecov/codecov@3.2.4
