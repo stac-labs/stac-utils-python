@@ -7,10 +7,9 @@ jobs:
     steps:
       - checkout
       - run: python3 -m pip install .
-      - run: python3 -m pip install pytest
-      - run: python3 -m pytest
-      - codecov/upload:
-          file: './coverage/integration/clover.xml'
+      - run: python3 -m pip install -r requirements.txt
+      - run: python -m pytest --cov
+      - codecov/upload
 
 orbs:
   codecov: codecov/codecov@3.2.4
