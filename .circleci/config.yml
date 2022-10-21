@@ -18,9 +18,10 @@ jobs:
       - checkout
       - run: python3 -m pip install -r requirements.txt
       - run:
-          name: bump version
+          name: tag new version which should exist
           command: |
             VERSION=$(git diff main setup.cfg | grep "+version" | grep -o "\d.*\d")
+            echo ${VERSION}
             git config user.email "engineering@staclabs.io"
             git config user.name "stac engineering"
             git tag "v${VERSION}"
