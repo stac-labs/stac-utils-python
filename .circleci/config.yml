@@ -1,7 +1,7 @@
 version: 2.1
 
 jobs:
-  buildandtest:
+  buildAndTest:
     docker:
       - image: cimg/python:3.10
     steps:
@@ -10,12 +10,37 @@ jobs:
       - run: python3 -m pip install -r requirements.txt
       - run: python -m pytest --cov --cov-report xml
       - codecov/upload
+  
+  tagAndRelease:
+    docker:
+      - image: cimg/python:3.10
+    steps:
+      - checkout
+      - run: sh update_version.sh
+      # TODO make sure the version in cfg matches
 
 orbs:
   codecov: codecov/codecov@3.2.4
 
 workflows:
-  mergeToMain:
+  testing:
     jobs:
-      - buildandtest
-#TODO versioning
+      - buildAndTest:
+          filters: &filters-testing
+            branches:
+              ignore: main
+      - tagAndRelease: # TODO REMOVE
+          filters:
+            <<: *filters-testing
+          requires: buildAndTest
+  
+  production:
+    jobs:
+      - buildAndTest:
+          filters: &filters-production
+            branches:
+              only: main
+      - tagAndRelease:
+          filters:
+            <<: *filters-production
+          requires: buildAndTest
