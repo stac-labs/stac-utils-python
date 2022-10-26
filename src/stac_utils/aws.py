@@ -42,7 +42,6 @@ def load_from_s3(bucket: str, path: str, file_name: str) -> Dict:
             data = json.load(open(temp_file))
         except ClientError as e:
             if "ExpiredToken" in str(e):
-                # TODO: check for other permissions issues here
                 raise e
             data = {}
         except json.JSONDecodeError:
