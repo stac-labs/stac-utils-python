@@ -2,7 +2,7 @@ import json
 import readline # necessary to support service account length inputs
 
 from enum import Enum
-from src.stac_utils.truthy import truthy
+from .truthy import truthy
 
 class SecretsJSONFactory:
     def __init__(self, secret_name: str, json_inputs: Enum):
