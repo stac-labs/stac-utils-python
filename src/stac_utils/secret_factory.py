@@ -95,3 +95,8 @@ class SecretsJSONFactory:
     def write_json(self):
         with open(self.filename, "w") as outfile:
             json.dump(self.json, outfile)
+
+def build_secrets_json(name: str, json_inputs: Enum):
+    secrets = SecretsJSONFactory(name, json_inputs)
+    secrets.build_json()
+    secrets.write_json()
