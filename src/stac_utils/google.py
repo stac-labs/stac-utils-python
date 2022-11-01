@@ -106,17 +106,20 @@ def create_table_from_dataframe(
     table_name: str
 ):
     column_name_conversion = {}
-    for column in dataframe.columns:
-        column_name_conversion[column] = underscore(parameterize(column))
-    dataframe.rename(columns = column_name_conversion, inplace = True)
     column_definitions = []
-    for column_type in dataframe.dtypes:
-        if (column_type[1] == "object"):
-            column_definitions.append(f"{column_type[1]} STRING")
-        elif (column_type[1] == "int64"):
-            column_definitions.append(f"{column_type[1]} NUMBER")
+    for columnIndex in range(len(dataframe.columns)):
+        column_name = dataframe.columns[columnIndex]
+        db_column_name = underscore(parameterize(column_name))
+        column_name_conversion[column_name] = db_column_name
+        datatype = dataframe.dtypes[columnIndex].name
+        if (datatype == "object"):
+            column_definitions.append(f"{db_column_name} STRING")
+        elif (datatype == "int64"):
+            column_definitions.append(f"{db_column_name} NUMBER")
         else:
-            raise ValueError(f"Unknown column type {column_type}")
+            raise ValueError(f"Unknown data type {datatype} on column {column_name}")
+
+    dataframe.rename(columns = column_name_conversion, inplace = True)
     table_definition_sql = f"""
         DROP TABLE {project_name}.{dataset_name}.{table_name} IF EXISTS
         ;
