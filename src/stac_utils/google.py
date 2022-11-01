@@ -2,6 +2,7 @@ import json
 import os
 import sys
 
+from inflection import parameterize, underscore
 from typing import Any, List, Union, Mapping, Sequence
 
 from google.cloud import storage, bigquery
@@ -96,6 +97,40 @@ def get_table(
 
     return results
 
+
+def create_table_from_dataframe(
+    client: bigquery.Client,
+    dataframe: Any,
+    project_name: str,
+    dataset_name: str,
+    table_name: str
+):
+    column_name_conversion = {}
+    for column in dataframe.columns:
+        column_name_conversion[column] = underscore(parameterize(column))
+    dataframe.rename(columns = column_name_conversion, inplace = True)
+    column_definitions = []
+    for column_type in dataframe.dtypes:
+        if (column_type[1] == "object"):
+            column_definitions.append(f"{column_type[1]} STRING")
+        elif (column_type[1] == "int64"):
+            column_definitions.append(f"{column_type[1]} NUMBER")
+        else:
+            raise ValueError(f"Unknown column type {column_type}")
+    table_definition_sql = f"""
+        DROP TABLE {project_name}.{dataset_name}.{table_name} IF EXISTS
+        ;
+        CREATE TABLE {project_name}.{dataset_name}.{table_name} {
+            column_definitions.join(", ")
+        }
+    """
+    run_query(table_definition_sql, client = client)
+    load_data_from_dataframe(
+        client,
+        dataframe,
+        project_name,
+        dataset_name,
+        table_name)
 
 def load_data_from_dataframe(
     client: bigquery.Client,
