@@ -123,10 +123,11 @@ def create_table_from_dataframe(
     table_definition_sql = f"""
         DROP TABLE {project_name}.{dataset_name}.{table_name} IF EXISTS
         ;
-        CREATE TABLE {project_name}.{dataset_name}.{table_name} {
-            ", ".join(column_definitions)
-        }
+        CREATE TABLE {project_name}.{dataset_name}.{table_name} ( 
+            {", ".join(column_definitions)}
+        )
     """
+    print(table_definition_sql)
     run_query(table_definition_sql, client = client)
     load_data_from_dataframe(
         client,
