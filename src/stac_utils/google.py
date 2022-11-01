@@ -124,7 +124,7 @@ def create_table_from_dataframe(
         DROP TABLE {project_name}.{dataset_name}.{table_name} IF EXISTS
         ;
         CREATE TABLE {project_name}.{dataset_name}.{table_name} {
-            column_definitions.join(", ")
+            ", ".join(column_definitions)
         }
     """
     run_query(table_definition_sql, client = client)
