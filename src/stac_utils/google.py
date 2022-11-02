@@ -116,6 +116,8 @@ def create_table_from_dataframe(
             column_definitions.append(f"{db_column_name} STRING")
         elif (datatype == "int64"):
             column_definitions.append(f"{db_column_name} INT64")
+        elif (datatype == "float64"):
+            column_definitions.append(f"{db_column_name} NUMERIC")
         else:
             raise ValueError(f"Unknown data type {datatype} on column {column_name}")
 
