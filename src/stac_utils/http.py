@@ -209,3 +209,13 @@ class HTTPClient(Client):
         """Clean up step to free memory that wouldn't normally be
         garbage collected (ie: soup.decompose() for BeautifulSoup)
         """
+
+    def check_for_error(self, *args, **kwargs):
+        """Check a valid API response for error messages
+        and raise an exception as needed
+        """
+
+    def transform_response(self, response: requests.Response, **kwargs) -> Any:
+        """Transform the response from the API"""
+
+        return response.content
