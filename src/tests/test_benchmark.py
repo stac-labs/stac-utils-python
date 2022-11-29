@@ -5,18 +5,17 @@ from src.stac_utils.benchmark import make_msg, benchmark, Benchmark
 
 class TestBenchmark(unittest.TestCase):
     def test_make_msg(self):
-        """ Test make message """
+        """Test make message"""
 
     def test_benchmark_decorator(self):
-        """ Test benchmark decorator"""
+        """Test benchmark decorator"""
 
     def test_benchmark_class_init(self):
-        """ Test Benchmark class init """
+        """Test Benchmark class init"""
 
     def test_benchmark_class_context(self):
-        """ Test Benchmark class """
+        """Test Benchmark class"""
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
