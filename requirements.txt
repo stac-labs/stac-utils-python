@@ -1,7 +1,0 @@
-.
-pytest
-pytest-cov
-pytest-runner
-build
-bumpversion
-inflection
