@@ -5,3 +5,6 @@ pytest-runner
 build
 bumpversion
 inflection
+pandas
+selenium
+webdriver-manager @ git+https://github.com/SergeyPirogov/webdriver_manager.git

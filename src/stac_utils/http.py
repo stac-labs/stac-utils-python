@@ -84,9 +84,10 @@ class HTTPClient(Client):
         rate_wait = self.check_response_for_rate_limit(response)
 
         if rate_wait is None:
-            requests_made, window = self.rate_limits.get(endpoint)
+            rate_limit = self.rate_limits.get(endpoint)
 
-            if requests_made and window:
+            if rate_limit:
+                requests_made, window = rate_limit
                 rate_wait = window * 60 / requests_made
             else:
                 rate_wait = self.retry_wait
@@ -186,6 +187,9 @@ class HTTPClient(Client):
     def update(self, *args, **kwargs):
         return self.call_api("UPDATE", *args, **kwargs)
 
+    def patch(self, *args, **kwargs):
+        return self.call_api("PATCH", *args, **kwargs)
+
     def update_rate_limits(self) -> Dict[str, Tuple[int, int]]:
         """Update the rate limits for the API
         This could be a static function or calling the API
@@ -209,3 +213,13 @@ class HTTPClient(Client):
         """Clean up step to free memory that wouldn't normally be
         garbage collected (ie: soup.decompose() for BeautifulSoup)
         """
+
+    def check_for_error(self, *args, **kwargs):
+        """Check a valid API response for error messages
+        and raise an exception as needed
+        """
+
+    def transform_response(self, response: requests.Response, **kwargs) -> Any:
+        """Transform the response from the API"""
+
+        return response.content
