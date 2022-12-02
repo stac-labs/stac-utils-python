@@ -15,7 +15,7 @@ where `version` can be used to match a tag for the version of the code you'd lik
 
 ## Development
 
-Run `pip install -r requirements.local.txt` to install dependencies into your virtual environment necessary for development and local testing.
+Run `pip install -r requirements.txt` to install dependencies into your virtual environment necessary for development and local testing.
 
 Run `python -m build .` to build both a `.tar` and `.whl` package in the `dist` folder.
 
