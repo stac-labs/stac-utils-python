@@ -13,6 +13,8 @@ from inflection import parameterize, underscore
 
 from .listify import listify
 
+RETRY_EXCEPTIONS = [InternalServerError]
+
 
 def get_credentials(
     service_account_blob: Mapping = None,
@@ -78,7 +80,7 @@ def run_query(
         )
         client = bigquery.Client(credentials=credentials)
 
-    retry_policy = Retry(predicate=if_exception_type(InternalServerError))
+    retry_policy = Retry(predicate=if_exception_type(*RETRY_EXCEPTIONS))
     job = client.query(sql, retry=retry_policy).result()
 
     results = [{k: v for k, v in row.items()} for row in job]
@@ -142,7 +144,7 @@ def create_table_from_dataframe(
     load_data_from_dataframe(client, dataframe, project_name, dataset_name, table_name)
 
 
-@Retry(predicate=if_exception_type(InternalServerError))
+@Retry(predicate=if_exception_type(*RETRY_EXCEPTIONS))
 def load_data_from_dataframe(
     client: bigquery.Client,
     dataframe: Any,
