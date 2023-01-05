@@ -1,15 +1,40 @@
 import json
 import os
 import sys
+import time
 
 from inflection import parameterize, underscore
-from typing import Any, List, Union, Mapping, Sequence
+from typing import Any, List, Union, Mapping, Sequence, Callable
 
 from google.cloud import storage, bigquery
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
 from .listify import listify
+
+
+MAX_RETRIES = 5
+
+
+def backoff(bigquery_function: Callable) -> Callable:
+    def wrapper(*args, **kwargs):
+        fails = 0
+        result = None
+        while True:
+            try:
+                result = bigquery_function(*args, **kwargs)
+                break
+            except Exception as e:
+                print(e)
+                fails += 1
+                if fails > MAX_RETRIES:
+                    raise e
+                wait = 2 ** fails
+                print(f"Retrying after {wait} seconds...")
+                time.sleep(wait)
+                continue
+        return result
+    return wrapper
 
 
 def get_credentials(
