@@ -125,7 +125,7 @@ class TestHTTPClient(unittest.TestCase):
             test_client = HTTPClient()
             test_client.base_url = test_base_url
             result_url = test_client.format_url(test_endpoint)
-            self.assertEquals(expected_url, result_url)
+            self.assertEqual(expected_url, result_url)
 
     def test_call_api(self):
         """Test call api"""
@@ -209,7 +209,7 @@ class TestHTTPClient(unittest.TestCase):
         expected_transform = "FOO"
         mock_response.content = expected_transform
         result_transform = test_client.transform_response(mock_response)
-        self.assertEquals(result_transform, expected_transform)
+        self.assertEqual(result_transform, expected_transform)
 
 
 if __name__ == "__main__":

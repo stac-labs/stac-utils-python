@@ -1,5 +1,5 @@
+import json
 import os
-from typing import List
 import requests
 
 from . import listify
@@ -21,19 +21,27 @@ class Emailer:
     def send_email(
         self,
         subject: str,
-        body: str,
-        emails: List[str],
+        body: str = None,
+        emails: list[str] = None,
         from_addr: str = None,
         reply_to: str = None,
+        template: str = None,
+        variables: dict = None,
     ):
         email_data = {
             "to": ",".join(emails),
             "from": from_addr or self.from_addr,
             "subject": subject,
-            "text": "",
-            "html": body,
             "h:Reply-to": listify(reply_to) or self.reply_to,
         }
+
+        if body:
+            email_data["html"] = body
+        elif template and variables:
+            email_data["template"] = template
+            email_data["t:variables"] = json.dumps(variables)
+        else:
+            raise ValueError("body or template must be provided")
 
         request_url = f"https://api.mailgun.net/v3/{self.domain}/messages"
 
