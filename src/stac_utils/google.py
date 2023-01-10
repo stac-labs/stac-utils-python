@@ -63,6 +63,7 @@ def run_query(
     service_account_blob: Mapping[str, str] = None,
     subject: str = None,
     client: bigquery.Client = None,
+    retry_exceptions: list = None,
 ) -> List[dict]:
     """Performs a SQL query in BigQuery"""
     if not client:
@@ -79,8 +80,9 @@ def run_query(
             service_account_blob, scopes=["bigquery", "drive"], subject=subject
         )
         client = bigquery.Client(credentials=credentials)
+    retry_exceptions = retry_exceptions or RETRY_EXCEPTIONS
 
-    retry_policy = Retry(predicate=if_exception_type(*RETRY_EXCEPTIONS))
+    retry_policy = Retry(predicate=if_exception_type(*retry_exceptions))
     job = client.query(sql, retry=retry_policy).result()
 
     results = [{k: v for k, v in row.items()} for row in job]
