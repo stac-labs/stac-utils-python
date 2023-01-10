@@ -16,3 +16,8 @@ def parse_date_for_tz(value: str) -> datetime:
 def get_today_tz() -> datetime:
     """Shortcut for getting today's date in the timezone specified by the 'TIMEZONE' environment variable"""
     return _today(timezone)
+
+
+def get_now_tz() -> datetime:
+    """Shortcut for getting the current time in the timezone specified by the 'TIMEZONE' environment variable"""
+    return datetime.now(timezone)
