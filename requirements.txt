@@ -4,6 +4,7 @@ pytest-cov
 pytest-runner
 build
 bumpversion
+freezegun
 pandas
 selenium
 webdriver-manager
