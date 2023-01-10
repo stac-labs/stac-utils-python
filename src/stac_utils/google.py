@@ -1,15 +1,19 @@
 import json
 import os
 import sys
-
-from inflection import parameterize, underscore
 from typing import Any, List, Union, Mapping, Sequence
 
 from google.cloud import storage, bigquery
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
+from google.api_core.retry import if_exception_type, Retry
+from google.api_core.exceptions import InternalServerError
+from inflection import parameterize, underscore
+
 
 from .listify import listify
+
+RETRY_EXCEPTIONS = [InternalServerError]
 
 
 def get_credentials(
@@ -55,13 +59,19 @@ def auth_bq() -> bigquery.Client:
 
 
 def run_query(
-    sql: str, service_account_blob: Mapping[str, str] = None, subject: str = None, client: bigquery.Client = None,
+    sql: str,
+    service_account_blob: Mapping[str, str] = None,
+    subject: str = None,
+    client: bigquery.Client = None,
+    retry_exceptions: list = None,
 ) -> List[dict]:
     """Performs a SQL query in BigQuery"""
     if not client:
         if not service_account_blob:
             try:
-                service_account_string = os.environ.get("BQ_SERVICE_ACCOUNT") or os.environ.get("SERVICE_ACCOUNT")
+                service_account_string = os.environ.get(
+                    "BQ_SERVICE_ACCOUNT"
+                ) or os.environ.get("SERVICE_ACCOUNT")
                 service_account_blob = json.loads(service_account_string)
             except (json.JSONDecodeError, KeyError) as error:
                 raise Exception("Service account did not load correctly", error)
@@ -70,8 +80,10 @@ def run_query(
             service_account_blob, scopes=["bigquery", "drive"], subject=subject
         )
         client = bigquery.Client(credentials=credentials)
+    retry_exceptions = retry_exceptions or RETRY_EXCEPTIONS
 
-    job = client.query(sql).result()
+    retry_policy = Retry(predicate=if_exception_type(*retry_exceptions))
+    job = client.query(sql, retry=retry_policy).result()
 
     results = [{k: v for k, v in row.items()} for row in job]
 
@@ -103,7 +115,7 @@ def create_table_from_dataframe(
     dataframe: Any,
     project_name: str,
     dataset_name: str,
-    table_name: str
+    table_name: str,
 ):
     column_name_conversion = {}
     column_definitions = []
@@ -112,16 +124,16 @@ def create_table_from_dataframe(
         db_column_name = underscore(parameterize(column_name))
         column_name_conversion[column_name] = db_column_name
         datatype = dataframe.dtypes[columnIndex].name
-        if (datatype == "object"):
+        if datatype == "object":
             column_definitions.append(f"{db_column_name} STRING")
-        elif (datatype == "int64"):
+        elif datatype == "int64":
             column_definitions.append(f"{db_column_name} INT64")
-        elif (datatype == "float64"):
+        elif datatype == "float64":
             column_definitions.append(f"{db_column_name} NUMERIC")
         else:
             raise ValueError(f"Unknown data type {datatype} on column {column_name}")
 
-    dataframe.rename(columns = column_name_conversion, inplace = True)
+    dataframe.rename(columns=column_name_conversion, inplace=True)
     table_definition_sql = f"""
         DROP TABLE IF EXISTS {project_name}.{dataset_name}.{table_name} 
         ;
@@ -130,14 +142,11 @@ def create_table_from_dataframe(
         )
     """
     print(table_definition_sql)
-    run_query(table_definition_sql, client = client)
-    load_data_from_dataframe(
-        client,
-        dataframe,
-        project_name,
-        dataset_name,
-        table_name)
+    run_query(table_definition_sql, client=client)
+    load_data_from_dataframe(client, dataframe, project_name, dataset_name, table_name)
 
+
+@Retry(predicate=if_exception_type(*RETRY_EXCEPTIONS))
 def load_data_from_dataframe(
     client: bigquery.Client,
     dataframe: Any,
@@ -218,34 +227,29 @@ def auth_sheets(
     scopes = scopes or ["drive"]
     credentials = get_credentials(service_account_blob, scopes=scopes, subject=subject)
 
-    return build('sheets', 'v4', credentials=credentials, cache_discovery=False)
+    return build("sheets", "v4", credentials=credentials, cache_discovery=False)
 
 
-def get_data_from_sheets(
-    spreadsheet_id: str,
-    range: str,
-    client = None
-) -> List[List]:
+def get_data_from_sheets(spreadsheet_id: str, range: str, client=None) -> List[List]:
     """Returns the sheet data in the form of a list of lists"""
 
     if client is None:
         client = auth_sheets()
 
-    request = client.spreadsheets().values().get(
-        spreadsheetId = spreadsheet_id,
-        range = range
+    request = (
+        client.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=range)
     )
     response = request.execute()
-    return response.get('values')
+    return response.get("values")
 
 
 def send_data_to_sheets(
     data: List[List],
     spreadsheet_id: str,
     range: str,
-    input_option: str = 'RAW',
-    client = None,
-    is_overwrite = True
+    input_option: str = "RAW",
+    client=None,
+    is_overwrite=True,
 ) -> dict:
     """Posts the data to the Google Sheet and returns the API response"""
 
@@ -256,20 +260,21 @@ def send_data_to_sheets(
 
     if is_overwrite:
         request = sheet_modifier.update(
-            spreadsheetId = spreadsheet_id,
-            range = range,
-            valueInputOption = input_option,
-            body = { 'values': data }
+            spreadsheetId=spreadsheet_id,
+            range=range,
+            valueInputOption=input_option,
+            body={"values": data},
         )
     else:
         request = sheet_modifier.append(
-            spreadsheetId = spreadsheet_id,
-            range = range,
-            valueInputOption = input_option,
-            body = { 'values': data }
+            spreadsheetId=spreadsheet_id,
+            range=range,
+            valueInputOption=input_option,
+            body={"values": data},
         )
     response = request.execute()
     return response
+
 
 def _sanitize_name(string: str) -> str:
     valid_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890._"
