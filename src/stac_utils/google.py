@@ -64,6 +64,7 @@ def run_query(
     subject: str = None,
     client: bigquery.Client = None,
     retry_exceptions: list = None,
+    job_config: bigquery.QueryJobConfig = None,
 ) -> List[dict]:
     """Performs a SQL query in BigQuery"""
     if not client:
@@ -83,7 +84,7 @@ def run_query(
     retry_exceptions = retry_exceptions or RETRY_EXCEPTIONS
 
     retry_policy = Retry(predicate=if_exception_type(*retry_exceptions))
-    job = client.query(sql, retry=retry_policy).result()
+    job = client.query(sql, retry=retry_policy, job_config=job_config).result()
 
     results = [{k: v for k, v in row.items()} for row in job]
 
