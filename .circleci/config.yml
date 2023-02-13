@@ -20,7 +20,7 @@ jobs:
       - run:
           name: bump version
           command: |
-            git config user.email "bella@staclabs.io"
+            git config user.email "engineering@staclabs.io"
             git config user.name "stac engineering"
             python3 -m bumpversion patch
             git config --add --bool push.autoSetupRemote true
