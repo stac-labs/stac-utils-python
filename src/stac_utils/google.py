@@ -147,6 +147,21 @@ def create_table_from_dataframe(
     load_data_from_dataframe(client, dataframe, project_name, dataset_name, table_name)
 
 
+def get_table_for_loading(
+    client: bigquery.Client,
+    project_name: str,
+    dataset_name: str,
+    table_name: str,
+):
+    dataset_ref = bigquery.Dataset(project_name + "." + dataset_name)
+    table_ref = dataset_ref.table(table_name)
+
+    table = client.get_table(table_ref)
+    print("ready to insert rows")
+
+    return table
+
+
 @Retry(predicate=if_exception_type(*RETRY_EXCEPTIONS))
 def load_data_from_dataframe(
     client: bigquery.Client,
@@ -156,16 +171,25 @@ def load_data_from_dataframe(
     table_name: str,
 ):
     """Loads data from the specified dataframe into the specified table in BigQuery"""
-    dataset_ref = bigquery.Dataset(project_name + "." + dataset_name)
-    table_ref = dataset_ref.table(table_name)
-
-    table = client.get_table(table_ref)
-
-    print("inserting rows")
-
+    table = get_table_for_loading(client, project_name, dataset_name, table_name)
     results = client.insert_rows_from_dataframe(
         table=table, dataframe=dataframe, chunk_size=10000
     )
+
+    print(results)
+
+
+@Retry(predicate=if_exception_type(*RETRY_EXCEPTIONS))
+def load_data_from_list(
+    client: bigquery.Client,
+    data: list[dict],
+    project_name: str,
+    dataset_name: str,
+    table_name: str,
+):
+    """Loads data from the specified list[dict] into the specified table in BigQuery"""
+    table = get_table_for_loading(client, project_name, dataset_name, table_name)
+    results = client.insert_rows(table=table, rows=data)
 
     print(results)
 
