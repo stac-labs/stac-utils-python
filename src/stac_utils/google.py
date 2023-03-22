@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import sys
 from typing import Any, Union, Mapping, Sequence
@@ -175,6 +176,8 @@ def load_data_from_dataframe(
         table=table, dataframe=dataframe, chunk_size=10000
     )
 
+    logging.info(f"inserted {len(results)} rows")
+
 
 @Retry(predicate=if_exception_type(*RETRY_EXCEPTIONS))
 def load_data_from_list(
@@ -187,6 +190,8 @@ def load_data_from_list(
     """Loads data from the specified list[dict] into the specified table in BigQuery"""
     table = get_table_for_loading(client, project_name, dataset_name, table_name)
     results = client.insert_rows(table=table, rows=data)
+
+    logging.info(f"inserted {len(results)} rows")
 
 
 def auth_gcs() -> storage.Client:
