@@ -1,7 +1,7 @@
 import json
 import os
 import sys
-from typing import Any, List, Union, Mapping, Sequence
+from typing import Any, Union, Mapping, Sequence
 
 from google.cloud import storage, bigquery
 from google.oauth2 import service_account
@@ -65,7 +65,7 @@ def run_query(
     client: bigquery.Client = None,
     retry_exceptions: list = None,
     job_config: bigquery.QueryJobConfig = None,
-) -> List[dict]:
+) -> list[dict]:
     """Performs a SQL query in BigQuery"""
     if not client:
         if not service_account_blob:
@@ -96,7 +96,7 @@ def get_table(
     service_account_blob: Mapping[str, str] = None,
     service_account_env_name: str = "SERVICE_ACCOUNT",
     subject: str = None,
-) -> List[dict]:
+) -> list[dict]:
     """Performs a select * from the given table in BigQuery"""
     if not service_account_blob:
         try:
@@ -232,7 +232,7 @@ def upload_data_to_gcs(
 def make_gmail_client(
     service_account_blob: Mapping[str, str] = None,
     subject: str = None,
-    scopes: List[str] = None,
+    scopes: list[str] = None,
 ):
     """Returns an initialized Gmail Client object"""
 
@@ -245,7 +245,7 @@ def make_gmail_client(
 def auth_sheets(
     service_account_blob: Mapping[str, str] = None,
     subject: str = None,
-    scopes: List[str] = None,
+    scopes: list[str] = None,
 ):
     """Returns an initialized Sheets client object"""
 
@@ -255,7 +255,7 @@ def auth_sheets(
     return build("sheets", "v4", credentials=credentials, cache_discovery=False)
 
 
-def get_data_from_sheets(spreadsheet_id: str, range: str, client=None) -> List[List]:
+def get_data_from_sheets(spreadsheet_id: str, range: str, client=None) -> list[list]:
     """Returns the sheet data in the form of a list of lists"""
 
     if client is None:
@@ -269,7 +269,7 @@ def get_data_from_sheets(spreadsheet_id: str, range: str, client=None) -> List[L
 
 
 def send_data_to_sheets(
-    data: List[List],
+    data: list[list],
     spreadsheet_id: str,
     range: str,
     input_option: str = "RAW",
