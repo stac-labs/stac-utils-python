@@ -2,8 +2,6 @@ import logging
 import os
 import requests
 
-from typing import List
-
 from .http import HTTPClient
 
 logger = logging.getLogger(__name__)
@@ -35,7 +33,7 @@ class TickerRequest(HTTPClient):
             logger.error(error)
             raise Exception(error)
 
-        self.data: List[dict] = []
+        self.data: list[dict] = []
         super().__init__(*args, **kwargs)
     
     def create_session(self) -> requests.Session:

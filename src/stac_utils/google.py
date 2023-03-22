@@ -1,7 +1,8 @@
 import json
+import logging
 import os
 import sys
-from typing import Any, List, Union, Mapping, Sequence
+from typing import Any, Union, Mapping, Sequence
 
 from google.cloud import storage, bigquery
 from google.oauth2 import service_account
@@ -65,7 +66,7 @@ def run_query(
     client: bigquery.Client = None,
     retry_exceptions: list = None,
     job_config: bigquery.QueryJobConfig = None,
-) -> List[dict]:
+) -> list[dict]:
     """Performs a SQL query in BigQuery"""
     if not client:
         if not service_account_blob:
@@ -96,7 +97,7 @@ def get_table(
     service_account_blob: Mapping[str, str] = None,
     service_account_env_name: str = "SERVICE_ACCOUNT",
     subject: str = None,
-) -> List[dict]:
+) -> list[dict]:
     """Performs a select * from the given table in BigQuery"""
     if not service_account_blob:
         try:
@@ -147,6 +148,20 @@ def create_table_from_dataframe(
     load_data_from_dataframe(client, dataframe, project_name, dataset_name, table_name)
 
 
+def get_table_for_loading(
+    client: bigquery.Client,
+    project_name: str,
+    dataset_name: str,
+    table_name: str,
+):
+    dataset_ref = bigquery.Dataset(project_name + "." + dataset_name)
+    table_ref = dataset_ref.table(table_name)
+
+    table = client.get_table(table_ref)
+
+    return table
+
+
 @Retry(predicate=if_exception_type(*RETRY_EXCEPTIONS))
 def load_data_from_dataframe(
     client: bigquery.Client,
@@ -156,18 +171,27 @@ def load_data_from_dataframe(
     table_name: str,
 ):
     """Loads data from the specified dataframe into the specified table in BigQuery"""
-    dataset_ref = bigquery.Dataset(project_name + "." + dataset_name)
-    table_ref = dataset_ref.table(table_name)
-
-    table = client.get_table(table_ref)
-
-    print("inserting rows")
-
+    table = get_table_for_loading(client, project_name, dataset_name, table_name)
     results = client.insert_rows_from_dataframe(
         table=table, dataframe=dataframe, chunk_size=10000
     )
 
-    print(results)
+    logging.info(f"inserted {len(results)} rows")
+
+
+@Retry(predicate=if_exception_type(*RETRY_EXCEPTIONS))
+def load_data_from_list(
+    client: bigquery.Client,
+    data: list[dict],
+    project_name: str,
+    dataset_name: str,
+    table_name: str,
+):
+    """Loads data from the specified list[dict] into the specified table in BigQuery"""
+    table = get_table_for_loading(client, project_name, dataset_name, table_name)
+    results = client.insert_rows(table=table, rows=data)
+
+    logging.info(f"inserted {len(results)} rows")
 
 
 def auth_gcs() -> storage.Client:
@@ -208,7 +232,7 @@ def upload_data_to_gcs(
 def make_gmail_client(
     service_account_blob: Mapping[str, str] = None,
     subject: str = None,
-    scopes: List[str] = None,
+    scopes: list[str] = None,
 ):
     """Returns an initialized Gmail Client object"""
 
@@ -221,7 +245,7 @@ def make_gmail_client(
 def auth_sheets(
     service_account_blob: Mapping[str, str] = None,
     subject: str = None,
-    scopes: List[str] = None,
+    scopes: list[str] = None,
 ):
     """Returns an initialized Sheets client object"""
 
@@ -231,7 +255,7 @@ def auth_sheets(
     return build("sheets", "v4", credentials=credentials, cache_discovery=False)
 
 
-def get_data_from_sheets(spreadsheet_id: str, range: str, client=None) -> List[List]:
+def get_data_from_sheets(spreadsheet_id: str, range: str, client=None) -> list[list]:
     """Returns the sheet data in the form of a list of lists"""
 
     if client is None:
@@ -245,7 +269,7 @@ def get_data_from_sheets(spreadsheet_id: str, range: str, client=None) -> List[L
 
 
 def send_data_to_sheets(
-    data: List[List],
+    data: list[list],
     spreadsheet_id: str,
     range: str,
     input_option: str = "RAW",
