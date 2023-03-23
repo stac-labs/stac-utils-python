@@ -99,8 +99,8 @@ class NGPVANClient(HTTPClient):
         all_items = []
         next_url = url
         while next_url:
-            print(f"Getting {url}")
-            data = self.get(url, **kwargs)
+            print(f"Getting {next_url}")
+            data = self.get(next_url, **kwargs)
             if "items" not in data:
                 return all_items
             all_items.extend(data["items"])
