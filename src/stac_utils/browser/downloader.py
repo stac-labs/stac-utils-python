@@ -6,15 +6,16 @@ from typing import Iterator
 
 
 class Downloader:
-    """ Iterator that looks for files in a directory and waits for one
-        to finish downloading.
+    """Iterator that looks for files in a directory and waits for one
+    to finish downloading.
 
-        Later calls will not return files that have already been given.
+    Later calls will not return files that have already been given.
 
-        Useful for Selenium where it's the only way to check
-        whether a file finished downloading or not.
+    Useful for Selenium where it's the only way to check
+    whether a file finished downloading or not.
 
     """
+
     def __init__(self, directory: str, polling: float = 10.0, pattern: str = None):
         self.directory = directory
         self.returned_files = set()
@@ -34,23 +35,21 @@ class Downloader:
             directory_files = glob.glob(os.path.join(self.directory, pattern))
 
             if not directory_files:
-                """ No files so let's wait """
+                """No files so let's wait"""
                 continue
 
             downloaded = [
-                file for file in
-                directory_files
-                if file not in self.returned_files
+                file for file in directory_files if file not in self.returned_files
             ]
             if not downloaded:
-                """ If there are files and we've already returned them all,
-                    stop iterating
+                """If there are files and we've already returned them all,
+                stop iterating
                 """
                 break
 
             for download in downloaded:
-                """ Check each file, compare file size to last time it was checked
-                    and if it's been static, assume it's finished.
+                """Check each file, compare file size to last time it was checked
+                and if it's been static, assume it's finished.
                 """
                 size = os.path.getsize(download)
                 if (last_size[download] > 0) and (size == last_size[download]):
@@ -59,7 +58,7 @@ class Downloader:
                     last_size[download] = size
 
             for filename in finished:
-                """ Start spitting out finished files """
+                """Start spitting out finished files"""
                 print(f"{filename} is complete")
                 self.returned_files.add(filename)
                 yield filename
