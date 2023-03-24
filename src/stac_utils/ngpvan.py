@@ -105,5 +105,6 @@ class NGPVANClient(HTTPClient):
                 return all_items
             all_items.extend(data["items"])
 
-            next_url = data.get("next_page_link").split("/")[-1]
+            next_full_url = data.get("next_page_link")
+            next_url = next_full_url.split("/")[-1] if next_full_url else None
         return all_items
