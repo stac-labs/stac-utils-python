@@ -2,15 +2,14 @@ import json
 import logging
 import os
 import sys
-from typing import Any, Union, Mapping, Sequence
 
+from google.api_core.exceptions import InternalServerError
+from google.api_core.retry import if_exception_type, Retry
 from google.cloud import storage, bigquery
+from google.cloud.bigquery.table import Table
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
-from google.api_core.retry import if_exception_type, Retry
-from google.api_core.exceptions import InternalServerError
 from inflection import parameterize, underscore
-
 
 from .listify import listify
 
@@ -18,9 +17,9 @@ RETRY_EXCEPTIONS = [InternalServerError]
 
 
 def get_credentials(
-    service_account_blob: Mapping = None,
+    service_account_blob: dict = None,
     service_account_env_name: str = "SERVICE_ACCOUNT",
-    scopes: Union[Sequence[str], str] = None,
+    scopes: [list[str], str] = None,
     subject: str = None,
 ) -> service_account.Credentials:
     """Loads a Google Service Account into a Credentials object with the given scopes"""
@@ -61,7 +60,7 @@ def auth_bq() -> bigquery.Client:
 
 def run_query(
     sql: str,
-    service_account_blob: Mapping[str, str] = None,
+    service_account_blob: dict[str, str] = None,
     subject: str = None,
     client: bigquery.Client = None,
     retry_exceptions: list = None,
@@ -94,7 +93,7 @@ def run_query(
 
 def get_table(
     table_name: str,
-    service_account_blob: Mapping[str, str] = None,
+    service_account_blob: dict[str, str] = None,
     service_account_env_name: str = "SERVICE_ACCOUNT",
     subject: str = None,
 ) -> list[dict]:
@@ -114,7 +113,7 @@ def get_table(
 
 def create_table_from_dataframe(
     client: bigquery.Client,
-    dataframe: Any,
+    dataframe,
     project_name: str,
     dataset_name: str,
     table_name: str,
@@ -153,7 +152,7 @@ def get_table_for_loading(
     project_name: str,
     dataset_name: str,
     table_name: str,
-):
+) -> Table:
     dataset_ref = bigquery.Dataset(project_name + "." + dataset_name)
     table_ref = dataset_ref.table(table_name)
 
@@ -165,7 +164,7 @@ def get_table_for_loading(
 @Retry(predicate=if_exception_type(*RETRY_EXCEPTIONS))
 def load_data_from_dataframe(
     client: bigquery.Client,
-    dataframe: Any,
+    dataframe,
     project_name: str,
     dataset_name: str,
     table_name: str,
@@ -230,7 +229,7 @@ def upload_data_to_gcs(
 
 
 def make_gmail_client(
-    service_account_blob: Mapping[str, str] = None,
+    service_account_blob: dict[str, str] = None,
     subject: str = None,
     scopes: list[str] = None,
 ):
@@ -243,7 +242,7 @@ def make_gmail_client(
 
 
 def auth_sheets(
-    service_account_blob: Mapping[str, str] = None,
+    service_account_blob: dict[str, str] = None,
     subject: str = None,
     scopes: list[str] = None,
 ):

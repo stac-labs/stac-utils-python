@@ -6,22 +6,21 @@ from .http import HTTPClient
 
 logger = logging.getLogger(__name__)
 
-"""
-Sample code:
-from stac_utils.ticker_request import TickerRequest
-from stac_utils import secrets # only necessary in AWS
-
-# with secrets() context only needed in AWS
-with secrets(secret_name = os.environ['TICKER_SECRET_NAME']):
-    ticker = TickerRequest()
-    ticker.add_data('FL', 'AWS Lambda', 'event-sync', 'events created', 155)
-    ticker.add_data('FL', 'AWS Lambda', 'event-sync', 'signups created', 1342)
-
-    ticker.send_to_ticker()
-"""
-
 
 class TickerRequest(HTTPClient):
+    """ Usage:
+        from stac_utils.ticker_request import TickerRequest
+        from stac_utils import secrets # only necessary in AWS
+
+        # with secrets() context only needed in AWS
+        with secrets(secret_name = os.environ['TICKER_SECRET_NAME']):
+            ticker = TickerRequest()
+            ticker.add_data('FL', 'AWS Lambda', 'event-sync', 'events created', 155)
+            ticker.add_data('FL', 'AWS Lambda', 'event-sync', 'signups created', 1342)
+
+            ticker.send_to_ticker()
+    """
+
     def __init__(self, *args, **kwargs):
         if (
             os.environ["TICKER_URL"]

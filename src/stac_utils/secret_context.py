@@ -1,5 +1,5 @@
-import os
 import json
+import os
 from unittest.mock import patch
 
 from .aws import get_secret

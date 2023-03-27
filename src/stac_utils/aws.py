@@ -1,13 +1,12 @@
 import json
 import os.path as op
-from typing import Dict
 from tempfile import TemporaryDirectory
 
 import boto3
 from botocore.exceptions import ClientError
 
 
-def get_secret(region_name: str, secret_name: str) -> Dict:
+def get_secret(region_name: str, secret_name: str) -> dict:
     # Create a Secrets Manager client
     session = boto3.session.Session()
     client = session.client(service_name="secretsmanager", region_name=region_name)
@@ -19,7 +18,7 @@ def get_secret(region_name: str, secret_name: str) -> Dict:
     return secret
 
 
-def write_secret(region_name: str, secret_name: str, secret: Dict):
+def write_secret(region_name: str, secret_name: str, secret: dict):
     # Create a Secrets Manager client
     session = boto3.session.Session()
     client = session.client(service_name="secretsmanager", region_name=region_name)
@@ -30,7 +29,7 @@ def write_secret(region_name: str, secret_name: str, secret: Dict):
     )
 
 
-def load_from_s3(bucket: str, path: str, file_name: str) -> Dict:
+def load_from_s3(bucket: str, path: str, file_name: str) -> dict:
     s3 = boto3.resource("s3").Bucket(bucket)
     key = path.strip("/") + "/" + file_name
 
@@ -50,7 +49,7 @@ def load_from_s3(bucket: str, path: str, file_name: str) -> Dict:
     return data
 
 
-def save_to_s3(data: Dict, bucket: str, path: str, file_name: str):
+def save_to_s3(data: dict, bucket: str, path: str, file_name: str):
     s3 = boto3.resource("s3").Bucket(bucket)
     key = path.strip("/") + "/" + file_name
 

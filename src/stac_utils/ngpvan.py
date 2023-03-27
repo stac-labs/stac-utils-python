@@ -82,14 +82,14 @@ class NGPVANClient(HTTPClient):
     ):
         errors = data.get("errors")
         if errors:
-            LOCATION_ERROR_TEXT = "'location' is required by the specified Event"
+            location_error_text = "'location' is required by the specified Event"
             if (
                 len(errors) == 1
-                and errors[0].get("text") == LOCATION_ERROR_TEXT
+                and errors[0].get("text") == location_error_text
                 and override_error_logging
             ):
-                ## This error means that the existing event needs a new location added
-                ## so we will do that first, without logging an error, and then retry the signup
+                # This error means that the existing event needs a new location added
+                # so we will do that first, without logging an error, and then retry the signup
                 raise NGPVANLocationException(errors)
             else:
                 logger.error(response.content)
