@@ -7,6 +7,14 @@ from .http import HTTPClient
 logger = logging.getLogger(__name__)
 
 
+class TickerException(Exception):
+    pass
+
+
+class TickerAuthException(TickerException):
+    pass
+
+
 class TickerRequest(HTTPClient):
     """ Usage:
         from stac_utils.ticker_request import TickerRequest
@@ -23,15 +31,15 @@ class TickerRequest(HTTPClient):
 
     def __init__(self, *args, **kwargs):
         if (
-            os.environ["TICKER_URL"]
-            and os.environ["AUTH_USER"]
-            and os.environ["AUTH_PASS"]
+            os.environ.get("TICKER_URL")
+            and os.environ.get("AUTH_USER")
+            and os.environ.get("AUTH_PASS")
         ):
             self.base_url = os.environ["TICKER_URL"]
         else:
             error = "Ticker authentication or URL missing from environment"
             logger.error(error)
-            raise Exception(error)
+            raise TickerAuthException(error)
 
         self.data: list[dict] = []
         super().__init__(*args, **kwargs)
@@ -58,7 +66,7 @@ class TickerRequest(HTTPClient):
     ):
         if response.status_code != 200:
             logger.error(response.content)
-            raise Exception(response.content)
+            raise TickerException(response.content)
 
     def add_data(self, state: str, source: str, task: str, metric: str, amount: float):
         self.data.append(
@@ -79,8 +87,8 @@ class TickerRequest(HTTPClient):
                 self.data = []
                 return result
             else:
-                print(result)
-                raise Exception("Metrics not sent to ticker")
+                logger.error(result)
+                raise TickerException("Metrics not sent to ticker")
         else:
-            print("No data to send to ticker")
+            logger.info("No data to send to ticker")
             return
