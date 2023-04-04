@@ -140,9 +140,8 @@ class HTTPClient(Client):
 
                 if resp.status_code in [429]:
                     print("429: Rate limit")
-                    self.wait_for_rate(endpoint, resp)
                     fails += 1
-                    continue
+                    self.wait_for_rate(endpoint, resp)
                 elif resp.status_code in [401]:
                     print("401: Refreshing client auth")
                     fails += 1
