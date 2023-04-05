@@ -77,7 +77,7 @@ class TestTickerRequest(unittest.TestCase):
         with patch.dict(os.environ, values=self.test_auth):
             test_ticker = TickerRequest()
             test_data = {
-                "state": "UNK",
+                "state": "ZZ",
                 "source": "foo",
                 "task": "bar",
                 "metric": "spam",
@@ -97,7 +97,7 @@ class TestTickerRequest(unittest.TestCase):
             mock_response.status_code = 200
             test_ticker.post.return_value = mock_response
             test_data = {
-                "state": "UNK",
+                "state": "ZZ",
                 "source": "foo",
                 "task": "bar",
                 "metric": "spam",
@@ -130,7 +130,7 @@ class TestTickerRequest(unittest.TestCase):
             mock_response.status_code = 500
             test_ticker.post.return_value = mock_response
             test_data = {
-                "state": "UNK",
+                "state": "ZZ",
                 "source": "foo",
                 "task": "bar",
                 "metric": "spam",
