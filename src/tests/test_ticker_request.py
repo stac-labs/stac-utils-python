@@ -4,12 +4,20 @@ from unittest.mock import patch, MagicMock
 
 import requests
 
-from src.stac_utils.ticker_request import TickerRequest, TickerException, TickerAuthException
+from src.stac_utils.ticker_request import (
+    TickerRequest,
+    TickerException,
+    TickerAuthException,
+)
 
 
 class TestTickerRequest(unittest.TestCase):
     def setUp(self) -> None:
-        self.test_auth = {"TICKER_URL": "https://www.foo.bar", "AUTH_USER": "spam", "AUTH_PASS": "spam1234"}
+        self.test_auth = {
+            "TICKER_URL": "https://www.foo.bar",
+            "AUTH_USER": "spam",
+            "AUTH_PASS": "spam1234",
+        }
 
     def test_init(self):
         """Test init"""
@@ -28,7 +36,10 @@ class TestTickerRequest(unittest.TestCase):
             test_ticker = TickerRequest()
             test_session = test_ticker.create_session()
             self.assertIsInstance(test_session, requests.Session)
-            self.assertEqual(test_session.auth, (self.test_auth["AUTH_USER"], self.test_auth["AUTH_PASS"]))
+            self.assertEqual(
+                test_session.auth,
+                (self.test_auth["AUTH_USER"], self.test_auth["AUTH_PASS"]),
+            )
 
     def test_transform_response(self):
         """Test transform response"""
@@ -46,7 +57,9 @@ class TestTickerRequest(unittest.TestCase):
 
         with patch.dict(os.environ, values=self.test_auth):
             test_ticker = TickerRequest()
-            self.assertRaises(TickerException, lambda: test_ticker.check_for_error(test_response, {}))
+            self.assertRaises(
+                TickerException, lambda: test_ticker.check_for_error(test_response, {})
+            )
 
     def test_check_for_error_when_not_exists(self):
         """Test check for error when one does not exist"""
@@ -63,7 +76,13 @@ class TestTickerRequest(unittest.TestCase):
 
         with patch.dict(os.environ, values=self.test_auth):
             test_ticker = TickerRequest()
-            test_data = {"state": "UNK", "source": "foo", "task": "bar", "metric": "spam", "amount": 42.0}
+            test_data = {
+                "state": "UNK",
+                "source": "foo",
+                "task": "bar",
+                "metric": "spam",
+                "amount": 42.0,
+            }
             test_ticker.add_data(**test_data)
 
             self.assertListEqual(test_ticker.data, [test_data])
@@ -77,7 +96,13 @@ class TestTickerRequest(unittest.TestCase):
             mock_response = MagicMock()
             mock_response.status_code = 200
             test_ticker.post.return_value = mock_response
-            test_data = {"state": "UNK", "source": "foo", "task": "bar", "metric": "spam", "amount": 42.0}
+            test_data = {
+                "state": "UNK",
+                "source": "foo",
+                "task": "bar",
+                "metric": "spam",
+                "amount": 42.0,
+            }
             test_ticker.add_data(**test_data)
             test_response = test_ticker.send_to_ticker()
 
@@ -104,7 +129,13 @@ class TestTickerRequest(unittest.TestCase):
             mock_response = MagicMock()
             mock_response.status_code = 500
             test_ticker.post.return_value = mock_response
-            test_data = {"state": "UNK", "source": "foo", "task": "bar", "metric": "spam", "amount": 42.0}
+            test_data = {
+                "state": "UNK",
+                "source": "foo",
+                "task": "bar",
+                "metric": "spam",
+                "amount": 42.0,
+            }
             test_ticker.add_data(**test_data)
             self.assertRaises(TickerException, test_ticker.send_to_ticker)
 

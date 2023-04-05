@@ -6,7 +6,12 @@ from unittest.mock import patch
 from dateutil.tz import tzfile
 from freezegun import freeze_time
 
-from src.stac_utils.time import parse_date_for_tz, get_today_tz, get_now_tz, DEFAULT_TIMEZONE
+from src.stac_utils.time import (
+    parse_date_for_tz,
+    get_today_tz,
+    get_now_tz,
+    DEFAULT_TIMEZONE,
+)
 
 
 class TestTime(unittest.TestCase):
@@ -29,7 +34,12 @@ class TestTime(unittest.TestCase):
             self.assertEqual(
                 parse_date_for_tz("2023-01-01"),
                 datetime(
-                    2023, 1, 1, 0, 0, tzinfo=tzfile("/usr/share/zoneinfo/America/Los_Angeles")
+                    2023,
+                    1,
+                    1,
+                    0,
+                    0,
+                    tzinfo=tzfile("/usr/share/zoneinfo/America/Los_Angeles"),
                 ),
             )
 

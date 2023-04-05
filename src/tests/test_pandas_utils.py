@@ -21,8 +21,7 @@ class TestPandasUtils(unittest.TestCase):
         test_list = transform_to_lists(test_df)
 
         self.assertListEqual(
-            test_list,
-            [["id", "value"], ["1", "foo"], ["2", "bar"], ["3", "spam"]]
+            test_list, [["id", "value"], ["1", "foo"], ["2", "bar"], ["3", "spam"]]
         )
 
     def test_transform_to_lists_with_none(self):
@@ -30,30 +29,21 @@ class TestPandasUtils(unittest.TestCase):
         test_df = pd.DataFrame({"id": [None], "value": [None]})
         test_list = transform_to_lists(test_df)
 
-        self.assertListEqual(
-            test_list,
-            [["id", "value"], ["", ""]]
-        )
+        self.assertListEqual(test_list, [["id", "value"], ["", ""]])
 
     def test_transform_to_lists_empty_dataframe_with_columns(self):
         """Test an empty dataframe with columns is transformed into an empty list"""
         test_df = pd.DataFrame({"id": [], "value": []})
         test_list = transform_to_lists(test_df)
 
-        self.assertListEqual(
-            test_list,
-            [["id", "value"]]
-        )
+        self.assertListEqual(test_list, [["id", "value"]])
 
     def test_transform_to_lists_empty_dataframe(self):
         """Test an empty dataframe is transformed into an empty list"""
         test_df = pd.DataFrame()
         test_list = transform_to_lists(test_df)
 
-        self.assertListEqual(
-            test_list,
-            [[]]
-        )
+        self.assertListEqual(test_list, [[]])
 
 
 if __name__ == "__main__":

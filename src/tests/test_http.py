@@ -9,6 +9,7 @@ from src.stac_utils.http import Client, HTTPClient
 
 class MockClient(Client):
     """Non-abstract version of Client so we can test its non-abstract methods"""
+
     def create_session(self):
         return MagicMock()
 
@@ -93,7 +94,7 @@ class TestHTTPClient(unittest.TestCase):
 
     @patch("time.sleep")
     def test_wait_for_rate_no_limit_in_response(self, mock_sleep: MagicMock):
-        """Test wait for rate limit when there's no rate limit in response """
+        """Test wait for rate limit when there's no rate limit in response"""
 
         test_client = HTTPClient()
         test_client._rate_limits = {"FOO": (1.0, 1.0)}
@@ -128,10 +129,7 @@ class TestHTTPClient(unittest.TestCase):
     def test_format_url(self):
         """Test format url"""
 
-        test_base_urls = [
-            "https://foo.org",
-            "https://foo.org/"
-        ]
+        test_base_urls = ["https://foo.org", "https://foo.org/"]
         test_endpoints = [
             "bar",
             "/bar",
@@ -158,7 +156,9 @@ class TestHTTPClient(unittest.TestCase):
         test_session.request = MagicMock(return_value=test_response)
 
         test_client.call_api("GET", "/foo")
-        test_session.request.assert_called_once_with("GET", "ERROR/foo", params=None, json=None)
+        test_session.request.assert_called_once_with(
+            "GET", "ERROR/foo", params=None, json=None
+        )
         mock_sleep.assert_called_once_with(0.0)
 
     def test_call_api_with_404(self):
@@ -170,10 +170,14 @@ class TestHTTPClient(unittest.TestCase):
         test_response = MagicMock()
         test_response.status_code = 404
         test_response.content = {}
-        test_response.raise_for_status = MagicMock(side_effect=requests.exceptions.RequestException)
+        test_response.raise_for_status = MagicMock(
+            side_effect=requests.exceptions.RequestException
+        )
         test_session.request = MagicMock(return_value=test_response)
 
-        self.assertRaises(requests.exceptions.RequestException, test_client.call_api, "GET", "/foo")
+        self.assertRaises(
+            requests.exceptions.RequestException, test_client.call_api, "GET", "/foo"
+        )
 
     @patch("time.sleep")
     def test_call_api_with_429(self, mock_sleep: MagicMock):
@@ -188,10 +192,14 @@ class TestHTTPClient(unittest.TestCase):
         test_response = MagicMock()
         test_response.status_code = 429
         test_response.content = {}
-        test_response.raise_for_status = MagicMock(side_effect=requests.exceptions.RequestException)
+        test_response.raise_for_status = MagicMock(
+            side_effect=requests.exceptions.RequestException
+        )
         test_session.request = MagicMock(return_value=test_response)
 
-        self.assertRaises(requests.exceptions.RequestException, test_client.call_api, "GET", "/foo")
+        self.assertRaises(
+            requests.exceptions.RequestException, test_client.call_api, "GET", "/foo"
+        )
         test_client.wait_for_rate.assert_called()
         mock_sleep.assert_called()
 
@@ -208,10 +216,14 @@ class TestHTTPClient(unittest.TestCase):
         test_response = MagicMock()
         test_response.status_code = 401
         test_response.content = {}
-        test_response.raise_for_status = MagicMock(side_effect=requests.exceptions.RequestException)
+        test_response.raise_for_status = MagicMock(
+            side_effect=requests.exceptions.RequestException
+        )
         test_session.request = MagicMock(return_value=test_response)
 
-        self.assertRaises(requests.exceptions.RequestException, test_client.call_api, "GET", "/foo")
+        self.assertRaises(
+            requests.exceptions.RequestException, test_client.call_api, "GET", "/foo"
+        )
         test_client.refresh_auth.assert_called()
         mock_sleep.assert_has_calls([call(0.0), call(2.0)])
 
@@ -227,10 +239,14 @@ class TestHTTPClient(unittest.TestCase):
         test_session = test_client.session
         test_response = MagicMock()
         test_response.status_code = None
-        test_response.raise_for_status = MagicMock(side_effect=requests.exceptions.RequestException)
+        test_response.raise_for_status = MagicMock(
+            side_effect=requests.exceptions.RequestException
+        )
         test_session.request = MagicMock(return_value=test_response)
 
-        self.assertRaises(requests.exceptions.RequestException, test_client.call_api, "GET", "/foo")
+        self.assertRaises(
+            requests.exceptions.RequestException, test_client.call_api, "GET", "/foo"
+        )
         mock_sleep.assert_has_calls([call(0.0), call(1.0), call(2.0), call(3.0)])
 
     def test_get(self):
