@@ -1,10 +1,8 @@
 import time
 import logging
-
-
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
-from typing import Any, Union, Tuple, Dict
+
 import requests
 
 logger = logging.getLogger(__name__)
@@ -45,11 +43,11 @@ class Client(ABC):
                 self._session = None
 
     @abstractmethod
-    def call_api(self, *args, **kwargs) -> Any:
+    def call_api(self, *args, **kwargs):
         """Make an API request"""
 
     @abstractmethod
-    def transform_response(self, *args, **kwargs) -> Any:
+    def transform_response(self, *args, **kwargs):
         """Transform the response from the API"""
 
     @abstractmethod
@@ -96,7 +94,7 @@ class HTTPClient(Client):
 
     def check_response_for_rate_limit(
         self, response: requests.Response
-    ) -> Union[int, float, None]:
+    ) -> [int, float, None]:
         """Inspect the response for rate limit information"""
 
         return None
@@ -118,7 +116,7 @@ class HTTPClient(Client):
         use_snake_case: bool = True,
         override_error_logging: bool = False,
         **kwargs,
-    ) -> Any:
+    ):
         """Basic API request, retries on failures, parses errors"""
 
         fails = 0
@@ -142,9 +140,8 @@ class HTTPClient(Client):
 
                 if resp.status_code in [429]:
                     print("429: Rate limit")
-                    self.wait_for_rate(endpoint, resp)
                     fails += 1
-                    continue
+                    self.wait_for_rate(endpoint, resp)
                 elif resp.status_code in [401]:
                     print("401: Refreshing client auth")
                     fails += 1
@@ -190,7 +187,7 @@ class HTTPClient(Client):
     def patch(self, *args, **kwargs):
         return self.call_api("PATCH", *args, **kwargs)
 
-    def update_rate_limits(self) -> Dict[str, Tuple[int, int]]:
+    def update_rate_limits(self) -> dict[str, tuple[int, int]]:
         """Update the rate limits for the API
         This could be a static function or calling the API
 
@@ -209,7 +206,7 @@ class HTTPClient(Client):
     def refresh_auth(self, response: requests.Response):
         """Makes a blocking auth request to the API"""
 
-    def clean_up(self, response: requests.Response, data: Any):
+    def clean_up(self, response: requests.Response, data):
         """Clean up step to free memory that wouldn't normally be
         garbage collected (ie: soup.decompose() for BeautifulSoup)
         """
@@ -219,7 +216,7 @@ class HTTPClient(Client):
         and raise an exception as needed
         """
 
-    def transform_response(self, response: requests.Response, **kwargs) -> Any:
+    def transform_response(self, response: requests.Response, **kwargs):
         """Transform the response from the API"""
 
         return response.content

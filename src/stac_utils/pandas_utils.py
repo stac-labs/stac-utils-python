@@ -1,11 +1,10 @@
-from pandas import DataFrame
-from typing import List
+import pandas as pd
 
 from .google import send_data_to_sheets
 
 
 def send_dataframe_to_sheets(
-    df: DataFrame,
+    df: pd.DataFrame,
     spreadsheet_id: str,
     range: str,
     input_option: str = "RAW",
@@ -17,7 +16,7 @@ def send_dataframe_to_sheets(
     return send_data_to_sheets(data, spreadsheet_id, range, input_option, client)
 
 
-def transform_to_lists(df: DataFrame) -> List[list]:
+def transform_to_lists(df: pd.DataFrame) -> list[list]:
     df = df.fillna("")
     row_data = [[col for col in df.columns]]
     for row in df.itertuples(index=False):

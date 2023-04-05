@@ -1,5 +1,4 @@
 import json
-import readline  # necessary to support service account length inputs
 
 from enum import Enum
 from .truthy import truthy
