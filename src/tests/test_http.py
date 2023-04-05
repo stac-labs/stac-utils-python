@@ -22,10 +22,6 @@ class MockClient(Client):
         pass
 
 
-def raise_requests_exception():
-    raise requests.exceptions.RequestException
-
-
 class TestClient(unittest.TestCase):
     def test_init(self):
         """Test init raises type error because it's an abstract class"""
@@ -174,7 +170,7 @@ class TestHTTPClient(unittest.TestCase):
         test_response = MagicMock()
         test_response.status_code = 404
         test_response.content = {}
-        test_response.raise_for_status = raise_requests_exception
+        test_response.raise_for_status = MagicMock(side_effect=requests.exceptions.RequestException)
         test_session.request = MagicMock(return_value=test_response)
 
         self.assertRaises(requests.exceptions.RequestException, test_client.call_api, "GET", "/foo")
@@ -192,11 +188,12 @@ class TestHTTPClient(unittest.TestCase):
         test_response = MagicMock()
         test_response.status_code = 429
         test_response.content = {}
-        test_response.raise_for_status = raise_requests_exception
+        test_response.raise_for_status = MagicMock(side_effect=requests.exceptions.RequestException)
         test_session.request = MagicMock(return_value=test_response)
 
         self.assertRaises(requests.exceptions.RequestException, test_client.call_api, "GET", "/foo")
         test_client.wait_for_rate.assert_called()
+        mock_sleep.assert_called()
 
     @patch("time.sleep")
     def test_call_api_with_401(self, mock_sleep: MagicMock):
@@ -211,7 +208,7 @@ class TestHTTPClient(unittest.TestCase):
         test_response = MagicMock()
         test_response.status_code = 401
         test_response.content = {}
-        test_response.raise_for_status = raise_requests_exception
+        test_response.raise_for_status = MagicMock(side_effect=requests.exceptions.RequestException)
         test_session.request = MagicMock(return_value=test_response)
 
         self.assertRaises(requests.exceptions.RequestException, test_client.call_api, "GET", "/foo")
@@ -230,7 +227,7 @@ class TestHTTPClient(unittest.TestCase):
         test_session = test_client.session
         test_response = MagicMock()
         test_response.status_code = None
-        test_response.raise_for_status = raise_requests_exception
+        test_response.raise_for_status = MagicMock(side_effect=requests.exceptions.RequestException)
         test_session.request = MagicMock(return_value=test_response)
 
         self.assertRaises(requests.exceptions.RequestException, test_client.call_api, "GET", "/foo")
