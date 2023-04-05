@@ -24,7 +24,9 @@ class TestAWS(unittest.TestCase):
 
         self.assertEqual(test_response, test_secret)
         mock_session.client.get_secret_value(SecretId=test_secret_name)
-        mock_session.client.assert_called_once_with(service_name='secretsmanager', region_name=test_region)
+        mock_session.client.assert_called_once_with(
+            service_name="secretsmanager", region_name=test_region
+        )
 
     @patch("boto3.session.Session")
     def test_write_secret(self, mock_session_class: MagicMock):
@@ -40,8 +42,12 @@ class TestAWS(unittest.TestCase):
         mock_client.put_secret_value = MagicMock()
         write_secret(test_region, test_secret_name, test_secret)
 
-        mock_session.client.put_secret_value(SecretId=test_secret_name, SecretString=json.dumps(test_secret))
-        mock_session.client.assert_called_once_with(service_name='secretsmanager', region_name=test_region)
+        mock_session.client.put_secret_value(
+            SecretId=test_secret_name, SecretString=json.dumps(test_secret)
+        )
+        mock_session.client.assert_called_once_with(
+            service_name="secretsmanager", region_name=test_region
+        )
 
     def test_load_from_s3(self):
         """Test load from s3"""
