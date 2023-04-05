@@ -1,20 +1,47 @@
+import json
 import unittest
+from unittest.mock import MagicMock, patch, call
 
 from src.stac_utils.aws import get_secret, write_secret, load_from_s3, save_to_s3
 
 
 class TestAWS(unittest.TestCase):
-    def test_get_secret(self):
+    @patch("boto3.session.Session")
+    def test_get_secret(self, mock_session_class: MagicMock):
         """Test get secret"""
 
-    def test_get_secret_does_not_exist(self):
-        """Test get secret when it doesn't exist"""
+        test_region = "us-east-1"
+        test_secret_name = "spam"
+        test_secret = {"FOO": "bar"}
+        mock_client = MagicMock()
+        mock_session = MagicMock()
+        mock_session_class.return_value = mock_session
+        mock_session.client = MagicMock(return_value=mock_client)
+        mock_client.get_secret_value = MagicMock(
+            return_value={"SecretString": json.dumps(test_secret)}
+        )
+        test_response = get_secret(test_region, test_secret_name)
 
-    def test_write_secret(self):
+        self.assertEqual(test_response, test_secret)
+        mock_session.client.get_secret_value(SecretId=test_secret_name)
+        mock_session.client.assert_called_once_with(service_name='secretsmanager', region_name=test_region)
+
+    @patch("boto3.session.Session")
+    def test_write_secret(self, mock_session_class: MagicMock):
         """Test write secret"""
 
-    def test_write_secret_does_not_exist(self):
-        """Test write secret when it doesn't exist"""
+        test_region = "us-east-1"
+        test_secret_name = "spam"
+        test_secret = {"FOO": "bar"}
+        mock_client = MagicMock()
+        mock_session = MagicMock()
+        mock_session_class.return_value = mock_session
+        mock_session.client = MagicMock(return_value=mock_client)
+        mock_client.put_secret_value = MagicMock()
+        write_secret(test_region, test_secret_name, test_secret)
+
+        mock_session.client.put_secret_value(SecretId=test_secret_name, SecretString=json.dumps(test_secret))
+        mock_session.client.assert_called_once_with(service_name='secretsmanager', region_name=test_region)
 
     def test_load_from_s3(self):
         """Test load from s3"""
