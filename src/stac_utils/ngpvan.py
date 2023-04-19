@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-
 import requests
 
 from .convert import convert_to_snake_case
@@ -91,6 +90,10 @@ class NGPVANClient(HTTPClient):
                 # This error means that the existing event needs a new location added
                 # so we will do that first, without logging an error, and then retry the signup
                 raise NGPVANLocationException(errors)
+
+            # successful 204 response code does not raise error (i.e. when applying ACs/SQs)
+            elif response.status_code == 204 and errors == 'Expecting value: line 1 column 1 (char 0)':
+                pass
             else:
                 logger.error(response.content)
                 raise NGPVANException(errors)
