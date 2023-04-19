@@ -115,6 +115,7 @@ class HTTPClient(Client):
         return_headers: bool = False,
         use_snake_case: bool = True,
         override_error_logging: bool = False,
+        override_data_printing: bool = False,
         **kwargs,
     ):
         """Basic API request, retries on failures, parses errors"""
@@ -166,7 +167,9 @@ class HTTPClient(Client):
                 if fails > self.retry_limit:
                     raise
 
-        print(data)
+        if not override_data_printing:
+            print(data)
+
         return data
 
     def get(self, *args, **kwargs):
