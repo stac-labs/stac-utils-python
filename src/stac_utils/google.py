@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import sys
+from typing import Union
 
 from google.api_core.exceptions import InternalServerError
 from google.api_core.retry import if_exception_type, Retry
@@ -19,7 +20,7 @@ RETRY_EXCEPTIONS = [InternalServerError]
 def get_credentials(
     service_account_blob: dict = None,
     service_account_env_name: str = "SERVICE_ACCOUNT",
-    scopes: [list[str], str] = None,
+    scopes: Union[list[str], str] = None,
     subject: str = None,
 ) -> service_account.Credentials:
     """Loads a Google Service Account into a Credentials object with the given scopes"""
@@ -44,16 +45,19 @@ def get_credentials(
     return credentials
 
 
-def auth_bq() -> bigquery.Client:
+def auth_bq(is_auto_credential: bool = False) -> bigquery.Client:
     """Returns an initialized BigQuery client object"""
 
     scopes = ["cloud-platform", "drive"]
     credentials = get_credentials(scopes=scopes)
 
-    client = bigquery.Client(
-        credentials=credentials,
-        project=credentials.project_id,
-    )
+    if is_auto_credential:
+        client = bigquery.Client()
+    else:
+        client = bigquery.Client(
+            credentials=credentials,
+            project=credentials.project_id,
+        )
 
     return client
 
@@ -65,8 +69,11 @@ def run_query(
     client: bigquery.Client = None,
     retry_exceptions: list = None,
     job_config: bigquery.QueryJobConfig = None,
+    is_auto_credential: bool = False
 ) -> list[dict]:
     """Performs a SQL query in BigQuery"""
+    if is_auto_credential:
+        client = bigquery.Client()
     if not client:
         if not service_account_blob:
             try:

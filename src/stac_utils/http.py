@@ -2,6 +2,7 @@ import time
 import logging
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
+from typing import Union
 
 import requests
 
@@ -94,7 +95,7 @@ class HTTPClient(Client):
 
     def check_response_for_rate_limit(
         self, response: requests.Response
-    ) -> [int, float, None]:
+    ) -> Union[int, float, None]:
         """Inspect the response for rate limit information"""
 
         return None
