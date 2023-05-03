@@ -69,7 +69,7 @@ def run_query(
     client: bigquery.Client = None,
     retry_exceptions: list = None,
     job_config: bigquery.QueryJobConfig = None,
-    is_auto_credential: bool = False
+    is_auto_credential: bool = False,
 ) -> list[dict]:
     """Performs a SQL query in BigQuery"""
     if is_auto_credential:
@@ -103,9 +103,10 @@ def get_table(
     service_account_blob: dict[str, str] = None,
     service_account_env_name: str = "SERVICE_ACCOUNT",
     subject: str = None,
+    client: bigquery.Client = None,
 ) -> list[dict]:
     """Performs a select * from the given table in BigQuery"""
-    if not service_account_blob:
+    if not service_account_blob and not client:
         try:
             service_account_blob = json.loads(os.environ[service_account_env_name])
         except json.JSONDecodeError:
@@ -113,7 +114,12 @@ def get_table(
 
     # sadly bq's parameterized queries don't support table names
     sql = f"SELECT * FROM `{_sanitize_name(table_name)}`;"
-    results = run_query(sql, service_account_blob=service_account_blob, subject=subject)
+    results = run_query(
+        sql,
+        service_account_blob=service_account_blob,
+        client=client,
+        subject=subject,
+    )
 
     return results
 
