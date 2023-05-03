@@ -49,11 +49,11 @@ def auth_bq(is_auto_credential: bool = False) -> bigquery.Client:
     """Returns an initialized BigQuery client object"""
 
     scopes = ["cloud-platform", "drive"]
-    credentials = get_credentials(scopes=scopes)
 
     if is_auto_credential:
         client = bigquery.Client()
     else:
+        credentials = get_credentials(scopes=scopes)
         client = bigquery.Client(
             credentials=credentials,
             project=credentials.project_id,
