@@ -81,7 +81,7 @@ class TestTickerRequest(unittest.TestCase):
                 "source": "foo",
                 "task": "bar",
                 "metric": "spam",
-                "amount": 42.0
+                "amount": 42.0,
             }
             test_ticker.add_data(**test_data)
 
@@ -103,7 +103,7 @@ class TestTickerRequest(unittest.TestCase):
                 "source": "foo",
                 "task": "bar",
                 "metric": "spam",
-                "amount": 42.0
+                "amount": 42.0,
             }
             test_ticker.add_data(**test_data)
             test_response = test_ticker.send_to_ticker()
@@ -138,7 +138,7 @@ class TestTickerRequest(unittest.TestCase):
                 "source": "foo",
                 "task": "bar",
                 "metric": "spam",
-                "amount": 42.0
+                "amount": 42.0,
             }
             test_ticker.add_data(**test_data)
             self.assertRaises(TickerException, test_ticker.send_to_ticker)
