@@ -76,7 +76,7 @@ class TickerRequest(HTTPClient):
                 "task": task,
                 "metric": metric,
                 "amount": amount,
-                "is_test": os.environ.get("IS_TESTING", "")
+                "is_testing": os.environ.get("IS_TESTING", "")
             }
         )
 
