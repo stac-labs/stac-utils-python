@@ -85,7 +85,9 @@ class TestTickerRequest(unittest.TestCase):
             }
             test_ticker.add_data(**test_data)
 
-            self.assertListEqual(test_ticker.data, [test_data])
+            test_result = test_data.copy()
+            test_result["is_testing"] = ""
+            self.assertListEqual(test_ticker.data, [test_result])
 
     def test_send_to_ticker(self):
         """Test send to ticker"""
@@ -106,7 +108,9 @@ class TestTickerRequest(unittest.TestCase):
             test_ticker.add_data(**test_data)
             test_response = test_ticker.send_to_ticker()
 
-            test_ticker.post.assert_called_once_with("/ticker", body=[test_data])
+            test_result = test_data.copy()
+            test_result["is_testing"] = ""
+            test_ticker.post.assert_called_once_with("/ticker", body=[test_result])
             self.assertIs(test_response, mock_response)
             self.assertListEqual(test_ticker.data, [])
 
@@ -139,8 +143,10 @@ class TestTickerRequest(unittest.TestCase):
             test_ticker.add_data(**test_data)
             self.assertRaises(TickerException, test_ticker.send_to_ticker)
 
-            test_ticker.post.assert_called_once_with("/ticker", body=[test_data])
-            self.assertListEqual(test_ticker.data, [test_data])
+            test_result = test_data.copy()
+            test_result["is_testing"] = ""
+            test_ticker.post.assert_called_once_with("/ticker", body=[test_result])
+            self.assertListEqual(test_ticker.data, [test_result])
 
 
 if __name__ == "__main__":

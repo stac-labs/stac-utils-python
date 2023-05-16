@@ -59,6 +59,33 @@ class TestEmailer(unittest.TestCase):
         )
 
     @patch("requests.post")
+    def test_send_email_with_template(self, mock_post: MagicMock):
+        """Test send email"""
+        test_emailer = Emailer("foo", "bar")
+        mock_response = MagicMock()
+        mock_response.raise_for_status = MagicMock()
+        mock_post.return_value = mock_response
+        test_emailer.send_email(
+            "foo",
+            template="barTemplate",
+            variables={"variable": "misc"},
+            emails=["spam@foo.bar"],
+        )
+        mock_post.assert_called_once_with(
+            f"https://api.mailgun.net/v3/foo/messages",
+            auth=("api", "bar"),
+            data={
+                "to": "spam@foo.bar",
+                "from": None,
+                "subject": "foo",
+                "h:Reply-to": [],
+                "template": "barTemplate",
+                "t:variables": '{"variable": "misc"}',
+            },
+        )
+        mock_response.raise_for_status.assert_called_once()
+
+    @patch("requests.post")
     def test_send_email_custom_reply_to(self, mock_post: MagicMock):
         """Test send email with custom reply to"""
         test_emailer = Emailer("foo", "bar", reply_to="no@foo.bar")
