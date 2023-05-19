@@ -59,22 +59,44 @@ def get_client(
     return client
 
 
-def auth_gcs(**kwargs) -> storage.Client:
+def auth_gcs(scopes: list[str] = None, **kwargs) -> storage.Client:
     """Returns an initialized Storage client object"""
 
-    scopes = ["cloud-platform"]
+    scopes = scopes or ["cloud-platform"]
     client = get_client(storage.Client, scopes, **kwargs)
 
     return client
 
 
-def auth_bq(**kwargs) -> bigquery.Client:
+def auth_bq(scopes: list[str] = None, **kwargs) -> bigquery.Client:
     """Returns an initialized BigQuery client object"""
 
-    scopes = ["cloud-platform", "drive"]
+    scopes = scopes or ["cloud-platform", "drive"]
     client = get_client(bigquery.Client, scopes, **kwargs)
 
     return client
+
+
+def make_gmail_client(scopes: list[str] = None, **kwargs) -> Resource:
+    """Returns an initialized Gmail Client object"""
+
+    scopes = scopes or ["gmail.labels", "gmail.modify", "gmail.readonly"]
+
+    credentials = get_credentials(scopes=scopes, **kwargs)
+    return build("gmail", "v1", credentials=credentials)
+
+
+def auth_gmail(*args, **kwargs) -> Resource:
+    return make_gmail_client(*args, **kwargs)
+
+
+def auth_sheets(scopes: list[str] = None, **kwargs) -> Resource:
+    """Returns an initialized Sheets client object"""
+
+    scopes = scopes or ["drive"]
+    credentials = get_credentials(scopes=scopes, **kwargs)
+
+    return build("sheets", "v4", credentials=credentials, cache_discovery=False)
 
 
 def run_query(
@@ -165,6 +187,7 @@ def load_data_from_dataframe(
     table_name: str,
 ):
     """Loads data from the specified dataframe into the specified table in BigQuery"""
+
     table = get_table_for_loading(client, project_name, dataset_name, table_name)
     results = client.insert_rows_from_dataframe(
         table=table, dataframe=dataframe, chunk_size=10000
@@ -182,6 +205,7 @@ def load_data_from_list(
     table_name: str,
 ):
     """Loads data from the specified list[dict] into the specified table in BigQuery"""
+
     table = get_table_for_loading(client, project_name, dataset_name, table_name)
     results = client.insert_rows(table=table, rows=data)
 
@@ -189,13 +213,18 @@ def load_data_from_list(
 
 
 def upload_data_to_gcs(
-    bucket_name: str, filename: str, destination_filename: str, destination_path: str
+    bucket_name: str,
+    filename: str,
+    destination_filename: str,
+    destination_path: str,
+    **kwargs,
 ):
     """Uploads the given file to a specified path in a GCS Bucket"""
+
     destination_path = destination_path.strip("/")
     destination_blob_name = destination_path + "/" + destination_filename
 
-    client = auth_gcs()
+    client = auth_gcs(**kwargs)
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(destination_blob_name)
 
@@ -207,32 +236,6 @@ def upload_data_to_gcs(
         print("File", filename, "uploaded to GCS as", destination_blob_name)
     else:
         print("Already on GCS", file=sys.stderr)
-
-
-def make_gmail_client(
-    service_account_blob: dict[str, str] = None,
-    subject: str = None,
-    scopes: list[str] = None,
-) -> Resource:
-    """Returns an initialized Gmail Client object"""
-
-    scopes = scopes or ["gmail.labels", "gmail.modify", "gmail.readonly"]
-
-    credentials = get_credentials(service_account_blob, scopes=scopes, subject=subject)
-    return build("gmail", "v1", credentials=credentials)
-
-
-def auth_sheets(
-    service_account_blob: dict[str, str] = None,
-    subject: str = None,
-    scopes: list[str] = None,
-) -> Resource:
-    """Returns an initialized Sheets client object"""
-
-    scopes = scopes or ["drive"]
-    credentials = get_credentials(service_account_blob, scopes=scopes, subject=subject)
-
-    return build("sheets", "v4", credentials=credentials, cache_discovery=False)
 
 
 def get_data_from_sheets(
@@ -255,13 +258,12 @@ def send_data_to_sheets(
     spreadsheet_id: str,
     range: str,
     input_option: str = "RAW",
-    client=None,
+    client: Resource = None,
     is_overwrite: bool = True,
 ) -> dict:
     """Posts the data to the Google Sheet and returns the API response"""
 
-    if client is None:
-        client = auth_sheets()
+    client = client or auth_sheets()
 
     sheet_modifier = client.spreadsheets().values()
 
