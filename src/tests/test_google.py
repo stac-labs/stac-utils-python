@@ -3,14 +3,15 @@ import unittest
 from src.stac_utils.google import (
     get_credentials,
     auth_bq,
+    auth_gcs,
+    auth_gmail,
+    auth_sheets,
+    make_gmail_client,
     run_query,
     get_table,
     create_table_from_dataframe,
     load_data_from_dataframe,
-    auth_gcs,
     upload_data_to_gcs,
-    make_gmail_client,
-    auth_sheets,
     get_data_from_sheets,
     send_data_to_sheets,
     _sanitize_name,
@@ -32,18 +33,6 @@ class TestGoogle(unittest.TestCase):
 
     def test_run_query_provided_client(self):
         """Test run query with provided client"""
-
-    def test_run_query_no_client_environment_blob(self):
-        """Test run query with no client and environment blob"""
-
-    def test_run_query_no_client_provided_blob(self):
-        """Test run query with no client and environment blob"""
-
-    def test_run_query_no_client_no_blob(self):
-        """Test run query with no client and no blob"""
-
-    def test_run_query_no_client_bad_environment_blob(self):
-        """Test run query with no client and bad blob"""
 
     def test_get_table(self):
         """Test get table"""
