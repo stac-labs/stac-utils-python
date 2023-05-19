@@ -2,14 +2,14 @@ import json
 import logging
 import os
 import sys
-from typing import Union
 
+import pandas as pd
 from google.api_core.exceptions import InternalServerError
 from google.api_core.retry import if_exception_type, Retry
 from google.cloud import storage, bigquery
 from google.cloud.bigquery.table import Table
 from google.oauth2 import service_account
-from googleapiclient.discovery import build
+from googleapiclient.discovery import build, Resource
 from inflection import parameterize, underscore
 
 from .listify import listify
@@ -20,7 +20,7 @@ RETRY_EXCEPTIONS = [InternalServerError]
 def get_credentials(
     service_account_blob: dict = None,
     service_account_env_name: str = "SERVICE_ACCOUNT",
-    scopes: Union[list[str], str] = None,
+    scopes: [list[str], str] = None,
     subject: str = None,
 ) -> service_account.Credentials:
     """Loads a Google Service Account into a Credentials object with the given scopes"""
@@ -126,7 +126,7 @@ def get_table(
 
 def create_table_from_dataframe(
     client: bigquery.Client,
-    dataframe,
+    dataframe: pd.DataFrame,
     project_name: str,
     dataset_name: str,
     table_name: str,
@@ -177,7 +177,7 @@ def get_table_for_loading(
 @Retry(predicate=if_exception_type(*RETRY_EXCEPTIONS))
 def load_data_from_dataframe(
     client: bigquery.Client,
-    dataframe,
+    dataframe: pd.DataFrame,
     project_name: str,
     dataset_name: str,
     table_name: str,
@@ -245,7 +245,7 @@ def make_gmail_client(
     service_account_blob: dict[str, str] = None,
     subject: str = None,
     scopes: list[str] = None,
-):
+) -> Resource:
     """Returns an initialized Gmail Client object"""
 
     scopes = scopes or ["gmail.labels", "gmail.modify", "gmail.readonly"]
@@ -258,7 +258,7 @@ def auth_sheets(
     service_account_blob: dict[str, str] = None,
     subject: str = None,
     scopes: list[str] = None,
-):
+) -> Resource:
     """Returns an initialized Sheets client object"""
 
     scopes = scopes or ["drive"]
@@ -267,7 +267,7 @@ def auth_sheets(
     return build("sheets", "v4", credentials=credentials, cache_discovery=False)
 
 
-def get_data_from_sheets(spreadsheet_id: str, range: str, client=None) -> list[list]:
+def get_data_from_sheets(spreadsheet_id: str, range: str, client: Resource = None) -> list[list]:
     """Returns the sheet data in the form of a list of lists"""
 
     if client is None:
@@ -286,7 +286,7 @@ def send_data_to_sheets(
     range: str,
     input_option: str = "RAW",
     client=None,
-    is_overwrite=True,
+    is_overwrite: bool = True,
 ) -> dict:
     """Posts the data to the Google Sheet and returns the API response"""
 
