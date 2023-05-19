@@ -77,7 +77,7 @@ def auth_bq(scopes: list[str] = None, **kwargs) -> bigquery.Client:
     return client
 
 
-def make_gmail_client(scopes: list[str] = None, **kwargs) -> Resource:
+def auth_gmail(scopes: list[str] = None, **kwargs) -> Resource:
     """Returns an initialized Gmail Client object"""
 
     scopes = scopes or ["gmail.labels", "gmail.modify", "gmail.readonly"]
@@ -86,8 +86,9 @@ def make_gmail_client(scopes: list[str] = None, **kwargs) -> Resource:
     return build("gmail", "v1", credentials=credentials)
 
 
-def auth_gmail(*args, **kwargs) -> Resource:
-    return make_gmail_client(*args, **kwargs)
+def make_gmail_client(*args, **kwargs) -> Resource:
+    """ Deprecated """
+    return auth_gmail(*args, **kwargs)
 
 
 def auth_sheets(scopes: list[str] = None, **kwargs) -> Resource:
