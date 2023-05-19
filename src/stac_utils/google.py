@@ -137,11 +137,11 @@ def create_table_from_dataframe(
 ):
     column_name_conversion = {}
     column_definitions = []
-    for columnIndex in range(len(dataframe.columns)):
-        column_name = dataframe.columns[columnIndex]
+    for column_index in range(len(dataframe.columns)):
+        column_name = dataframe.columns[column_index]
         db_column_name = underscore(parameterize(column_name))
         column_name_conversion[column_name] = db_column_name
-        datatype = dataframe.dtypes[columnIndex].name
+        datatype = dataframe.dtypes[column_index].name
         if datatype == "object":
             column_definitions.append(f"{db_column_name} STRING")
         elif datatype == "int64":
