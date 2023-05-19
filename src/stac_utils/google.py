@@ -45,81 +45,63 @@ def get_credentials(
     return credentials
 
 
-def auth_bq(is_auto_credential: bool = False) -> bigquery.Client:
-    """Returns an initialized BigQuery client object"""
-
-    scopes = ["cloud-platform", "drive"]
-
+def get_client(
+    client_class, scopes: list[str], is_auto_credential: bool = False, **kwargs
+):
     if is_auto_credential:
-        client = bigquery.Client()
+        client = client_class()
     else:
-        credentials = get_credentials(scopes=scopes)
-        client = bigquery.Client(
+        credentials = get_credentials(scopes=scopes, **kwargs)
+        client = client_class(
             credentials=credentials,
             project=credentials.project_id,
         )
+    return client
+
+
+def auth_gcs(**kwargs) -> storage.Client:
+    """Returns an initialized Storage client object"""
+
+    scopes = ["cloud-platform"]
+    client = get_client(storage.Client, scopes, **kwargs)
+
+    return client
+
+
+def auth_bq(**kwargs) -> bigquery.Client:
+    """Returns an initialized BigQuery client object"""
+
+    scopes = ["cloud-platform", "drive"]
+    client = get_client(bigquery.Client, scopes, **kwargs)
 
     return client
 
 
 def run_query(
     sql: str,
-    service_account_blob: dict[str, str] = None,
-    subject: str = None,
     client: bigquery.Client = None,
     retry_exceptions: list = None,
     job_config: bigquery.QueryJobConfig = None,
-    is_auto_credential: bool = False,
+    **kwargs,
 ) -> list[dict]:
     """Performs a SQL query in BigQuery"""
-    if is_auto_credential:
-        client = bigquery.Client()
-    if not client:
-        if not service_account_blob:
-            try:
-                service_account_string = os.environ.get(
-                    "BQ_SERVICE_ACCOUNT"
-                ) or os.environ.get("SERVICE_ACCOUNT")
-                service_account_blob = json.loads(service_account_string)
-            except (json.JSONDecodeError, KeyError) as error:
-                raise Exception("Service account did not load correctly", error)
+    client = client or auth_bq(**kwargs)
 
-        credentials = get_credentials(
-            service_account_blob, scopes=["bigquery", "drive"], subject=subject
-        )
-        client = bigquery.Client(credentials=credentials)
     retry_exceptions = retry_exceptions or RETRY_EXCEPTIONS
-
     retry_policy = Retry(predicate=if_exception_type(*retry_exceptions))
-    job = client.query(sql, retry=retry_policy, job_config=job_config).result()
 
+    job = client.query(sql, retry=retry_policy, job_config=job_config).result()
     results = [{k: v for k, v in row.items()} for row in job]
 
     return results
 
 
-def get_table(
-    table_name: str,
-    service_account_blob: dict[str, str] = None,
-    service_account_env_name: str = "SERVICE_ACCOUNT",
-    subject: str = None,
-    client: bigquery.Client = None,
-) -> list[dict]:
+def get_table(table_name: str, **kwargs) -> list[dict]:
     """Performs a select * from the given table in BigQuery"""
-    if not service_account_blob and not client:
-        try:
-            service_account_blob = json.loads(os.environ[service_account_env_name])
-        except json.JSONDecodeError:
-            pass
 
     # sadly bq's parameterized queries don't support table names
     sql = f"SELECT * FROM `{_sanitize_name(table_name)}`;"
-    results = run_query(
-        sql,
-        service_account_blob=service_account_blob,
-        client=client,
-        subject=subject,
-    )
+    results = run_query(sql, **kwargs)
 
     return results
 
@@ -206,20 +188,6 @@ def load_data_from_list(
     logging.info(f"inserted {len(results)} rows")
 
 
-def auth_gcs() -> storage.Client:
-    """Returns an initialized Storage client object"""
-
-    scopes = ["cloud-platform"]
-    credentials = get_credentials(scopes=scopes)
-
-    client = storage.Client(
-        credentials=credentials,
-        project=credentials.project_id,
-    )
-
-    return client
-
-
 def upload_data_to_gcs(
     bucket_name: str, filename: str, destination_filename: str, destination_path: str
 ):
@@ -267,7 +235,9 @@ def auth_sheets(
     return build("sheets", "v4", credentials=credentials, cache_discovery=False)
 
 
-def get_data_from_sheets(spreadsheet_id: str, range: str, client: Resource = None) -> list[list]:
+def get_data_from_sheets(
+    spreadsheet_id: str, range: str, client: Resource = None
+) -> list[list]:
     """Returns the sheet data in the form of a list of lists"""
 
     if client is None:
