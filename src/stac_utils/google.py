@@ -179,36 +179,40 @@ def get_table_for_loading(
     return table
 
 
-@Retry(predicate=if_exception_type(*RETRY_EXCEPTIONS))
 def load_data_from_dataframe(
     client: bigquery.Client,
     dataframe: pd.DataFrame,
     project_name: str,
     dataset_name: str,
     table_name: str,
+    retry_exceptions: list = None,
 ):
     """Loads data from the specified dataframe into the specified table in BigQuery"""
 
     table = get_table_for_loading(client, project_name, dataset_name, table_name)
+    retry_exceptions = retry_exceptions or RETRY_EXCEPTIONS
+    retry_policy = Retry(predicate=if_exception_type(*retry_exceptions))
     results = client.insert_rows_from_dataframe(
-        table=table, dataframe=dataframe, chunk_size=10000
+        table=table, dataframe=dataframe, chunk_size=10000, retry=retry_policy,
     )
 
     logging.info(f"inserted {len(results)} rows")
 
 
-@Retry(predicate=if_exception_type(*RETRY_EXCEPTIONS))
 def load_data_from_list(
     client: bigquery.Client,
     data: list[dict],
     project_name: str,
     dataset_name: str,
     table_name: str,
+    retry_exceptions: list = None,
 ):
     """Loads data from the specified list[dict] into the specified table in BigQuery"""
 
     table = get_table_for_loading(client, project_name, dataset_name, table_name)
-    results = client.insert_rows(table=table, rows=data)
+    retry_exceptions = retry_exceptions or RETRY_EXCEPTIONS
+    retry_policy = Retry(predicate=if_exception_type(*retry_exceptions))
+    results = client.insert_rows(table=table, rows=data, retry=retry_policy)
 
     logging.info(f"inserted {len(results)} rows")
 
@@ -244,8 +248,7 @@ def get_data_from_sheets(
 ) -> list[list]:
     """Returns the sheet data in the form of a list of lists"""
 
-    if client is None:
-        client = auth_sheets()
+    client = client or auth_sheets()
 
     request = (
         client.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=range)
