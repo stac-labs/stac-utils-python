@@ -153,11 +153,12 @@ def create_table_from_dataframe(
 
     dataframe.rename(columns=column_name_conversion, inplace=True)
     table_definition_sql = f"""
-        DROP TABLE IF EXISTS {project_name}.{dataset_name}.{table_name} 
+        DROP TABLE IF EXISTS 
+            {project_name}.{dataset_name}.{table_name} 
         ;
         CREATE TABLE {project_name}.{dataset_name}.{table_name} ( 
             {", ".join(column_definitions)}
-        )
+        );
     """
     print(table_definition_sql)
     run_query(table_definition_sql, client=client)
