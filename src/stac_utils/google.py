@@ -245,11 +245,11 @@ def upload_data_to_gcs(
 
 
 def get_data_from_sheets(
-    spreadsheet_id: str, range: str, client: Resource = None
+    spreadsheet_id: str, range: str, client: Resource = None, **kwargs
 ) -> list[list]:
     """Returns the sheet data in the form of a list of lists"""
 
-    client = client or auth_sheets()
+    client = client or auth_sheets(**kwargs)
 
     request = (
         client.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=range)
@@ -265,10 +265,11 @@ def send_data_to_sheets(
     input_option: str = "RAW",
     client: Resource = None,
     is_overwrite: bool = True,
+    **kwargs,
 ) -> dict:
     """Posts the data to the Google Sheet and returns the API response"""
 
-    client = client or auth_sheets()
+    client = client or auth_sheets(**kwargs)
 
     sheet_modifier = client.spreadsheets().values()
 
