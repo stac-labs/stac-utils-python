@@ -87,7 +87,7 @@ def auth_gmail(scopes: list[str] = None, **kwargs) -> Resource:
 
 
 def make_gmail_client(*args, **kwargs) -> Resource:
-    """ Deprecated """
+    """ Deprecated alias """
     return auth_gmail(*args, **kwargs)
 
 
