@@ -1,7 +1,12 @@
 import unittest
+from unittest.mock import MagicMock, patch, call
+
+from google.cloud import storage, bigquery
+from googleapiclient.discovery import Resource
 
 from src.stac_utils.google import (
     get_credentials,
+    get_client,
     auth_bq,
     auth_gcs,
     auth_gmail,
@@ -28,38 +33,148 @@ class TestGoogle(unittest.TestCase):
     def test_get_credentials_missing(self):
         """Test credentials fails because no credentials were provided"""
 
-    def test_get_client(self):
+    @patch("src.stac_utils.google.get_credentials")
+    def test_get_client(self, mock_get_credentials: MagicMock):
         """Test it gets credentials and makes a client"""
 
-    def test_get_client_auto_credential(self):
+        mock_client = MagicMock()
+        mock_client_class = MagicMock(
+            return_value=mock_client
+        )
+        mock_credentials = MagicMock()
+        mock_credentials.project_id = 42
+        mock_get_credentials.return_value = mock_credentials
+
+        result_client = get_client(mock_client_class, ["foo"], bar=True)
+        mock_get_credentials.assert_called_once_with(scopes=["foo"], bar=True)
+        mock_client_class.assert_called_once_with(
+            credentials=mock_credentials,
+            project=mock_credentials.project_id,
+        )
+        self.assertIs(result_client, mock_client)
+
+    @patch("src.stac_utils.google.get_credentials")
+    def test_get_client_auto_credential(self, mock_get_credentials: MagicMock):
         """Test it creates a client from default credentials"""
 
-    def test_auth_gcs(self):
+        mock_client = MagicMock()
+        mock_client_class = MagicMock(
+            return_value=mock_client
+        )
+
+        result_client = get_client(mock_client_class, ["foo"], is_auto_credential=True)
+        mock_get_credentials.assert_not_called()
+        mock_client_class.assert_called_once_with()
+        self.assertIs(result_client, mock_client)
+
+    @patch("src.stac_utils.google.get_client")
+    def test_auth_gcs(self, mock_get_client: MagicMock):
         """Test it makes a gcs client"""
 
-    def test_auth_gcs_other_scopes(self):
+        mock_client = MagicMock()
+        mock_get_client.return_value = mock_client
+
+        result_client = auth_gcs()
+
+        mock_get_client.assert_called_once_with(
+            storage.Client, ["cloud-platform"]
+        )
+        self.assertIs(result_client, mock_client)
+
+    @patch("src.stac_utils.google.get_client")
+    def test_auth_gcs_other_scopes(self, mock_get_client: MagicMock):
         """Test auth gcs with custom scopes"""
 
-    def test_auth_bq(self):
+        auth_gcs(["foo", "bar"])
+
+        mock_get_client.assert_called_once_with(
+            storage.Client, ["foo", "bar"]
+        )
+
+    @patch("src.stac_utils.google.get_client")
+    def test_auth_bq(self, mock_get_client: MagicMock):
         """Test it makes a bigquery client"""
 
-    def test_auth_bq_other_scopes(self):
+        mock_client = MagicMock()
+        mock_get_client.return_value = mock_client
+
+        result_client = auth_bq()
+
+        mock_get_client.assert_called_once_with(
+            bigquery.Client, ["cloud-platform", "drive"]
+        )
+        self.assertIs(result_client, mock_client)
+
+    @patch("src.stac_utils.google.get_client")
+    def test_auth_bq_other_scopes(self, mock_get_client: MagicMock):
         """Test auth bq with custom scopes"""
 
-    def test_auth_gmail(self):
+        auth_bq(["foo", "bar"])
+
+        mock_get_client.assert_called_once_with(
+            bigquery.Client, ["foo", "bar"]
+        )
+
+    @patch("src.stac_utils.google.get_credentials")
+    def test_auth_gmail(self, mock_get_credentials: MagicMock):
         """Test it gets credentials & builds a gmail client"""
 
-    def test_auth_gmail_other_scopes(self):
+        mock_credentials = MagicMock()
+        mock_get_credentials.return_value = mock_credentials
+
+        result_client = auth_gmail()
+
+        mock_get_credentials.assert_called_once_with(
+            scopes=["gmail.labels", "gmail.modify", "gmail.readonly"]
+        )
+        self.assertIsInstance(result_client, Resource)
+
+    @patch("src.stac_utils.google.get_credentials")
+    def test_auth_gmail_other_scopes(self, mock_get_credentials: MagicMock):
         """Test auth gmail with custom scopes"""
 
-    def test_make_gmail_client(self):
+        mock_credentials = MagicMock()
+        mock_get_credentials.return_value = mock_credentials
+
+        auth_gmail(["foo", "bar"])
+
+        mock_get_credentials.assert_called_once_with(
+            scopes=["foo", "bar"]
+        )
+
+    @patch("src.stac_utils.google.auth_gmail")
+    def test_make_gmail_client(self, mock_auth_gmail: MagicMock):
         """Test it simply calls auth_gmail """
 
-    def test_auth_sheets(self):
+        make_gmail_client("foo", bar="spam")
+        mock_auth_gmail.assert_called_once_with("foo", bar="spam")
+
+    @patch("src.stac_utils.google.get_credentials")
+    def test_auth_sheets(self, mock_get_credentials: MagicMock):
         """Test it gets credentials & builds a sheets client"""
 
-    def test_auth_sheets_other_scopes(self):
+        mock_credentials = MagicMock()
+        mock_get_credentials.return_value = mock_credentials
+
+        result_client = auth_sheets()
+
+        mock_get_credentials.assert_called_once_with(
+            scopes=["drive"]
+        )
+        self.assertIsInstance(result_client, Resource)
+
+    @patch("src.stac_utils.google.get_credentials")
+    def test_auth_sheets_other_scopes(self, mock_get_credentials: MagicMock):
         """Test auth sheets with custom scopes"""
+
+        mock_credentials = MagicMock()
+        mock_get_credentials.return_value = mock_credentials
+
+        auth_sheets(["foo", "bar"])
+
+        mock_get_credentials.assert_called_once_with(
+            scopes=["foo", "bar"]
+        )
 
     def test_run_query_provided_client(self):
         """Test run query with provided client"""
@@ -67,8 +182,18 @@ class TestGoogle(unittest.TestCase):
     def test_run_query_no_client(self):
         """Test run query with no client"""
 
-    def test_get_table(self):
+    @patch("src.stac_utils.google.run_query")
+    def test_get_table(self, mock_run_query: MagicMock):
         """Test get table"""
+
+        mock_results = MagicMock()
+        mock_run_query.return_value = mock_results
+
+        test_results = get_table("foo.bar", spam=True)
+        mock_run_query.assert_called_once_with(
+            "SELECT * FROM `foo.bar`;", spam=True
+        )
+        self.assertIs(test_results, mock_results)
 
     def test_create_table_from_dataframe(self):
         """Test create table from dataframe"""
