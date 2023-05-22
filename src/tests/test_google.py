@@ -109,6 +109,15 @@ class TestGoogle(unittest.TestCase):
     def test__sanitize_name(self):
         """Test sanitize name"""
 
+        self.assertEqual(_sanitize_name("Foo.Bar"), "Foo.Bar")
+        self.assertEqual(_sanitize_name("foo.bar"), "foo.bar")
+        self.assertEqual(_sanitize_name("FOO.BAR"), "FOO.BAR")
+        self.assertEqual(_sanitize_name("Foo1.Bar2"), "Foo1.Bar2")
+        self.assertEqual(_sanitize_name("Foo_1.Bar_2"), "Foo_1.Bar_2")
+        self.assertEqual(_sanitize_name("foo;DROP TABLE.bar"), "fooDROPTABLE.bar")
+        self.assertEqual(_sanitize_name("foo???.bar"), "foo.bar")
+        self.assertEqual(_sanitize_name("'foo'.'bar'"), "foo.bar")
+
 
 if __name__ == "__main__":
     unittest.main()
