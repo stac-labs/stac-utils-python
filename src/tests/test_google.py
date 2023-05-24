@@ -16,7 +16,9 @@ from src.stac_utils.google import (
     run_query,
     get_table,
     create_table_from_dataframe,
+    get_table_for_loading,
     load_data_from_dataframe,
+    load_data_from_list,
     upload_data_to_gcs,
     get_data_from_sheets,
     send_data_to_sheets,
@@ -274,14 +276,29 @@ class TestGoogle(unittest.TestCase):
         mock_run_query.assert_not_called()
         mock_load_data.assert_not_called()
 
-    def test_get_table_for_loading(self):
+    @patch("src.stac_utils.google.bigquery")
+    def test_get_table_for_loading(self, mock_bigquery: MagicMock):
         """Test get table for loading"""
+        mock_client = MagicMock()
+        get_table_for_loading(mock_client, "foo", "bar", "spam")
+        mock_bigquery.Dataset.assert_called_once_with("foo.bar")
+        mock_client.get_table.assert_called_once()
 
-    def test_load_data_from_dataframe(self):
+    @patch("src.stac_utils.google.get_table_for_loading")
+    def test_load_data_from_dataframe(self, mock_get_table: MagicMock):
         """Test load data from dataframe"""
+        mock_client = MagicMock()
+        load_data_from_dataframe(mock_client, pd.DataFrame(), "foo", "bar", "spam")
+        mock_get_table.assert_called_once_with(mock_client, "foo", "bar", "spam")
+        mock_client.insert_rows_from_dataframe.assert_called_once()
 
-    def test_load_data_from_list(self):
+    @patch("src.stac_utils.google.get_table_for_loading")
+    def test_load_data_from_list(self, mock_get_table: MagicMock):
         """Test load data from list"""
+        mock_client = MagicMock()
+        load_data_from_list(mock_client, [], "foo", "bar", "spam")
+        mock_get_table.assert_called_once_with(mock_client, "foo", "bar", "spam")
+        mock_client.insert_rows.assert_called_once()
 
     def test_upload_data_to_gcs(self):
         """Test upload data to gcs"""
