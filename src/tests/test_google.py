@@ -300,14 +300,50 @@ class TestGoogle(unittest.TestCase):
         mock_get_table.assert_called_once_with(mock_client, "foo", "bar", "spam")
         mock_client.insert_rows.assert_called_once()
 
-    def test_upload_data_to_gcs(self):
+    @patch("src.stac_utils.google.auth_gcs")
+    def test_upload_data_to_gcs(self, mock_auth_gcs: MagicMock):
         """Test upload data to gcs"""
+        mock_client = MagicMock()
+        mock_auth_gcs.return_value = mock_client
+        mock_bucket = MagicMock()
+        mock_blob = MagicMock()
+        mock_client.bucket.return_value = mock_bucket
+        mock_bucket.blob.return_value = mock_blob
+        mock_blob.exists.return_value = False
+        upload_data_to_gcs("foo", "bar", "spam", "eggs")
+        mock_auth_gcs.assert_called_once()
+        mock_client.bucket.assert_called_once_with("foo")
+        mock_bucket.blob.assert_called_once_with("eggs/spam")
+        mock_blob.upload_from_filename.assert_called_once_with("bar")
 
-    def test_upload_data_to_gcs_already_exists(self):
+    @patch("src.stac_utils.google.auth_gcs")
+    def test_upload_data_to_gcs_with_provided_client(self, mock_auth_gcs: MagicMock):
+        """Test upload data to gcs with provided client"""
+        mock_client = MagicMock()
+        mock_bucket = MagicMock()
+        mock_blob = MagicMock()
+        mock_client.bucket.return_value = mock_bucket
+        mock_bucket.blob.return_value = mock_blob
+        mock_blob.exists.return_value = False
+        upload_data_to_gcs("foo", "bar", "spam", "eggs", client=mock_client)
+        mock_auth_gcs.assert_not_called()
+        mock_blob.upload_from_filename.assert_called_once_with("bar")
+
+    @patch("src.stac_utils.google.auth_gcs")
+    def test_upload_data_to_gcs_already_exists(self, mock_auth_gcs: MagicMock):
         """Test upload data to gcs when file already exists"""
+        mock_client = MagicMock()
+        mock_auth_gcs.return_value = mock_client
+        mock_bucket = MagicMock()
+        mock_blob = MagicMock()
+        mock_client.bucket.return_value = mock_bucket
+        mock_bucket.blob.return_value = mock_blob
+        mock_blob.exists.return_value = True
+        upload_data_to_gcs("foo", "bar", "spam", "eggs")
+        mock_blob.upload_from_filename.assert_not_called()
 
     def test_get_data_from_sheets(self):
-        """Test get data from sheest"""
+        """Test get data from sheets"""
 
     def test_get_data_from_sheets_no_client(self):
         """Test get data from sheets with no client provided"""
