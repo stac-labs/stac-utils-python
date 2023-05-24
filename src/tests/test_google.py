@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, patch, call
 
+import pandas as pd
 from google.cloud import storage, bigquery
 from googleapiclient.discovery import Resource
 
@@ -220,11 +221,58 @@ class TestGoogle(unittest.TestCase):
         mock_run_query.assert_called_once_with("SELECT * FROM `foo.bar`;", spam=True)
         self.assertIs(test_results, mock_results)
 
-    def test_create_table_from_dataframe(self):
+    @patch("src.stac_utils.google.run_query")
+    @patch("src.stac_utils.google.load_data_from_dataframe")
+    def test_create_table_from_dataframe(
+        self, mock_load_data: MagicMock, mock_run_query: MagicMock
+    ):
         """Test create table from dataframe"""
 
-    def test_create_table_from_dataframe_bad_types(self):
+        mock_df = pd.DataFrame([{"foo": 1, "bar": 2.5, "spam": "spam"}])
+
+        table_definition_sql = f"""
+        DROP TABLE IF EXISTS 
+            foo.bar.spam 
+        ;
+        CREATE TABLE foo.bar.spam ( 
+            foo INT64, bar NUMERIC, spam STRING
+        );
+    """
+
+        mock_client = MagicMock()
+        create_table_from_dataframe(
+            mock_client,
+            mock_df,
+            project_name="foo",
+            dataset_name="bar",
+            table_name="spam",
+        )
+        mock_run_query.assert_called_once_with(table_definition_sql, client=mock_client)
+        mock_load_data.assert_called_once()
+
+    @patch("src.stac_utils.google.run_query")
+    @patch("src.stac_utils.google.load_data_from_dataframe")
+    def test_create_table_from_dataframe_bad_types(
+        self, mock_load_data: MagicMock, mock_run_query: MagicMock
+    ):
         """Test create table from dataframe with bad type"""
+
+        mock_df = pd.DataFrame(
+            [{"foo": pd.Timestamp("20230524"), "bar": 2.5, "spam": "spam"}]
+        )
+
+        mock_client = MagicMock()
+        self.assertRaises(
+            ValueError,
+            create_table_from_dataframe,
+            mock_client,
+            mock_df,
+            project_name="foo",
+            dataset_name="bar",
+            table_name="spam",
+        )
+        mock_run_query.assert_not_called()
+        mock_load_data.assert_not_called()
 
     def test_get_table_for_loading(self):
         """Test get table for loading"""
