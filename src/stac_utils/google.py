@@ -223,6 +223,7 @@ def upload_data_to_gcs(
     filename: str,
     destination_filename: str,
     destination_path: str,
+    client: storage.Client = None,
     **kwargs,
 ):
     """Uploads the given file to a specified path in a GCS Bucket"""
@@ -230,7 +231,7 @@ def upload_data_to_gcs(
     destination_path = destination_path.strip("/")
     destination_blob_name = destination_path + "/" + destination_filename
 
-    client = auth_gcs(**kwargs)
+    client = client or auth_gcs(**kwargs)
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(destination_blob_name)
 
