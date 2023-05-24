@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import MagicMock, patch, call
 
 from src.stac_utils.browser.driver import ChromeDriver
 
