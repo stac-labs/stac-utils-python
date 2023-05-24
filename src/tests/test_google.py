@@ -342,17 +342,41 @@ class TestGoogle(unittest.TestCase):
         upload_data_to_gcs("foo", "bar", "spam", "eggs")
         mock_blob.upload_from_filename.assert_not_called()
 
-    def test_get_data_from_sheets(self):
+    @patch("src.stac_utils.google.auth_sheets")
+    def test_get_data_from_sheets(self, mock_auth_sheets: MagicMock):
         """Test get data from sheets"""
+        mock_client = MagicMock()
+        mock_auth_sheets.return_value = mock_client
+        get_data_from_sheets("foo", "bar")
+        mock_client.spreadsheets.return_value.values.return_value.get.assert_called_once_with(
+            spreadsheetId="foo", range="bar"
+        )
 
-    def test_get_data_from_sheets_no_client(self):
-        """Test get data from sheets with no client provided"""
+    @patch("src.stac_utils.google.auth_sheets")
+    def test_get_data_from_sheets_provided_client(self, mock_auth_sheets: MagicMock):
+        """Test get data from sheets with client provided"""
+        mock_client = MagicMock()
+        get_data_from_sheets("foo", "bar", client=mock_client)
+        mock_auth_sheets.assert_not_called()
+
+    @patch("src.stac_utils.google.auth_sheets")
+    def test_send_data_to_sheets_overwrite(self, mock_auth_sheets: MagicMock):
+        """test send to sheets with overwrite"""
+        mock_client = MagicMock()
+        mock_auth_sheets.return_value = mock_client
+        mock_modifier = MagicMock()
+        mock_client.spreadsheets.return_value.values.return_value = mock_modifier
+        send_data_to_sheets([[]], "foo", "bar")
+        mock_modifier.append.assert_not_called()
+        mock_modifier.update.assert_called_once_with(
+            spreadsheetId="foo",
+            range="bar",
+            valueInputOption="RAW",
+            body={"values": [[]]},
+        )
 
     def test_send_data_to_sheets_no_overwrite(self):
         """test send to sheets with no overwrite"""
-
-    def test_send_data_to_sheets_overwrite(self):
-        """test send to sheets with overwrite"""
 
     def test_send_data_to_sheets_no_client(self):
         """test send to sheets with no client and no overwrite"""
