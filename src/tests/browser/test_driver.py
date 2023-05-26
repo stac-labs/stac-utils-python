@@ -54,8 +54,10 @@ class TestChromeDriver(unittest.TestCase):
     def test_init_local_no_driver(self):
         """Test init run locally and no driver location"""
 
+        mock_manager.install.return_value = "./foo"
         test_driver = ChromeDriver(run_locally=True)
         mock_manager.install.assert_called_once()
+        self.assertEqual(test_driver.driver_location, "./foo")
 
     @patch("tempfile.TemporaryDirectory")
     def test_context_manager(self, mock_temp_dir: MagicMock):
