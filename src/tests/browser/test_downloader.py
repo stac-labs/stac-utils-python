@@ -1,9 +1,7 @@
 import unittest
-from unittest.mock import MagicMock, patch, call
-
+from unittest.mock import MagicMock, patch
 
 from src.stac_utils.browser.downloader import Downloader
-
 
 mock_sleep = MagicMock()
 mock_getsize = MagicMock()
