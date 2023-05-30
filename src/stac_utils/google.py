@@ -22,14 +22,16 @@ def get_credentials(
     service_account_env_name: str = "SERVICE_ACCOUNT",
     scopes: [list[str], str] = None,
     subject: str = None,
-) -> service_account.Credentials:
+) -> [service_account.Credentials, None]:
     """Loads a Google Service Account into a Credentials object with the given scopes"""
 
     if not service_account_blob:
         try:
             service_account_blob = json.loads(os.environ[service_account_env_name])
-        except (json.JSONDecodeError, KeyError) as error:
-            raise Exception("Service account did not load correctly", error)
+        except (json.JSONDecodeError, KeyError) as e:
+            print("Service account did not load correctly")
+            print(e)
+            return None
 
     if isinstance(scopes, str):
         scopes = listify(scopes)
@@ -46,16 +48,10 @@ def get_credentials(
 
 
 def get_client(
-    client_class, scopes: list[str], is_auto_credential: bool = False, **kwargs
+    client_class, scopes: list[str], **kwargs
 ):
-    if is_auto_credential:
-        client = client_class()
-    else:
-        credentials = get_credentials(scopes=scopes, **kwargs)
-        client = client_class(
-            credentials=credentials,
-            project=credentials.project_id,
-        )
+    credentials = get_credentials(scopes=scopes, **kwargs)
+    client = client_class(credentials=credentials)
     return client
 
 

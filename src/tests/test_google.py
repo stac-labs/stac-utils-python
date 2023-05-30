@@ -54,39 +54,33 @@ class TestGoogle(unittest.TestCase):
             )
 
     def test_get_credentials_missing(self):
-        """Test credentials fails because no credentials were provided"""
+        """Test credentials returns None because no credentials were provided"""
 
-        self.assertRaises(Exception, get_credentials, scopes="foo")
+        self.assertIsNone(get_credentials(scopes="foo"))
 
     @patch("src.stac_utils.google.get_credentials")
     def test_get_client(self, mock_get_credentials: MagicMock):
         """Test it gets credentials and makes a client"""
 
-        mock_client = MagicMock()
-        mock_client_class = MagicMock(return_value=mock_client)
-        mock_credentials = MagicMock()
-        mock_credentials.project_id = 42
-        mock_get_credentials.return_value = mock_credentials
-
+        mock_client_class = MagicMock()
         result_client = get_client(mock_client_class, ["foo"], bar=True)
         mock_get_credentials.assert_called_once_with(scopes=["foo"], bar=True)
         mock_client_class.assert_called_once_with(
-            credentials=mock_credentials,
-            project=mock_credentials.project_id,
+            credentials=mock_get_credentials.return_value,
         )
-        self.assertIs(mock_client, result_client)
+        self.assertIs(mock_client_class.return_value, result_client)
 
     @patch("src.stac_utils.google.get_credentials")
     def test_get_client_auto_credential(self, mock_get_credentials: MagicMock):
         """Test it creates a client from default credentials"""
 
-        mock_client = MagicMock()
-        mock_client_class = MagicMock(return_value=mock_client)
+        mock_client_class = MagicMock()
+        mock_get_credentials.return_value = None
 
-        result_client = get_client(mock_client_class, ["foo"], is_auto_credential=True)
-        mock_get_credentials.assert_not_called()
-        mock_client_class.assert_called_once_with()
-        self.assertIs(mock_client, result_client)
+        result_client = get_client(mock_client_class, ["foo"])
+        mock_get_credentials.assert_called_once_with(scopes=["foo"])
+        mock_client_class.assert_called_once_with(credentials=None)
+        self.assertIs(mock_client_class.return_value, result_client)
 
     @patch("src.stac_utils.google.get_client")
     def test_auth_gcs(self, mock_get_client: MagicMock):
