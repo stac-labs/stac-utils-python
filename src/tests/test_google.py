@@ -1,3 +1,4 @@
+import os
 import unittest
 from unittest.mock import MagicMock, patch, call
 
@@ -27,14 +28,35 @@ from src.stac_utils.google import (
 
 
 class TestGoogle(unittest.TestCase):
-    def test_get_credentials_json_blob(self):
+    @patch("src.stac_utils.google.service_account")
+    def test_get_credentials_json_blob(self, mock_service_account: MagicMock):
         """Test credentials are created successfully from blob"""
 
-    def test_get_credentials_environment(self):
+        mock_blob = {"FOO": "BAR"}
+        get_credentials(mock_blob, scopes="foo")
+        mock_service_account.Credentials.from_service_account_info.assert_called_once_with(
+            mock_blob,
+            scopes=["https://www.googleapis.com/auth/foo"],
+            subject=None,
+        )
+
+    @patch("src.stac_utils.google.service_account")
+    def test_get_credentials_environment(self, mock_service_account: MagicMock):
         """Test credentials are created successfully from environment"""
+
+        mock_environ = {"SERVICE_ACCOUNT": """{"FOO": "BAR"}"""}
+        with patch.dict(os.environ, values=mock_environ):
+            get_credentials(scopes="foo")
+            mock_service_account.Credentials.from_service_account_info.assert_called_once_with(
+                {"FOO": "BAR"},
+                scopes=["https://www.googleapis.com/auth/foo"],
+                subject=None,
+            )
 
     def test_get_credentials_missing(self):
         """Test credentials fails because no credentials were provided"""
+
+        self.assertRaises(Exception, get_credentials, scopes="foo")
 
     @patch("src.stac_utils.google.get_credentials")
     def test_get_client(self, mock_get_credentials: MagicMock):
@@ -52,7 +74,7 @@ class TestGoogle(unittest.TestCase):
             credentials=mock_credentials,
             project=mock_credentials.project_id,
         )
-        self.assertIs(result_client, mock_client)
+        self.assertIs(mock_client, result_client)
 
     @patch("src.stac_utils.google.get_credentials")
     def test_get_client_auto_credential(self, mock_get_credentials: MagicMock):
@@ -64,7 +86,7 @@ class TestGoogle(unittest.TestCase):
         result_client = get_client(mock_client_class, ["foo"], is_auto_credential=True)
         mock_get_credentials.assert_not_called()
         mock_client_class.assert_called_once_with()
-        self.assertIs(result_client, mock_client)
+        self.assertIs(mock_client, result_client)
 
     @patch("src.stac_utils.google.get_client")
     def test_auth_gcs(self, mock_get_client: MagicMock):
@@ -76,7 +98,7 @@ class TestGoogle(unittest.TestCase):
         result_client = auth_gcs()
 
         mock_get_client.assert_called_once_with(storage.Client, ["cloud-platform"])
-        self.assertIs(result_client, mock_client)
+        self.assertIs(mock_client, result_client)
 
     @patch("src.stac_utils.google.get_client")
     def test_auth_gcs_other_scopes(self, mock_get_client: MagicMock):
@@ -98,7 +120,7 @@ class TestGoogle(unittest.TestCase):
         mock_get_client.assert_called_once_with(
             bigquery.Client, ["cloud-platform", "drive"]
         )
-        self.assertIs(result_client, mock_client)
+        self.assertIs(mock_client, result_client)
 
     @patch("src.stac_utils.google.get_client")
     def test_auth_bq_other_scopes(self, mock_get_client: MagicMock):
@@ -195,7 +217,7 @@ class TestGoogle(unittest.TestCase):
             job_config=mock_job_config,
         )
         mock_query_job.result.assert_called_once()
-        self.assertEqual(test_results, mock_job)
+        self.assertEqual(mock_job, test_results)
 
     @patch("src.stac_utils.google.auth_bq")
     def test_run_query_no_client(self, mock_auth_bq: MagicMock):
@@ -221,7 +243,7 @@ class TestGoogle(unittest.TestCase):
 
         test_results = get_table("foo.bar", spam=True)
         mock_run_query.assert_called_once_with("SELECT * FROM `foo.bar`;", spam=True)
-        self.assertIs(test_results, mock_results)
+        self.assertIs(mock_results, test_results)
 
     @patch("src.stac_utils.google.run_query")
     @patch("src.stac_utils.google.load_data_from_dataframe")

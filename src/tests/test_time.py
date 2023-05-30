@@ -19,10 +19,10 @@ class TestTime(unittest.TestCase):
         """Test parse date for date time using default eastern time zone"""
         self.assertEqual(DEFAULT_TIMEZONE, "America/New_York")
         self.assertEqual(
-            parse_date_for_tz("2023-01-01"),
             datetime(
                 2023, 1, 1, 0, 0, tzinfo=tzfile("/usr/share/zoneinfo/America/New_York")
             ),
+            parse_date_for_tz("2023-01-01"),
         )
 
     def test_parse_date_for_tz_environment_tz(self):
@@ -32,7 +32,6 @@ class TestTime(unittest.TestCase):
 
         with patch.dict(os.environ, values=test_tz_dict):
             self.assertEqual(
-                parse_date_for_tz("2023-01-01"),
                 datetime(
                     2023,
                     1,
@@ -41,23 +40,23 @@ class TestTime(unittest.TestCase):
                     0,
                     tzinfo=tzfile("/usr/share/zoneinfo/America/Los_Angeles"),
                 ),
+                parse_date_for_tz("2023-01-01"),
             )
 
     @freeze_time("2023-01-01", tz_offset=5)
     def test_get_today_tz(self):
         """Get today's date with time zone"""
         self.assertEqual(
-            get_today_tz(),
             datetime(
                 2023, 1, 1, 0, 0, tzinfo=tzfile("/usr/share/zoneinfo/America/New_York")
             ),
+            get_today_tz(),
         )
 
     @freeze_time("2023-01-01 12:00:01", tz_offset=5)
     def test_get_now_tz(self):
         """Get current date and time with time zone"""
         self.assertEqual(
-            get_now_tz(),
             datetime(
                 2023,
                 1,
@@ -67,6 +66,7 @@ class TestTime(unittest.TestCase):
                 1,
                 tzinfo=tzfile("/usr/share/zoneinfo/America/New_York"),
             ),
+            get_now_tz(),
         )
 
 
