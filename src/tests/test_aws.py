@@ -1,6 +1,7 @@
 import json
 import unittest
 from unittest.mock import MagicMock, patch, call
+from botocore.exceptions import ClientError
 
 from src.stac_utils.aws import get_secret, write_secret, load_from_s3, save_to_s3
 
@@ -49,23 +50,83 @@ class TestAWS(unittest.TestCase):
             service_name="secretsmanager", region_name=test_region
         )
 
-    def test_load_from_s3(self):
+    @patch("json.load")
+    @patch("src.stac_utils.aws.open")
+    @patch("boto3.resource")
+    def test_load_from_s3(
+        self, mock_boto: MagicMock, mock_open: MagicMock, mock_load: MagicMock
+    ):
         """Test load from s3"""
+        mock_data = {"foo": "bar"}
+        mock_load.return_value = mock_data
+        result_data = load_from_s3("foo", "bar", "spam")
+        self.assertEqual(mock_data, result_data)
+        mock_boto.return_value.Bucket.return_value.download_file.assert_called_once()
 
-    def test_load_from_s3_expired_token(self):
+    @patch("json.load")
+    @patch("src.stac_utils.aws.open")
+    @patch("boto3.resource")
+    def test_load_from_s3_expired_token(
+        self, mock_boto: MagicMock, mock_open: MagicMock, mock_load: MagicMock
+    ):
         """Test load from s3 with expired token"""
+        mock_data = {"foo": "bar"}
+        mock_load.return_value = mock_data
+        mock_boto.return_value.Bucket.return_value.download_file.side_effect = (
+            ClientError({"Error": {"Message": "ExpiredToken"}}, "foo")
+        )
+        self.assertRaises(ClientError, load_from_s3, "foo", "bar", "spam")
 
-    def test_load_from_s3_client_error(self):
+    @patch("json.load")
+    @patch("src.stac_utils.aws.open")
+    @patch("boto3.resource")
+    def test_load_from_s3_client_error(
+        self, mock_boto: MagicMock, mock_open: MagicMock, mock_load: MagicMock
+    ):
         """Test load from s3 with client error"""
+        mock_data = {"foo": "bar"}
+        mock_load.return_value = mock_data
+        mock_boto.return_value.Bucket.return_value.download_file.side_effect = (
+            ClientError({"Error": {"Message": "spam"}}, "foo")
+        )
+        result_data = load_from_s3("foo", "bar", "spam")
+        self.assertEqual({}, result_data)
 
-    def test_load_from_s3_json_decoder_error(self):
+    @patch("json.load")
+    @patch("src.stac_utils.aws.open")
+    @patch("boto3.resource")
+    def test_load_from_s3_json_decoder_error(
+        self, mock_boto: MagicMock, mock_open: MagicMock, mock_load: MagicMock
+    ):
         """Test load from s3 with bad data format"""
+        mock_load.side_effect = json.JSONDecodeError("foo", "bar", 0)
+        result_data = load_from_s3("foo", "bar", "spam")
+        self.assertEqual({}, result_data)
 
-    def test_save_to_s3(self):
+    @patch("json.dump")
+    @patch("src.stac_utils.aws.open")
+    @patch("boto3.resource")
+    def test_save_to_s3(
+        self, mock_boto: MagicMock, mock_open: MagicMock, mock_dump: MagicMock
+    ):
         """Test save to s3"""
+        mock_data = {"foo": "bar"}
+        result_data = save_to_s3(mock_data, "foo", "bar", "spam")
+        mock_boto.return_value.Bucket.return_value.upload_file.assert_called_once()
+        self.assertIs(mock_data, result_data)
 
-    def test_save_to_s3_client_error(self):
-        """Test save top s3 with client error"""
+    @patch("json.dump")
+    @patch("src.stac_utils.aws.open")
+    @patch("boto3.resource")
+    def test_save_to_s3_client_error(
+        self, mock_boto: MagicMock, mock_open: MagicMock, mock_dump: MagicMock
+    ):
+        """Test save to s3 with client error"""
+        mock_data = {"foo": "bar"}
+        mock_boto.return_value.Bucket.return_value.upload_file.side_effect = (
+            ClientError({"Error": {"Message": "spam"}}, "foo")
+        )
+        self.assertRaises(ClientError, save_to_s3, mock_data, "foo", "bar", "spam")
 
 
 if __name__ == "__main__":
