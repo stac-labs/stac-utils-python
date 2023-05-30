@@ -413,8 +413,12 @@ class TestGoogle(unittest.TestCase):
             body={"values": [[]]},
         )
 
-    def test_send_data_to_sheets_no_client(self):
-        """test send to sheets with no client and no overwrite"""
+    @patch("src.stac_utils.google.auth_sheets")
+    def test_send_data_to_sheets_with_client(self, mock_auth_sheets: MagicMock):
+        """test send to sheets with client"""
+        mock_client = MagicMock()
+        send_data_to_sheets([[]], "foo", "bar", is_overwrite=False, client=mock_client)
+        mock_auth_sheets.assert_not_called()
 
     def test__sanitize_name(self):
         """Test sanitize name"""
