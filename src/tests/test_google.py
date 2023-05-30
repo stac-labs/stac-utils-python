@@ -375,8 +375,21 @@ class TestGoogle(unittest.TestCase):
             body={"values": [[]]},
         )
 
-    def test_send_data_to_sheets_no_overwrite(self):
+    @patch("src.stac_utils.google.auth_sheets")
+    def test_send_data_to_sheets_no_overwrite(self, mock_auth_sheets: MagicMock):
         """test send to sheets with no overwrite"""
+        mock_client = MagicMock()
+        mock_auth_sheets.return_value = mock_client
+        mock_modifier = MagicMock()
+        mock_client.spreadsheets.return_value.values.return_value = mock_modifier
+        send_data_to_sheets([[]], "foo", "bar", is_overwrite=False)
+        mock_modifier.update.assert_not_called()
+        mock_modifier.append.assert_called_once_with(
+            spreadsheetId="foo",
+            range="bar",
+            valueInputOption="RAW",
+            body={"values": [[]]},
+        )
 
     def test_send_data_to_sheets_no_client(self):
         """test send to sheets with no client and no overwrite"""
