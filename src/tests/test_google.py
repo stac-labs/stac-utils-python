@@ -1,3 +1,4 @@
+import os
 import unittest
 from unittest.mock import MagicMock, patch, call
 
@@ -27,14 +28,35 @@ from src.stac_utils.google import (
 
 
 class TestGoogle(unittest.TestCase):
-    def test_get_credentials_json_blob(self):
+    @patch("src.stac_utils.google.service_account")
+    def test_get_credentials_json_blob(self, mock_service_account: MagicMock):
         """Test credentials are created successfully from blob"""
 
-    def test_get_credentials_environment(self):
+        mock_blob = {"FOO": "BAR"}
+        get_credentials(mock_blob, scopes="foo")
+        mock_service_account.Credentials.from_service_account_info.assert_called_once_with(
+            mock_blob,
+            scopes=["https://www.googleapis.com/auth/foo"],
+            subject=None,
+        )
+
+    @patch("src.stac_utils.google.service_account")
+    def test_get_credentials_environment(self, mock_service_account: MagicMock):
         """Test credentials are created successfully from environment"""
+
+        mock_environ = {"SERVICE_ACCOUNT": """{"FOO": "BAR"}"""}
+        with patch.dict(os.environ, values=mock_environ):
+            get_credentials(scopes="foo")
+            mock_service_account.Credentials.from_service_account_info.assert_called_once_with(
+                {"FOO": "BAR"},
+                scopes=["https://www.googleapis.com/auth/foo"],
+                subject=None,
+            )
 
     def test_get_credentials_missing(self):
         """Test credentials fails because no credentials were provided"""
+
+        self.assertRaises(Exception, get_credentials, scopes="foo")
 
     @patch("src.stac_utils.google.get_credentials")
     def test_get_client(self, mock_get_credentials: MagicMock):
