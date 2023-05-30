@@ -22,8 +22,8 @@ class TestEmailer(unittest.TestCase):
         test_keys = {"MAILGUN_API_KEY": "spam", "MAILGUN_DOMAIN": "foo.bar"}
         with patch.dict(os.environ, values=test_keys):
             test_emailer = Emailer()
-            self.assertEqual(test_emailer.api_key, "spam")
-            self.assertEqual(test_emailer.domain, "foo.bar")
+            self.assertEqual("spam", test_emailer.api_key)
+            self.assertEqual("foo.bar", test_emailer.domain)
 
     def test_init_no_keys(self):
         """Test init when no keys present anywhere"""

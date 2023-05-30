@@ -34,8 +34,8 @@ class TestNGPVAN(unittest.TestCase):
             os.environ, values={"NGPVAN_APP_NAME": test_app, "NGPVAN_API_KEY": test_key}
         ):
             test_client = NGPVANClient(mode=test_mode)
-            self.assertEqual(test_client.app_name, test_app)
-            self.assertEqual(test_client.api_key, f"{test_key}|{test_mode}")
+            self.assertEqual(test_app, test_client.app_name)
+            self.assertEqual(f"{test_key}|{test_mode}", test_client.api_key)
 
     def test_create_session(self):
         """Test session has api keys"""
@@ -45,13 +45,13 @@ class TestNGPVAN(unittest.TestCase):
         test_key = "bar"
         test_client = NGPVANClient(mode=test_mode, app_name=test_app, api_key=test_key)
         self.assertEqual(
-            test_client.session.auth, (test_app, f"{test_key}|{test_mode}")
+            (test_app, f"{test_key}|{test_mode}"), test_client.session.auth,
         )
 
     def test_check_response_for_rate_limit(self):
         """Test that it returns 2"""
 
-        self.assertEqual(self.test_client.check_response_for_rate_limit(None), 2)
+        self.assertEqual(2, self.test_client.check_response_for_rate_limit(None))
 
     def test_transform_response(self):
         """Test transform response handles normal data"""

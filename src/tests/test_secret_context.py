@@ -21,7 +21,7 @@ class TestSecretsContext(unittest.TestCase):
             values={"AWS_REGION": "us-east-1", "SECRET_NAME": "spam-credentials"},
         ):
             with secrets():
-                self.assertEqual(os.environ["FOO"], "BAR")
+                self.assertEqual("BAR", os.environ["FOO"])
         mock_get_secret.assert_called_once_with("us-east-1", "spam-credentials")
 
     @patch("src.stac_utils.secret_context.get_secret")
@@ -33,21 +33,21 @@ class TestSecretsContext(unittest.TestCase):
             values={"AWS_REGION": "us-east-1", "SECRET_NAME": "spam-credentials"},
         ):
             with secrets(aws_region="us-west-2", secret_name="foo-credentials"):
-                self.assertEqual(os.environ["FOO"], "BAR")
+                self.assertEqual("BAR", os.environ["FOO"])
         mock_get_secret.assert_called_once_with("us-west-2", "foo-credentials")
 
     def test_secrets_json_secrets(self):
         """Test loading json secrets"""
 
         with secrets(file_name="src/tests/mock-credentials.json"):
-            self.assertEqual(os.environ["FOO"], "BAR")
+            self.assertEqual("BAR", os.environ["FOO"])
 
     def test_secrets_dictionary_secrets(self):
         """Test loading dictionary secrets"""
 
         test_dict = {"FOO": "BAR"}
         with secrets(dictionary=test_dict):
-            self.assertEqual(os.environ["FOO"], "BAR")
+            self.assertEqual("BAR", os.environ["FOO"])
 
     @patch("src.stac_utils.secret_context.get_secret")
     def test_secrets_priority_order(self, mock_get_secret):
@@ -67,7 +67,7 @@ class TestSecretsContext(unittest.TestCase):
                 aws_region="us-west-2",
                 secret_name="foo-credentials",
             ):
-                self.assertEqual(os.environ["FOO"], "SPAM")
+                self.assertEqual("SPAM", os.environ["FOO"])
 
     def test_secrets_nested(self):
         """Test that secrets can be nested"""
@@ -75,7 +75,7 @@ class TestSecretsContext(unittest.TestCase):
         test_dict = {"FOO": "NO"}
         with secrets(dictionary=test_dict):
             with secrets(file_name="src/tests/mock-credentials.json"):
-                self.assertEqual(os.environ["FOO"], "BAR")
+                self.assertEqual("BAR", os.environ["FOO"])
 
     @patch("src.stac_utils.secret_context.get_secret")
     def test_secrets_nested_aws_secret(self, mock_get_secret):
@@ -90,7 +90,7 @@ class TestSecretsContext(unittest.TestCase):
             with secrets():
                 self.assertEqual(os.environ["SECRET_NAME"], "")
                 with secrets(dictionary=test_dict):
-                    self.assertEqual(os.environ["FOO"], "SPAM")
+                    self.assertEqual("SPAM", os.environ["FOO"])
 
         mock_get_secret.assert_called_once_with("us-east-1", "spam-credentials")
 
