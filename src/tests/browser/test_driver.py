@@ -1,5 +1,4 @@
 import os
-import tempfile
 import unittest
 from unittest.mock import MagicMock, patch, call
 
@@ -20,8 +19,8 @@ class TestChromeDriver(unittest.TestCase):
 
         test_driver = ChromeDriver()
         # check defaults
-        self.assertEqual(test_driver.binary_location, "/opt/chrome/chrome")
-        self.assertEqual(test_driver.driver_location,  "/opt/chromedriver")
+        self.assertEqual("/opt/chrome/chrome", test_driver.binary_location)
+        self.assertEqual("/opt/chromedriver", test_driver.driver_location)
         self.assertFalse(test_driver.run_locally)
         self.assertTrue(test_driver.is_headless)
         self.assertIsNone(test_driver.download_directory)
@@ -30,7 +29,7 @@ class TestChromeDriver(unittest.TestCase):
         """Test init with download dir"""
 
         test_driver = ChromeDriver(download_directory="./foo")
-        self.assertEqual(test_driver.download_directory, "./foo")
+        self.assertEqual("./foo", test_driver.download_directory)
 
     def test_init_headless(self):
         """Test init as headless"""
@@ -48,30 +47,30 @@ class TestChromeDriver(unittest.TestCase):
 
         with patch.dict(os.environ, values=mock_environ):
             test_driver = ChromeDriver()
-            self.assertEqual(test_driver.binary_location, "./foo")
-            self.assertEqual(test_driver.driver_location,  "./bar")
+            self.assertEqual("./foo", test_driver.binary_location)
+            self.assertEqual("./bar", test_driver.driver_location)
 
     def test_init_local_no_driver(self):
         """Test init run locally and no driver location"""
 
-        mock_manager.install.return_value = "./foo"
+        mock_manager.return_value.install.return_value = "./foo"
         test_driver = ChromeDriver(run_locally=True)
-        mock_manager.install.assert_called_once()
-        self.assertEqual(test_driver.driver_location, "./foo")
+        mock_manager.return_value.install.assert_called_once()
+        self.assertEqual("./foo", test_driver.driver_location)
 
     @patch("tempfile.TemporaryDirectory")
     def test_context_manager(self, mock_temp_dir: MagicMock):
         """Test context manager"""
 
-        mock_temp_dir.name.return_value = "./foo"
+        mock_temp_dir.return_value.name = "./foo"
 
         with ChromeDriver() as test_driver:
             mock_temp_dir.assert_called_once_with()
             mock_webdriver.ChromeOptions.assert_called_once_with()
             mock_webdriver.Chrome.assert_called_once()
-            self.assertEqual(test_driver.download_directory, "./foo")
+            self.assertEqual("./foo", test_driver.download_directory)
 
-        mock_webdriver.Chrome.close.assert_called_once()
+        mock_webdriver.Chrome.return_value.close.assert_called_once()
 
     @patch("tempfile.TemporaryDirectory")
     def test_context_manager_with_download_dir(self, mock_temp_dir: MagicMock):
@@ -79,6 +78,5 @@ class TestChromeDriver(unittest.TestCase):
 
         with ChromeDriver(download_directory="./foo") as test_driver:
             mock_temp_dir.assert_not_called()
-            self.assertEqual(test_driver.download_directory, "./foo")
+            self.assertEqual("./foo", test_driver.download_directory)
 
-        mock_temp_dir.cleanup.assert_called_once()
