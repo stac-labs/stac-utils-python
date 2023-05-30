@@ -17,8 +17,7 @@ class TestConvert(unittest.TestCase):
     def test_convert_to_snake_case_list(self):
         self.assertEqual(["foo_bar"], convert_to_snake_case(["FooBar"]))
         self.assertEqual(
-            ["foo_bar", "foo_bar"],
-            convert_to_snake_case(["FooBar", "FooBar"])
+            ["foo_bar", "foo_bar"], convert_to_snake_case(["FooBar", "FooBar"])
         )
         self.assertEqual(["spam"], convert_to_snake_case(["Spam"]))
         self.assertEqual([""], convert_to_snake_case([""]))
@@ -26,7 +25,8 @@ class TestConvert(unittest.TestCase):
 
     def test_convert_to_snake_case_dict(self):
         self.assertEqual(
-            {"foo_bar": "FooBar"}, convert_to_snake_case({"FooBar": "FooBar"}),
+            {"foo_bar": "FooBar"},
+            convert_to_snake_case({"FooBar": "FooBar"}),
         )
         self.assertEqual(
             {"foo_bar": "FooBar", "spam_bar": True},

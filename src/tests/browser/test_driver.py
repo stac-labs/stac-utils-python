@@ -79,4 +79,3 @@ class TestChromeDriver(unittest.TestCase):
         with ChromeDriver(download_directory="./foo") as test_driver:
             mock_temp_dir.assert_not_called()
             self.assertEqual("./foo", test_driver.download_directory)
-

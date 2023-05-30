@@ -45,7 +45,8 @@ class TestNGPVAN(unittest.TestCase):
         test_key = "bar"
         test_client = NGPVANClient(mode=test_mode, app_name=test_app, api_key=test_key)
         self.assertEqual(
-            (test_app, f"{test_key}|{test_mode}"), test_client.session.auth,
+            (test_app, f"{test_key}|{test_mode}"),
+            test_client.session.auth,
         )
 
     def test_check_response_for_rate_limit(self):
