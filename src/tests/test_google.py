@@ -64,14 +64,14 @@ class TestGoogle(unittest.TestCase):
 
         mock_client_class = MagicMock()
         result_client = get_client(mock_client_class, ["foo"], bar=True)
-        mock_get_credentials.assert_called_once_with(scopes=["foo"], bar=True)
+        mock_get_credentials.assert_called_once_with(scopes=["foo"])
         mock_client_class.assert_called_once_with(
-            credentials=mock_get_credentials.return_value,
+            credentials=mock_get_credentials.return_value, bar=True
         )
         self.assertIs(mock_client_class.return_value, result_client)
 
     @patch("src.stac_utils.google.get_credentials")
-    def test_get_client_auto_credential(self, mock_get_credentials: MagicMock):
+    def test_get_client_default_credential(self, mock_get_credentials: MagicMock):
         """Test it creates a client from default credentials"""
 
         mock_client_class = MagicMock()

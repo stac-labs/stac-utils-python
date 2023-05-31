@@ -50,8 +50,10 @@ def get_credentials(
 def get_client(
     client_class, scopes: list[str], **kwargs
 ):
-    credentials = get_credentials(scopes=scopes, **kwargs)
-    client = client_class(credentials=credentials)
+    if "is_auto_credential" in kwargs:
+        kwargs.pop("is_auto_credential")
+    credentials = get_credentials(scopes=scopes)
+    client = client_class(credentials=credentials, **kwargs)
     return client
 
 
@@ -76,10 +78,12 @@ def auth_bq(scopes: list[str] = None, **kwargs) -> bigquery.Client:
 def auth_gmail(scopes: list[str] = None, **kwargs) -> Resource:
     """Returns an initialized Gmail Client object"""
 
+    if "is_auto_credential" in kwargs:
+        kwargs.pop("is_auto_credential")
     scopes = scopes or ["gmail.labels", "gmail.modify", "gmail.readonly"]
 
-    credentials = get_credentials(scopes=scopes, **kwargs)
-    return build("gmail", "v1", credentials=credentials)
+    credentials = get_credentials(scopes=scopes)
+    return build("gmail", "v1", credentials=credentials, **kwargs)
 
 
 def make_gmail_client(*args, **kwargs) -> Resource:
@@ -87,13 +91,16 @@ def make_gmail_client(*args, **kwargs) -> Resource:
     return auth_gmail(*args, **kwargs)
 
 
-def auth_sheets(scopes: list[str] = None, **kwargs) -> Resource:
+def auth_sheets(scopes: list[str] = None, cache_discovery: bool = False, **kwargs) -> Resource:
     """Returns an initialized Sheets client object"""
 
-    scopes = scopes or ["drive"]
-    credentials = get_credentials(scopes=scopes, **kwargs)
+    if "is_auto_credential" in kwargs:
+        kwargs.pop("is_auto_credential")
 
-    return build("sheets", "v4", credentials=credentials, cache_discovery=False)
+    scopes = scopes or ["drive"]
+    credentials = get_credentials(scopes=scopes)
+
+    return build("sheets", "v4", credentials=credentials, cache_discovery=cache_discovery, **kwargs)
 
 
 def run_query(
