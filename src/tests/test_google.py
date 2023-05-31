@@ -225,9 +225,6 @@ class TestGoogle(unittest.TestCase):
         mock_auth_bq.assert_called_once_with(spam=True)
         mock_client.query.assert_called_once()
 
-    def test_run_query_retry_exceptions(self):
-        """Test run query with custom retry exceptions"""
-
     @patch("src.stac_utils.google.run_query")
     def test_get_table(self, mock_run_query: MagicMock):
         """Test get table"""
