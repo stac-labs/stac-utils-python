@@ -16,28 +16,28 @@ class TestSecretFactory(unittest.TestCase):
 
         secrets = SecretsJSONFactory("test", ThisInput)
         self.assertEqual(
+            "Enter INPUT1 (required):",
             secrets.build_input_string(
                 {
                     "name": "INPUT1",
                     "is_required": True,
                 }
             ),
-            "Enter INPUT1 (required):",
         )
         self.assertEqual(
+            "Enter INPUT2 (not required, hit enter to continue):",
             secrets.build_input_string(
                 {
                     "name": "INPUT2",
                     "is_required": False,
                 }
             ),
-            "Enter INPUT2 (not required, hit enter to continue):",
         )
         self.assertEqual(
+            "Enter INPUT3 (not required, hit enter to continue):",
             secrets.build_input_string(
                 {"name": "INPUT3", "is_required": True}, is_override_mode=True
             ),
-            "Enter INPUT3 (not required, hit enter to continue):",
         )
 
     @patch("src.stac_utils.secret_factory.input", create=True)
@@ -51,7 +51,7 @@ class TestSecretFactory(unittest.TestCase):
 
         secrets = SecretsJSONFactory("test", ThisInput)
         secrets.build_json()
-        self.assertEqual(secrets.json, {"TEST_SCHEMA": "demsspsp.commons"})
+        self.assertDictEqual({"TEST_SCHEMA": "demsspsp.commons"}, secrets.json)
 
     @patch("src.stac_utils.secret_factory.input", create=True)
     def test_optional_input(self, mocked_input):
@@ -64,7 +64,7 @@ class TestSecretFactory(unittest.TestCase):
 
         secrets = SecretsJSONFactory("test", ThisInput)
         secrets.build_json()
-        self.assertEqual(secrets.json, {})
+        self.assertDictEqual({}, secrets.json)
 
     @patch("src.stac_utils.secret_factory.input", create=True)
     def test_json_input(self, mocked_input):
@@ -81,8 +81,8 @@ class TestSecretFactory(unittest.TestCase):
 
         optional_secrets = SecretsJSONFactory("test", ThisInput)
         optional_secrets.build_json()
-        self.assertEqual(
-            optional_secrets.json, {"TEST_SERVICE_ACCOUNT": '{"FOO": "BAR"}'}
+        self.assertDictEqual(
+            {"TEST_SERVICE_ACCOUNT": '{"FOO": "BAR"}'}, optional_secrets.json
         )
 
     @patch("src.stac_utils.secret_factory.input", create=True)
@@ -101,7 +101,7 @@ class TestSecretFactory(unittest.TestCase):
 
         secrets = SecretsJSONFactory("test", ThisInput)
         secrets.build_json()
-        self.assertEqual(secrets.json, {})
+        self.assertDictEqual({}, secrets.json)
 
     @patch("src.stac_utils.secret_factory.input", create=True)
     def test_handle_overridable(self, mocked_input):
@@ -125,12 +125,12 @@ class TestSecretFactory(unittest.TestCase):
 
         secrets = SecretsJSONFactory("test", ThisInput)
         secrets.build_json()
-        self.assertEqual(
-            secrets.json,
+        self.assertDictEqual(
             {
                 "TEST_ID": "1234",
                 "TEST_OVERRIDES": '{"1234": {"TEST_OPTION": "an option"}}',
             },
+            secrets.json,
         )
 
     @patch("src.stac_utils.secret_factory.input", create=True)
@@ -159,12 +159,12 @@ class TestSecretFactory(unittest.TestCase):
 
         secrets = SecretsJSONFactory("test", ThisInput)
         secrets.build_json()
-        self.assertEqual(
-            secrets.json,
+        self.assertDictEqual(
             {
                 "TEST_SCHEMA": "demsspsp.commons",
                 "TEST_OVERRIDES": '{"1234": {"TEST_OPTION": "an option"}}',
             },
+            secrets.json,
         )
 
     @patch("src.stac_utils.secret_factory.input", create=True)
@@ -189,11 +189,11 @@ class TestSecretFactory(unittest.TestCase):
 
         secrets = SecretsJSONFactory("test", ThisInput)
         secrets.build_json()
-        self.assertEqual(
-            secrets.json,
+        self.assertDictEqual(
             {
                 "TEST_OVERRIDES": '{"1234": {"TEST_SERVICE_ACCOUNT": "{\\"FOO\\": \\"BAR\\"}"}}'
             },
+            secrets.json,
         )
 
     @patch("src.stac_utils.secret_factory.input", create=True)

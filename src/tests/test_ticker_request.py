@@ -37,8 +37,8 @@ class TestTickerRequest(unittest.TestCase):
             test_session = test_ticker.create_session()
             self.assertIsInstance(test_session, requests.Session)
             self.assertEqual(
-                test_session.auth,
                 (self.test_auth["AUTH_USER"], self.test_auth["AUTH_PASS"]),
+                test_session.auth,
             )
 
     def test_transform_response(self):
@@ -58,7 +58,7 @@ class TestTickerRequest(unittest.TestCase):
         with patch.dict(os.environ, values=self.test_auth):
             test_ticker = TickerRequest()
             self.assertRaises(
-                TickerException, lambda: test_ticker.check_for_error(test_response, {})
+                TickerException, test_ticker.check_for_error, test_response, {}
             )
 
     def test_check_for_error_when_not_exists(self):
@@ -87,7 +87,7 @@ class TestTickerRequest(unittest.TestCase):
 
             test_result = test_data.copy()
             test_result["is_testing"] = ""
-            self.assertListEqual(test_ticker.data, [test_result])
+            self.assertListEqual([test_result], test_ticker.data)
 
     def test_send_to_ticker(self):
         """Test send to ticker"""
@@ -111,8 +111,8 @@ class TestTickerRequest(unittest.TestCase):
             test_result = test_data.copy()
             test_result["is_testing"] = ""
             test_ticker.post.assert_called_once_with("/ticker", body=[test_result])
-            self.assertIs(test_response, mock_response)
-            self.assertListEqual(test_ticker.data, [])
+            self.assertIs(mock_response, test_response)
+            self.assertListEqual([], test_ticker.data)
 
     def test_send_to_ticker_no_data(self):
         """Test send to ticker with no data"""
@@ -146,7 +146,7 @@ class TestTickerRequest(unittest.TestCase):
             test_result = test_data.copy()
             test_result["is_testing"] = ""
             test_ticker.post.assert_called_once_with("/ticker", body=[test_result])
-            self.assertListEqual(test_ticker.data, [test_result])
+            self.assertListEqual([test_result], test_ticker.data)
 
 
 if __name__ == "__main__":

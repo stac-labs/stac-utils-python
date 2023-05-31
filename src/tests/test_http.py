@@ -301,7 +301,7 @@ class TestHTTPClient(unittest.TestCase):
         """Test update rate limits"""
         test_client = HTTPClient()
         test_rate_limits = test_client.update_rate_limits()
-        self.assertDictEqual(test_rate_limits, {})
+        self.assertDictEqual({}, test_rate_limits)
 
     def test_create_session(self):
         """Test create session"""
@@ -316,7 +316,7 @@ class TestHTTPClient(unittest.TestCase):
         expected_transform = "FOO"
         mock_response.content = expected_transform
         result_transform = test_client.transform_response(mock_response)
-        self.assertEqual(result_transform, expected_transform)
+        self.assertEqual(expected_transform, result_transform)
 
 
 if __name__ == "__main__":
