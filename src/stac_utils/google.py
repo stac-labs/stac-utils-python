@@ -3,7 +3,6 @@ import logging
 import os
 import sys
 
-import pandas as pd
 from google.api_core.exceptions import InternalServerError
 from google.api_core.retry import if_exception_type, Retry
 from google.cloud import storage, bigquery
@@ -134,7 +133,7 @@ def get_table(table_name: str, **kwargs) -> list[dict]:
 
 def create_table_from_dataframe(
     client: bigquery.Client,
-    dataframe: pd.DataFrame,
+    dataframe: "pd.DataFrame",
     project_name: str,
     dataset_name: str,
     table_name: str,
@@ -185,7 +184,7 @@ def get_table_for_loading(
 
 def load_data_from_dataframe(
     client: bigquery.Client,
-    dataframe: pd.DataFrame,
+    dataframe: "pd.DataFrame",
     project_name: str,
     dataset_name: str,
     table_name: str,
