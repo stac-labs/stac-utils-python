@@ -8,13 +8,12 @@ def listify(
     """
     Split a string into a list, converting to a type as necessary
 
-    :param string:
-    :param type_:
-    :param sep:
-    :param ignore_errors:
-    :param ignore_empty:
-    :return:
-    :raises:
+    :param string: String to split into list
+    :param type_: Type to convert, if desired, `str` by default
+    :param sep: Separator for list
+    :param ignore_errors: `False` by default
+    :param ignore_empty: `True` by default
+    :return: String converted to list
     """
     if string is None:
         return []
