@@ -21,6 +21,7 @@ class NGPVANClient(HTTPClient):
     """
     NGPVAN Client class built on basic HTTP Client class
     """
+
     base_url = "https://api.securevan.com/v4"
     max_connections = 5
 
@@ -116,7 +117,10 @@ class NGPVANClient(HTTPClient):
                 raise NGPVANLocationException(errors)
 
             # successful 204 response code does not raise error (i.e. when applying ACs/SQs)
-            elif response.status_code == 204 and errors == 'Expecting value: line 1 column 1 (char 0)':
+            elif (
+                response.status_code == 204
+                and errors == "Expecting value: line 1 column 1 (char 0)"
+            ):
                 pass
             else:
                 logger.error(response.content)

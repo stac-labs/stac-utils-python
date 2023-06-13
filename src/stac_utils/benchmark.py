@@ -6,6 +6,7 @@ class Benchmark(object):
     """
     Measures execution time
     """
+
     def __init__(self, msg: str):
         """
         Initializes with message string

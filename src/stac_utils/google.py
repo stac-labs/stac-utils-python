@@ -53,9 +53,7 @@ def get_credentials(
     return credentials
 
 
-def get_client(
-    client_class, scopes: list[str], **kwargs
-):
+def get_client(client_class, scopes: list[str], **kwargs):
     """
     Returns client of given class with given scopes
 
@@ -116,11 +114,13 @@ def auth_gmail(scopes: list[str] = None, **kwargs) -> Resource:
 
 
 def make_gmail_client(*args, **kwargs) -> Resource:
-    """ Deprecated alias """
+    """Deprecated alias"""
     return auth_gmail(*args, **kwargs)
 
 
-def auth_sheets(scopes: list[str] = None, cache_discovery: bool = False, **kwargs) -> Resource:
+def auth_sheets(
+    scopes: list[str] = None, cache_discovery: bool = False, **kwargs
+) -> Resource:
     """
     Returns an initialized Sheets client object
 
@@ -135,7 +135,13 @@ def auth_sheets(scopes: list[str] = None, cache_discovery: bool = False, **kwarg
     scopes = scopes or ["drive"]
     credentials = get_credentials(scopes=scopes)
 
-    return build("sheets", "v4", credentials=credentials, cache_discovery=cache_discovery, **kwargs)
+    return build(
+        "sheets",
+        "v4",
+        credentials=credentials,
+        cache_discovery=cache_discovery,
+        **kwargs,
+    )
 
 
 def run_query(
@@ -272,7 +278,10 @@ def load_data_from_dataframe(
     retry_exceptions = retry_exceptions or RETRY_EXCEPTIONS
     retry_policy = Retry(predicate=if_exception_type(*retry_exceptions))
     results = client.insert_rows_from_dataframe(
-        table=table, dataframe=dataframe, chunk_size=10000, retry=retry_policy,
+        table=table,
+        dataframe=dataframe,
+        chunk_size=10000,
+        retry=retry_policy,
     )
 
     logging.info(f"inserted {len(results)} rows")
@@ -405,7 +414,6 @@ def send_data_to_sheets(
 
 
 def _sanitize_name(string: str) -> str:
-
     valid_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890._"
 
     # crudely prevent sql injection

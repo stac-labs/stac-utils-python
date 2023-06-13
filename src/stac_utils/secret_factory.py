@@ -8,6 +8,7 @@ class SecretsJSONFactory:
     """
     Given name, json inputs, creates secrets JSON
     """
+
     def __init__(self, secret_name: str, json_inputs: Enum):
         self.filename = "secrets-{}.json".format(secret_name)
         self.json_inputs = json_inputs

@@ -13,6 +13,7 @@ class Client(ABC):
     """
     Basic API client class
     """
+
     def __init__(self, *args, **kwargs):
         self._session = None
         self._session_count = 0
@@ -75,6 +76,7 @@ class HTTPClient(Client):
     """
     HTTP Client class built on Client class
     """
+
     base_url = "ERROR"
     retry_limit = 3
     retry_wait = 7

@@ -9,6 +9,7 @@ class Emailer:
     """
     Sets up Mailgun Emailer
     """
+
     def __init__(
         self,
         domain: str = None,
