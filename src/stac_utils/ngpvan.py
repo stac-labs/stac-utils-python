@@ -99,6 +99,12 @@ class NGPVANClient(HTTPClient):
                 raise NGPVANException(errors)
 
     def get_paginated_items(self, url, **kwargs):
+        """
+        Given a URL, gets paginated items
+
+        :param url: Given URL where paginated items exist
+        :return: All items as list
+        """
         all_items = []
         next_url = url
         while next_url:
