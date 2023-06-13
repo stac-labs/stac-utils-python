@@ -12,6 +12,12 @@ def secrets(
     dictionary: dict = None,
 ):
     """
+    Takes either a file, a Python dict, or an AWS secret in Secrets Manager and loads it all into the os.environ as a context.
+
+    Usage is typically:
+
+        with secrets('secrets.json'):
+            rest_of_code
 
     :param file_name: Desired file name
     :param secret_name: Desired secret_name
