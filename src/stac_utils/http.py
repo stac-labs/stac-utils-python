@@ -10,13 +10,17 @@ logger = logging.getLogger(__name__)
 
 
 class Client(ABC):
+    """
+    Basic API client class
+    """
     def __init__(self, *args, **kwargs):
         self._session = None
         self._session_count = 0
 
     @property
     def session(self):
-        """Instead of passing session around, use the client's
+        """
+        Instead of passing session around, use the client's
         current context manager
         """
         if self._session is None:
@@ -25,11 +29,15 @@ class Client(ABC):
 
     @abstractmethod
     def create_session(self):
-        """Create a session, set headers & auth"""
+        """
+        Create a session, set headers & auth
+        """
 
     @contextmanager
     def session_context(self):
-        """Creates a context manager for a session"""
+        """
+        Creates a context manager for a session
+        """
 
         self._session_count += 1
         try:
@@ -45,20 +53,28 @@ class Client(ABC):
 
     @abstractmethod
     def call_api(self, *args, **kwargs):
-        """Make an API request"""
+        """
+        Make an API request
+        """
 
     @abstractmethod
     def transform_response(self, *args, **kwargs):
-        """Transform the response from the API"""
+        """
+        Transform the response from the API
+        """
 
     @abstractmethod
     def check_for_error(self, *args, **kwargs):
-        """Check a valid API response for error messages
+        """
+        Check a valid API response for error messages
         and raise an exception as needed
         """
 
 
 class HTTPClient(Client):
+    """
+    HTTP Client class built on Client class
+    """
     base_url = "ERROR"
     retry_limit = 3
     retry_wait = 7
@@ -71,14 +87,20 @@ class HTTPClient(Client):
 
     @property
     def rate_limits(self) -> dict:
-        """Get the rate limits for all the resources"""
+        """
+        Get the rate limits for all the resources
+        """
         if self._rate_limits is None:
             self._rate_limits = self.update_rate_limits()
 
         return self._rate_limits
 
     def wait_for_rate(self, endpoint: str, response: requests.Response):
-        """Wait for the rate limit to pass"""
+        """
+        Wait for the rate limit to pass
+
+        :param endpoint: Specified API endpoint
+        """
 
         rate_wait = self.check_response_for_rate_limit(response)
 
@@ -96,12 +118,19 @@ class HTTPClient(Client):
     def check_response_for_rate_limit(
         self, response: requests.Response
     ) -> Union[int, float, None]:
-        """Inspect the response for rate limit information"""
+        """
+        Inspect the response for rate limit information
+        """
 
         return None
 
     def format_url(self, endpoint: str) -> str:
-        """Prepare the URL for a request"""
+        """
+        Prepare the URL for a request
+
+        :param endpoint: Specified API endpoint
+        :return: URL
+        """
 
         url = f"{self.base_url.strip('/')}/{endpoint.strip('/')}"
 
@@ -119,7 +148,19 @@ class HTTPClient(Client):
         override_data_printing: bool = False,
         **kwargs,
     ):
-        """Basic API request, retries on failures, parses errors"""
+        """
+        Basic API request, retries on failures, parses errors
+
+        :param method: Specified API method
+        :param endpoint: Specified API endpoint
+        :param params: Specified parameters for API call
+        :param body: Specified body for API call
+        :param return_headers: `False` by default, set `True` if returning headers is desired
+        :param use_snake_case: `True` by default, set `False` if camel case or other is desired
+        :param override_error_logging: `False` by default, set `True` if logging not desired
+        :param override_data_printing: `False` by default, set `True` if data printing not desired
+        :return: Data from API call
+        """
 
         fails = 0
         print(f"{method} {endpoint}: {params} {body}")
@@ -174,21 +215,39 @@ class HTTPClient(Client):
         return data
 
     def get(self, *args, **kwargs):
+        """
+        Convenience wrapper for GET
+        """
         return self.call_api("GET", *args, **kwargs)
 
     def post(self, *args, **kwargs):
+        """
+        Convenience wrapper for POST
+        """
         return self.call_api("POST", *args, **kwargs)
 
     def put(self, *args, **kwargs):
+        """
+        Convenience wrapper for PUT
+        """
         return self.call_api("PUT", *args, **kwargs)
 
     def delete(self, *args, **kwargs):
+        """
+        Convenience wrapper for DELETE
+        """
         return self.call_api("DELETE", *args, **kwargs)
 
     def update(self, *args, **kwargs):
+        """
+        Convenience wrapper for UPDATE
+        """
         return self.call_api("UPDATE", *args, **kwargs)
 
     def patch(self, *args, **kwargs):
+        """
+        Convenience wrapper for PATCH
+        """
         return self.call_api("PATCH", *args, **kwargs)
 
     def update_rate_limits(self) -> dict[str, tuple[int, int]]:
