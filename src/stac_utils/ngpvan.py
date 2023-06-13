@@ -124,7 +124,7 @@ class NGPVANClient(HTTPClient):
 
     def get_paginated_items(self, url, **kwargs):
         """
-        Given a URL, gets paginated items
+        Given a URL, gets paginated items. For example with NGP, most likely to be used for pulling saved lists.
 
         :param url: Given URL where paginated items exist
         :return: All items as list
