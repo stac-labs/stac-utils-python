@@ -28,6 +28,17 @@ class Emailer:
         template: str = None,
         variables: dict = None,
     ):
+        """
+        Sends email given specified details
+
+        :param subject: Desired subject for email
+        :param body: Body of email
+        :param emails: List of email addresses receiving email
+        :param from_addr: From address for email
+        :param reply_to: Reply-to for email
+        :param template: Specified template for email
+        :param variables: Specified variables for email template
+        """
         email_data = {
             "to": ",".join(emails),
             "from": from_addr or self.from_addr,
