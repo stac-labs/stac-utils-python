@@ -11,6 +11,14 @@ def secrets(
     aws_region: str = None,
     dictionary: dict = None,
 ):
+    """
+
+    :param file_name:
+    :param secret_name:
+    :param aws_region:
+    :param dictionary:
+    :return:
+    """
     values = {}
     if not secret_name and os.environ.get("SECRET_NAME"):
         secret_name = os.environ.get("SECRET_NAME")
