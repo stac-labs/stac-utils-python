@@ -5,6 +5,9 @@ from .truthy import truthy
 
 
 class SecretsJSONFactory:
+    """
+    Given name, json inputs, creates secrets JSON
+    """
     def __init__(self, secret_name: str, json_inputs: Enum):
         self.filename = "secrets-{}.json".format(secret_name)
         self.json_inputs = json_inputs
@@ -47,7 +50,12 @@ class SecretsJSONFactory:
             self.json[input_settings.get("name")] = response
 
     def build_overrider(self, input_settings: dict) -> str:
-        """Builds a JSON string with overrides for each committee/county/whatever"""
+        """
+        Builds a JSON string with overrides for each committee/county/whatever
+
+        :param input_settings: Override settings
+        :return: JSON string with overrides
+        """
         override_json = {}
         while True:
             override_name = input(
@@ -80,6 +88,13 @@ class SecretsJSONFactory:
         return json.dumps(override_json)
 
     def build_input_string(self, input_settings: dict, is_override_mode=False) -> str:
+        """
+        Given settings, builds and returns input string
+
+        :param input_settings: Desired input settings
+        :param is_override_mode: `False` by default
+        :return: Input string
+        """
         input_string = f"Enter {input_settings.get('name')}"
 
         if input_settings.get("is_required") and not is_override_mode:
@@ -90,11 +105,20 @@ class SecretsJSONFactory:
         return input_string
 
     def write_json(self):
+        """
+        For convenience, writes JSON
+        """
         with open(self.filename, "w") as outfile:
             json.dump(self.json, outfile)
 
 
 def build_secrets_json(name: str, json_inputs: Enum):
+    """
+    Builds secrets JSON
+
+    :param name: Desired name
+    :param json_inputs: Specified JSON inputs
+    """
     secrets = SecretsJSONFactory(name, json_inputs)
     secrets.build_json()
     secrets.write_json()
