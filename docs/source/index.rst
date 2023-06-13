@@ -11,7 +11,8 @@ Welcome to stac-utils-python's documentation!
    email
    listify
    ngpvan
-
+   secret_context
+   secret_factory
 
 Indices and tables
 ==================
