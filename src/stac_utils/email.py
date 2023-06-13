@@ -32,7 +32,7 @@ class Emailer:
         variables: dict = None,
     ):
         """
-        Sends email given specified details
+        Sends email given specified details. Either include the body with the raw HTML directly, or template and variables so the template will be utilized.
 
         :param subject: Desired subject for email
         :param body: Body of email
