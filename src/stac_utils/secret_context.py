@@ -13,10 +13,10 @@ def secrets(
 ):
     """
 
-    :param file_name:
-    :param secret_name:
-    :param aws_region:
-    :param dictionary:
+    :param file_name: Desired file name
+    :param secret_name: Desired secret_name
+    :param aws_region: Desired AWS region for secret
+    :param dictionary: Specified dictionary
     :return:
     """
     values = {}
