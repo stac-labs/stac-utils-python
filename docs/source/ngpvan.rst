@@ -1,7 +1,7 @@
-API
-===
+NGPVAN
+======
 
 .. autosummary::
    :toctree: generated
 
-   stac_utils
+  stac_utils.ngpvan
