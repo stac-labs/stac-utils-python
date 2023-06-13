@@ -217,18 +217,24 @@ class HTTPClient(Client):
     def get(self, *args, **kwargs):
         """
         Convenience wrapper for GET
+
+        Example usage: `self.van.get(f"events/{event_id}?$expand=locations,roles,shifts")`
         """
         return self.call_api("GET", *args, **kwargs)
 
     def post(self, *args, **kwargs):
         """
-        Convenience wrapper for POST
+        Convenience wrapper for POST.
+
+        Example usage: `self.van.post("signups", body=payload)`
         """
         return self.call_api("POST", *args, **kwargs)
 
     def put(self, *args, **kwargs):
         """
         Convenience wrapper for PUT
+
+        Example usage: `self.van.put(endpoint, params=params, body=payload)`
         """
         return self.call_api("PUT", *args, **kwargs)
 
@@ -241,6 +247,10 @@ class HTTPClient(Client):
     def update(self, *args, **kwargs):
         """
         Convenience wrapper for UPDATE
+
+        Example usage: self.match_dict.update(
+                    {str(self.json_created["vanId"]): str(response["vanId"])}
+                )
         """
         return self.call_api("UPDATE", *args, **kwargs)
 
