@@ -405,12 +405,6 @@ def send_data_to_sheets(
 
 
 def _sanitize_name(string: str) -> str:
-    """
-    Sanitizes given string to include only valid characters and prevents SQL injection
-
-    :param string: Given string
-    :return: Sanitized version of given string
-    """
 
     valid_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890._"
 
