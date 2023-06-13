@@ -18,6 +18,9 @@ class NGPVANLocationException(Exception):
 
 
 class NGPVANClient(HTTPClient):
+    """
+    NGPVAN Client class built on basic HTTP Client class
+    """
     base_url = "https://api.securevan.com/v4"
     max_connections = 5
 
@@ -32,6 +35,9 @@ class NGPVANClient(HTTPClient):
         super().__init__(*args, **kwargs)
 
     def create_session(self) -> requests.Session:
+        """
+        Creates and returns session
+        """
         headers = {"content-type": "application/json"}
         session = requests.Session()
         session.headers.update(headers)
@@ -40,6 +46,9 @@ class NGPVANClient(HTTPClient):
         return session
 
     def check_response_for_rate_limit(self, response: requests.Response) -> int:
+        """
+        Checks response for rate limits and returns
+        """
         return 2
 
     def transform_response(
@@ -48,6 +57,14 @@ class NGPVANClient(HTTPClient):
         return_headers: bool = False,
         use_snake_case: bool = True,
     ) -> dict:
+        """
+        Transforms response given specifications and returns data
+
+        :param response: API response
+        :param return_headers: `False` by default, set `True` if return headers desired
+        :param use_snake_case: `True` by default, set `False` if camel case or something else desired
+        :return: Data
+        """
         try:
             data = response.json() or {}
 
@@ -79,6 +96,13 @@ class NGPVANClient(HTTPClient):
         data: dict,
         override_error_logging: bool = False,
     ):
+        """
+        Checks for errors given specifications
+
+        :param response: API response
+        :param data: Data to check
+        :param override_error_logging: `False` by default, set `True` if overriding logging desired
+        """
         errors = data.get("errors")
         if errors:
             location_error_text = "'location' is required by the specified Event"
