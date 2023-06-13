@@ -6,7 +6,7 @@ def listify(
     ignore_empty: bool = True,
 ) -> list:
     """
-    Split a string into a list, converting to a type as necessary
+    Split a string into a list, converting to a type as necessary. For example, `"foo, bar, spam"` will become `["foo","bar","spam"]`.
 
     :param string: String to split into list
     :param type_: Type to convert, if desired, `str` by default
