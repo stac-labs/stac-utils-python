@@ -22,7 +22,7 @@ def get_credentials(
     scopes: [list[str], str] = None,
     subject: str = None,
 ) -> [service_account.Credentials, None]:
-    """Loads a Google Service Account into a Credentials object with the given scopes
+    """Loads a Google Service Account into a Credentials object with the given scopes. Either include blob or environment name. It defaults to using the SERVICE_ACCOUNT if included in os.environ.
 
     :param service_account_blob: Service account blob
     :param service_account_env_name: Environmental variable name for service account
@@ -73,9 +73,9 @@ def get_client(
 
 def auth_gcs(scopes: list[str] = None, **kwargs) -> storage.Client:
     """
-    Returns an initialized Storage client object
+    Returns an initialized Storage client object.
 
-    :param scopes: Desired scopes
+    :param scopes: Desired scopes. The default scope is `cloud-platform`, but other common scopes include `gmail`, `drive`.
     :return: GCS client object
     """
 
@@ -103,7 +103,7 @@ def auth_gmail(scopes: list[str] = None, **kwargs) -> Resource:
     """
     Returns an initialized Gmail Client object
 
-    :param scopes: Desired scopes
+    :param scopes: Desired scopes. Defaults to `["gmail.labels", "gmail.modify", "gmail.readonly"]`
     :return: Gmail client object
     """
 
@@ -124,7 +124,7 @@ def auth_sheets(scopes: list[str] = None, cache_discovery: bool = False, **kwarg
     """
     Returns an initialized Sheets client object
 
-    :param scopes: Desired scopes
+    :param scopes: Desired scopes, defaults to `[drive]`
     :param cache_discovery: `False` unless specified. If cache discovery is desired, set to `True`.
     :return: Sheets client object
     """
