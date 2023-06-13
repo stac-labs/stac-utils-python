@@ -74,6 +74,7 @@ def load_from_s3(bucket: str, path: str, file_name: str) -> dict:
 def save_to_s3(data: dict, bucket: str, path: str, file_name: str):
     """
     Saves data to s3 in specified location
+
     :param data: Data to load to s3
     :param bucket: s3 bucket
     :param path: Path within bucket
