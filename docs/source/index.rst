@@ -7,9 +7,10 @@ Welcome to stac-utils-python's documentation!
 =============================================
 
 .. toctree::
-
-   api
-
+   aws
+   email
+   listify
+   ngpvan
 
 
 Indices and tables
