@@ -4,4 +4,4 @@ AWS
 .. autosummary::
    :toctree: generated
 
-  stac_utils.aws
+   stac_utils.aws

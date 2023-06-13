@@ -4,4 +4,4 @@ Email
 .. autosummary::
    :toctree: generated
 
-  stac_utils.email
+   stac_utils.email
