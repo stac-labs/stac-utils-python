@@ -250,9 +250,10 @@ class HTTPClient(Client):
         """
         Convenience wrapper for UPDATE
 
-        Example usage: self.match_dict.update(
-                    {str(self.json_created["vanId"]): str(response["vanId"])}
-                )
+        Example usage:
+        self.match_dict.update(
+        {str(self.json_created["vanId"]): str(response["vanId"])}
+        )
         """
         return self.call_api("UPDATE", *args, **kwargs)
 

@@ -18,15 +18,15 @@ import sys
 sys.path.insert(0, os.path.abspath('../src'))
 
 extensions = [
+    "sphinx.ext.napoleon",
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
-    "sphinx.ext.napoleon"
 ]
 
 autosummary_generate = True
 
 templates_path = ["_templates"]
-exclude_patterns = []
+exclude_patterns = ['_build', '_templates']
 
 
 # -- Options for HTML output -------------------------------------------------
