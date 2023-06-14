@@ -2,7 +2,7 @@ import json
 import os
 import requests
 
-from . import listify
+from stac_utils import listify
 
 
 class Emailer:
