@@ -1,1 +1,2 @@
-sphinx_rtd_theme
+-r ../requirements.txt
+sphinx_rtd_theme==1.2.2
