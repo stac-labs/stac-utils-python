@@ -11,6 +11,20 @@ def secrets(
     aws_region: str = None,
     dictionary: dict = None,
 ):
+    """
+    Takes either a file, a Python dict, or an AWS secret in Secrets Manager and loads it all into the os.environ as a context.
+
+    Usage is typically:
+
+        with secrets('secrets.json'):
+            rest_of_code
+
+    :param file_name: Desired file name
+    :param secret_name: Desired secret_name
+    :param aws_region: Desired AWS region for secret
+    :param dictionary: Specified dictionary
+    :return:
+    """
     values = {}
     if not secret_name and os.environ.get("SECRET_NAME"):
         secret_name = os.environ.get("SECRET_NAME")

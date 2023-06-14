@@ -22,7 +22,14 @@ def get_credentials(
     scopes: [list[str], str] = None,
     subject: str = None,
 ) -> [service_account.Credentials, None]:
-    """Loads a Google Service Account into a Credentials object with the given scopes"""
+    """Loads a Google Service Account into a Credentials object with the given scopes. Either include blob or environment name. It defaults to using the SERVICE_ACCOUNT if included in os.environ.
+
+    :param service_account_blob: Service account blob
+    :param service_account_env_name: Environmental variable name for service account
+    :param scopes: Desired service account scopes
+    :param subject: Service account subject
+    :return: Service account credentials
+    """
 
     if not service_account_blob:
         try:
@@ -46,9 +53,15 @@ def get_credentials(
     return credentials
 
 
-def get_client(
-    client_class, scopes: list[str], **kwargs
-):
+def get_client(client_class, scopes: list[str], **kwargs):
+    """
+    Returns client of given class with given scopes
+
+    :param client_class: Desired client class
+    :param scopes: Desired scopes
+    :return: Client of given class, scopes
+    """
+
     if "is_auto_credential" in kwargs:
         kwargs.pop("is_auto_credential")
     credentials = get_credentials(scopes=scopes)
@@ -57,7 +70,12 @@ def get_client(
 
 
 def auth_gcs(scopes: list[str] = None, **kwargs) -> storage.Client:
-    """Returns an initialized Storage client object"""
+    """
+    Returns an initialized Storage client object.
+
+    :param scopes: Desired scopes. The default scope is `cloud-platform`, but other common scopes include `gmail`, `drive`.
+    :return: GCS client object
+    """
 
     scopes = scopes or ["cloud-platform"]
     client = get_client(storage.Client, scopes, **kwargs)
@@ -66,7 +84,12 @@ def auth_gcs(scopes: list[str] = None, **kwargs) -> storage.Client:
 
 
 def auth_bq(scopes: list[str] = None, **kwargs) -> bigquery.Client:
-    """Returns an initialized BigQuery client object"""
+    """
+    Returns an initialized BigQuery client object
+
+    :param scopes: Desired scopes
+    :return: BigQuery client object
+    """
 
     scopes = scopes or ["cloud-platform", "drive"]
     client = get_client(bigquery.Client, scopes, **kwargs)
@@ -75,7 +98,12 @@ def auth_bq(scopes: list[str] = None, **kwargs) -> bigquery.Client:
 
 
 def auth_gmail(scopes: list[str] = None, **kwargs) -> Resource:
-    """Returns an initialized Gmail Client object"""
+    """
+    Returns an initialized Gmail Client object
+
+    :param scopes: Desired scopes. Defaults to `["gmail.labels", "gmail.modify", "gmail.readonly"]`
+    :return: Gmail client object
+    """
 
     if "is_auto_credential" in kwargs:
         kwargs.pop("is_auto_credential")
@@ -86,12 +114,20 @@ def auth_gmail(scopes: list[str] = None, **kwargs) -> Resource:
 
 
 def make_gmail_client(*args, **kwargs) -> Resource:
-    """ Deprecated alias """
+    """Deprecated alias"""
     return auth_gmail(*args, **kwargs)
 
 
-def auth_sheets(scopes: list[str] = None, cache_discovery: bool = False, **kwargs) -> Resource:
-    """Returns an initialized Sheets client object"""
+def auth_sheets(
+    scopes: list[str] = None, cache_discovery: bool = False, **kwargs
+) -> Resource:
+    """
+    Returns an initialized Sheets client object
+
+    :param scopes: Desired scopes, defaults to `[drive]`
+    :param cache_discovery: `False` unless specified. If cache discovery is desired, set to `True`.
+    :return: Sheets client object
+    """
 
     if "is_auto_credential" in kwargs:
         kwargs.pop("is_auto_credential")
@@ -99,7 +135,13 @@ def auth_sheets(scopes: list[str] = None, cache_discovery: bool = False, **kwarg
     scopes = scopes or ["drive"]
     credentials = get_credentials(scopes=scopes)
 
-    return build("sheets", "v4", credentials=credentials, cache_discovery=cache_discovery, **kwargs)
+    return build(
+        "sheets",
+        "v4",
+        credentials=credentials,
+        cache_discovery=cache_discovery,
+        **kwargs,
+    )
 
 
 def run_query(
@@ -109,7 +151,15 @@ def run_query(
     job_config: bigquery.QueryJobConfig = None,
     **kwargs,
 ) -> list[dict]:
-    """Performs a SQL query in BigQuery"""
+    """
+    Performs a SQL query in BigQuery
+
+    :param sql: SQL query to be performed
+    :param client: BigQuery client
+    :param retry_exceptions: Specified retry exceptions
+    :param job_config: Specified query job config
+    :return: Results of SQL query
+    """
     client = client or auth_bq(**kwargs)
 
     retry_exceptions = retry_exceptions or RETRY_EXCEPTIONS
@@ -122,7 +172,12 @@ def run_query(
 
 
 def get_table(table_name: str, **kwargs) -> list[dict]:
-    """Performs a select * from the given table in BigQuery"""
+    """
+    Performs a select * from the given table in BigQuery
+
+    :param table_name: Desired table
+    :return: Results of a `select all` from given table
+    """
 
     # sadly bq's parameterized queries don't support table names
     sql = f"SELECT * FROM `{_sanitize_name(table_name)}`;"
@@ -138,6 +193,15 @@ def create_table_from_dataframe(
     dataset_name: str,
     table_name: str,
 ):
+    """
+    Creates a BigQuery table from Pandas dataframe
+
+    :param client: BigQuery client
+    :param dataframe: Pandas dataframe to turn into BigQuery table
+    :param project_name: Desired BigQuery project name
+    :param dataset_name: Desired BigQuery dataset name
+    :param table_name: Desired BigQuery table name
+    """
     column_name_conversion = {}
     column_definitions = []
     for column_index in range(len(dataframe.columns)):
@@ -174,6 +238,15 @@ def get_table_for_loading(
     dataset_name: str,
     table_name: str,
 ) -> Table:
+    """
+    Gets a BigQuery table for loading given project, dataset, and table name details
+
+    :param client: BigQuery client
+    :param project_name: Specified BigQuery project name
+    :param dataset_name: Specified BigQuery dataset name
+    :param table_name: Specified BigQuery table name
+    :return: Specified table
+    """
     dataset_ref = bigquery.Dataset(project_name + "." + dataset_name)
     table_ref = dataset_ref.table(table_name)
 
@@ -190,13 +263,25 @@ def load_data_from_dataframe(
     table_name: str,
     retry_exceptions: list = None,
 ):
-    """Loads data from the specified dataframe into the specified table in BigQuery"""
+    """
+    Loads data from the specified dataframe into the specified table in BigQuery
+
+    :param client: BigQuery client
+    :param dataframe: Specified Pandas dataframe
+    :param project_name: Specified BigQuery project
+    :param dataset_name: Specified BigQuery project name
+    :param table_name: Specified BigQuery table name
+    :param retry_exceptions: Desired retry exceptions
+    """
 
     table = get_table_for_loading(client, project_name, dataset_name, table_name)
     retry_exceptions = retry_exceptions or RETRY_EXCEPTIONS
     retry_policy = Retry(predicate=if_exception_type(*retry_exceptions))
     results = client.insert_rows_from_dataframe(
-        table=table, dataframe=dataframe, chunk_size=10000, retry=retry_policy,
+        table=table,
+        dataframe=dataframe,
+        chunk_size=10000,
+        retry=retry_policy,
     )
 
     logging.info(f"inserted {len(results)} rows")
@@ -210,7 +295,16 @@ def load_data_from_list(
     table_name: str,
     retry_exceptions: list = None,
 ):
-    """Loads data from the specified list[dict] into the specified table in BigQuery"""
+    """
+    Loads data from the specified list[dict] into the specified table in BigQuery
+
+    :param client: BigQuery client
+    :param data: List to load to table
+    :param project_name: Specified BigQuery project name
+    :param dataset_name: Specified BigQuery dataset name
+    :param table_name: Specified BigQuery table name
+    :param retry_exceptions: Desired retry exceptions
+    """
 
     table = get_table_for_loading(client, project_name, dataset_name, table_name)
     retry_exceptions = retry_exceptions or RETRY_EXCEPTIONS
@@ -228,7 +322,15 @@ def upload_data_to_gcs(
     client: storage.Client = None,
     **kwargs,
 ):
-    """Uploads the given file to a specified path in a GCS Bucket"""
+    """
+    Uploads the given file to a specified path in a GCS Bucket
+
+    :param bucket_name: Specified GCS bucket
+    :param filename: Name of file to upload
+    :param destination_filename: Name for file once loaded
+    :param destination_path: Desired path for file once loaded
+    :param client: GCS client
+    """
 
     destination_path = destination_path.strip("/")
     destination_blob_name = destination_path + "/" + destination_filename
@@ -250,7 +352,14 @@ def upload_data_to_gcs(
 def get_data_from_sheets(
     spreadsheet_id: str, range: str, client: Resource = None, **kwargs
 ) -> list[list]:
-    """Returns the sheet data in the form of a list of lists"""
+    """
+    Returns the sheet data in the form of a list of lists
+
+    :param spreadsheet_id:  Google Sheets spreadsheet ID
+    :param range: Range within sheet
+    :param client: Google Sheets client
+    :return: List of lists of data from specified spreadsheet
+    """
 
     client = client or auth_sheets(**kwargs)
 
@@ -270,7 +379,17 @@ def send_data_to_sheets(
     is_overwrite: bool = True,
     **kwargs,
 ) -> dict:
-    """Posts the data to the Google Sheet and returns the API response"""
+    """
+    Posts the data to the Google Sheet and returns the API response
+
+    :param data: Data to post to specified Google Sheets spreadsheet
+    :param spreadsheet_id: Specified Google Sheets spreadsheet ID
+    :param range: Specified range within sheet
+    :param input_option: Specified input option, `RAW` by default
+    :param client: Google Sheets client
+    :param is_overwrite: Overwrite option, defaults to `True`
+    :return: Google Sheets API response
+    """
 
     client = client or auth_sheets(**kwargs)
 

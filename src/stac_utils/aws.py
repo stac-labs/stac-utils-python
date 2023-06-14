@@ -8,6 +8,13 @@ from botocore.exceptions import ClientError
 
 def get_secret(region_name: str, secret_name: str) -> dict:
     # Create a Secrets Manager client
+    """
+    Returns secret given AWS region and name
+
+    :param region_name: Desired AWS region
+    :param secret_name: Secret name
+    :return: Secret
+    """
     session = boto3.session.Session()
     client = session.client(service_name="secretsmanager", region_name=region_name)
 
@@ -20,6 +27,13 @@ def get_secret(region_name: str, secret_name: str) -> dict:
 
 def write_secret(region_name: str, secret_name: str, secret: dict):
     # Create a Secrets Manager client
+    """
+    Writes secret, given AWS region, name, and secret
+
+    :param region_name: Desired AWS region
+    :param secret_name: Secret name
+    :param secret: AWS secret
+    """
     session = boto3.session.Session()
     client = session.client(service_name="secretsmanager", region_name=region_name)
 
@@ -30,6 +44,14 @@ def write_secret(region_name: str, secret_name: str, secret: dict):
 
 
 def load_from_s3(bucket: str, path: str, file_name: str) -> dict:
+    """
+    Returns data from s3 given bucket, path, and file name
+
+    :param bucket: s3 bucket
+    :param path: Path within bucket
+    :param file_name: Name of file to load
+    :return: Data from specified file
+    """
     s3 = boto3.resource("s3").Bucket(bucket)
     key = path.strip("/") + "/" + file_name
 
@@ -50,6 +72,15 @@ def load_from_s3(bucket: str, path: str, file_name: str) -> dict:
 
 
 def save_to_s3(data: dict, bucket: str, path: str, file_name: str):
+    """
+    Saves data to s3 in specified location
+
+    :param data: Data to load to s3
+    :param bucket: s3 bucket
+    :param path: Path within bucket
+    :param file_name: Desired file name
+    :return: Data
+    """
     s3 = boto3.resource("s3").Bucket(bucket)
     key = path.strip("/") + "/" + file_name
 

@@ -9,6 +9,12 @@ def _convert(camel_input: str) -> str:
 
 
 def convert_to_snake_case(data: [str, dict, list]) -> [str, dict, list]:
+    """
+    Converts provided data to snake case
+
+    :param data: Data to convert to snake case
+    :return: Data reformatted as snake case
+    """
     if type(data) is list:
         return [convert_to_snake_case(row) for row in data]
     elif type(data) is str:

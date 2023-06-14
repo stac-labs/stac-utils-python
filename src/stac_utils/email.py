@@ -6,6 +6,10 @@ from . import listify
 
 
 class Emailer:
+    """
+    Sets up Mailgun Emailer
+    """
+
     def __init__(
         self,
         domain: str = None,
@@ -28,6 +32,17 @@ class Emailer:
         template: str = None,
         variables: dict = None,
     ):
+        """
+        Sends email given specified details. Either include the body with the raw HTML directly, or template and variables so the template will be utilized.
+
+        :param subject: Desired subject for email
+        :param body: Body of email
+        :param emails: List of email addresses receiving email
+        :param from_addr: From address for email
+        :param reply_to: Reply-to for email
+        :param template: Specified template for email
+        :param variables: Specified variables for email template
+        """
         email_data = {
             "to": ",".join(emails),
             "from": from_addr or self.from_addr,
