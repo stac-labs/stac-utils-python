@@ -20,6 +20,12 @@ class NGPVANLocationException(Exception):
 class NGPVANClient(HTTPClient):
     """
     NGPVAN Client class built on basic HTTP Client class
+
+    Parameters
+    ==========
+    mode: 0 for My Voters, 1 for everything else
+    app_name: app name of the API key, will pick up "NGPVAN_APP_NAME" if it's in the environment
+    api_key: the API key, will pick up "NGPVAN_API_KEY" if it's in the environment
     """
 
     base_url = "https://api.securevan.com/v4"
