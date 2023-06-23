@@ -14,7 +14,7 @@ import sys
 sys.path.insert(0, os.path.abspath('../src'))
 
 import stac_utils
-import stac_utils.email
+from stac_utils import email
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
