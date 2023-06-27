@@ -3,7 +3,7 @@ import logging
 import os
 import requests
 
-from .convert import convert_to_snake_case
+from .convert import convert_to_snake_case, strip_dict
 from .http import HTTPClient
 
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ class NGPVANClient(HTTPClient):
     max_connections = 5
 
     def __init__(
-        self, mode: int, app_name: str = None, api_key: str = None, *args, **kwargs
+            self, mode: int, app_name: str = None, api_key: str = None, *args, **kwargs
     ):
         self.app_name = app_name or os.environ.get("NGPVAN_APP_NAME")
         assert int(mode) in (0, 1)
@@ -59,10 +59,10 @@ class NGPVANClient(HTTPClient):
         return 2
 
     def transform_response(
-        self,
-        response: requests.Response,
-        return_headers: bool = False,
-        use_snake_case: bool = True,
+            self,
+            response: requests.Response,
+            return_headers: bool = False,
+            use_snake_case: bool = True,
     ) -> dict:
         """
         Transforms response given specifications and returns data
@@ -98,10 +98,10 @@ class NGPVANClient(HTTPClient):
         return data
 
     def check_for_error(
-        self,
-        response: requests.Response,
-        data: dict,
-        override_error_logging: bool = False,
+            self,
+            response: requests.Response,
+            data: dict,
+            override_error_logging: bool = False,
     ):
         """
         Checks for errors given specifications
@@ -114,9 +114,9 @@ class NGPVANClient(HTTPClient):
         if errors:
             location_error_text = "'location' is required by the specified Event"
             if (
-                len(errors) == 1
-                and errors[0].get("text") == location_error_text
-                and override_error_logging
+                    len(errors) == 1
+                    and errors[0].get("text") == location_error_text
+                    and override_error_logging
             ):
                 # This error means that the existing event needs a new location added
                 # so we will do that first, without logging an error, and then retry the signup
@@ -124,8 +124,8 @@ class NGPVANClient(HTTPClient):
 
             # successful 204 response code does not raise error (i.e. when applying ACs/SQs)
             elif (
-                response.status_code == 204
-                and errors == "Expecting value: line 1 column 1 (char 0)"
+                    response.status_code == 204
+                    and errors == "Expecting value: line 1 column 1 (char 0)"
             ):
                 pass
             else:
@@ -151,3 +151,65 @@ class NGPVANClient(HTTPClient):
             next_full_url = data.get("next_page_link")
             next_url = next_full_url.split("/")[-1] if next_full_url else None
         return all_items
+
+    def format_person_json(row: dict, id_key: str, hasIdentifier: bool) -> dict:
+        formatted_json = {
+            "firstName": row.get("first_name"),
+            "lastName": row.get("last_name"),
+            "dateOfBirth": row.get("date_of_birth"),
+            "contactMode": "Person",
+        }
+
+        if hasIdentifier and id_key is not None:
+            formatted_json["identifiers"] = [
+                {"type": "votervanid", "externalId": row.get(id_key)}
+            ]
+        elif hasIdentifier and id_key is None:
+            raise ValueError("did not indicate name of id key column")
+        elif row.get("custom_field_id") and row.get("custom_field_group_id"):
+            formatted_json["customFieldValues"] = [
+                {
+                    "custom_field_id": row.get("custom_field_id"),
+                    "custom_field_group_id": row.get("custom_field_group_id"),
+                    "assignedValue": row.get(id_key),
+                }
+            ]
+        else:
+            print("No ID key used")
+
+        if row.get("email"):
+            formatted_json["emails"] = [{"email": row.get("email")}]
+
+        if row.get("phone"):
+            formatted_json["phones"] = [
+                {"phoneNumber": str(row.get("phone")).replace(".0", "")}
+            ]
+
+        if row.get("middle_name"):
+            formatted_json["middleName"] = row.get("middle_name")
+
+        # if row.get('street_address') or row.get('city') or row.get('stateOrProvince') or row.get('zipOrPostalCode'):
+        address = {}
+
+        if row.get("street_address"):
+            address["addressLine1"] = row.get("street_address")
+
+        if row.get("city"):
+            address["city"] = row.get("city")
+
+        if row.get("state") or row.get("stateOrProvince"):
+            if row.get("state"):
+                address["stateOrProvince"] = row.get("state")
+            else:
+                address["stateOrProvince"] = row.get("stateOrProvince")
+
+        if row.get("zip") or row.get("zipOrPostalCode"):
+            if row.get("zip"):
+                address["zipOrPostalCode"] = row.get("zip")
+            else:
+                address["zipOrPostalCode"] = row.get("zipOrPostalCode")
+
+        if address is not {}:
+            formatted_json["addresses"] = [address]
+
+        return strip_dict(formatted_json)
