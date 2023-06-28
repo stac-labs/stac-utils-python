@@ -32,3 +32,44 @@ def email_validation(email) -> str:
         email = ""
     finally:
         return email
+
+
+def name_and_place_validation(van_input) -> str:
+    """
+    General validation for input fields, removing numbers, html tags and html special characters
+    :param van_input: str, the input field (i.e. city, first_name, last_name)
+    :return: str, the van input is returned after validation
+    """
+    # Set regex pattern
+    html_pattern = re.compile("[\<\>]+|&#|[0-9]")
+
+    # Handle NoneType
+    van_input = van_input or ""
+
+    # Remove html patterns and capitalize first letter of every word
+    van_input = html_pattern.sub("", van_input).title()
+
+    return van_input
+
+
+def zip_validation(zip_input) -> str:
+    """
+    Formats input zip to zip code 5
+    :param zip_input: str, zipcode value from Actionkit
+    :return: str, zip_input
+    """
+    # Set regex pattern
+    html_pattern = re.compile("[^0-9]")
+
+    # Handle NoneType
+    zip_input = zip_input or ""
+
+    # Remove anything that is not a number
+    zip_input = html_pattern.sub("", zip_input)
+
+    # limit to zip5
+    zip_input = zip_input[:5]
+    if len(zip_input) != 5:
+        zip_input = ""
+
+    return zip_input
