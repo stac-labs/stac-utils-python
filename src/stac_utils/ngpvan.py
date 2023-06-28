@@ -214,7 +214,7 @@ class NGPVANClient(HTTPClient):
 
         return strip_dict(formatted_json)
 
-    def phone_validation(phone) -> str:
+    def van_phone_validation(phone) -> str:
         """
         This method validates phone numbers using VAN's API, and if number is not valid the phone variable
         is assigned an empty string
