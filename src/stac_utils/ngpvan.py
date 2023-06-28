@@ -213,3 +213,22 @@ class NGPVANClient(HTTPClient):
             formatted_json["addresses"] = [address]
 
         return strip_dict(formatted_json)
+
+    def phone_validation(phone) -> str:
+        """
+        This method validates phone numbers using VAN's API, and if number is not valid the phone variable
+        is assigned an empty string
+        :param phone: str, phone number from ActionKit
+        :return: str, empty string if phone number was not valid, or returns the valid phone number
+        """
+        VAN_PHONE_ENDPOINT = "https://api.securevan.com/v4/people/findByPhone"
+        payload = {"phoneNumber": f"{phone}"}
+        headers = {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": os.getenv("VAN_AUTH")
+        }
+        response = requests.post(VAN_PHONE_ENDPOINT, json=payload, headers=headers)
+        if response.status_code == 400:
+            phone = ""
+        return phone
