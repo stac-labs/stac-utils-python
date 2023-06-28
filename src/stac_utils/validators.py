@@ -34,22 +34,22 @@ def email_validation(email) -> str:
         return email
 
 
-def name_and_place_validation(van_input) -> str:
+def name_and_place_validation(name_or_place_input) -> str:
     """
     General validation for input fields, removing numbers, html tags and html special characters
-    :param van_input: str, the input field (i.e. city, first_name, last_name)
-    :return: str, the van input is returned after validation
+    :param name_or_place_input: str, the input field (i.e. city, first_name, last_name)
+    :return: str, the name or place input is returned after validation
     """
     # Set regex pattern
     html_pattern = re.compile("[\<\>]+|&#|[0-9]")
 
     # Handle NoneType
-    van_input = van_input or ""
+    name_or_place_input = name_or_place_input or ""
 
     # Remove html patterns and capitalize first letter of every word
-    van_input = html_pattern.sub("", van_input).title()
+    name_or_place_input = html_pattern.sub("", name_or_place_input).title()
 
-    return van_input
+    return name_or_place_input
 
 
 def zip_validation(zip_input) -> str:
