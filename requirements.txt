@@ -16,3 +16,4 @@ boto3~=1.24.96
 xmltodict~=0.13.0
 python-dotenv~=1.0.0
 inflection~=0.5.1
+email-validator
