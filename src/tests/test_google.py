@@ -64,7 +64,12 @@ class TestGoogle(unittest.TestCase):
 
         mock_client_class = MagicMock()
         result_client = get_client(mock_client_class, ["foo"], bar=True)
-        mock_get_credentials.assert_called_once_with(scopes=["foo"])
+        mock_get_credentials.assert_called_once_with(
+            scopes=["foo"],
+            service_account_blob=None,
+            service_account_env_name="SERVICE_ACCOUNT",
+            subject=None,
+        )
         mock_client_class.assert_called_once_with(
             credentials=mock_get_credentials.return_value, bar=True
         )
@@ -78,8 +83,15 @@ class TestGoogle(unittest.TestCase):
         mock_get_credentials.return_value = None
 
         result_client = get_client(mock_client_class, ["foo"])
-        mock_get_credentials.assert_called_once_with(scopes=["foo"])
-        mock_client_class.assert_called_once_with(credentials=None)
+        mock_get_credentials.assert_called_once_with(
+            scopes=["foo"],
+            service_account_blob=None,
+            service_account_env_name="SERVICE_ACCOUNT",
+            subject=None,
+        )
+        mock_client_class.assert_called_once_with(
+            credentials=None,
+        )
         self.assertIs(mock_client_class.return_value, result_client)
 
     @patch("src.stac_utils.google.get_client")
@@ -134,7 +146,10 @@ class TestGoogle(unittest.TestCase):
         result_client = auth_gmail()
 
         mock_get_credentials.assert_called_once_with(
-            scopes=["gmail.labels", "gmail.modify", "gmail.readonly"]
+            scopes=["gmail.labels", "gmail.modify", "gmail.readonly"],
+            service_account_blob=None,
+            service_account_env_name="SERVICE_ACCOUNT",
+            subject=None,
         )
         self.assertIsInstance(result_client, Resource)
 
@@ -147,7 +162,12 @@ class TestGoogle(unittest.TestCase):
 
         auth_gmail(["foo", "bar"])
 
-        mock_get_credentials.assert_called_once_with(scopes=["foo", "bar"])
+        mock_get_credentials.assert_called_once_with(
+            scopes=["foo", "bar"],
+            service_account_blob=None,
+            service_account_env_name="SERVICE_ACCOUNT",
+            subject=None,
+        )
 
     @patch("src.stac_utils.google.auth_gmail")
     def test_make_gmail_client(self, mock_auth_gmail: MagicMock):
@@ -165,7 +185,12 @@ class TestGoogle(unittest.TestCase):
 
         result_client = auth_sheets()
 
-        mock_get_credentials.assert_called_once_with(scopes=["drive"])
+        mock_get_credentials.assert_called_once_with(
+            scopes=["drive"],
+            service_account_blob=None,
+            service_account_env_name="SERVICE_ACCOUNT",
+            subject=None,
+        )
         self.assertIsInstance(result_client, Resource)
 
     @patch("src.stac_utils.google.get_credentials")
@@ -177,7 +202,12 @@ class TestGoogle(unittest.TestCase):
 
         auth_sheets(["foo", "bar"])
 
-        mock_get_credentials.assert_called_once_with(scopes=["foo", "bar"])
+        mock_get_credentials.assert_called_once_with(
+            scopes=["foo", "bar"],
+            service_account_blob=None,
+            service_account_env_name="SERVICE_ACCOUNT",
+            subject=None,
+        )
 
     @patch("src.stac_utils.google.Retry")
     @patch("src.stac_utils.google.auth_bq")
