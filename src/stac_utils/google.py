@@ -57,7 +57,7 @@ def get_client(
     client_class,
     scopes: [list[str], str] = None,
     service_account_blob: dict = None,
-    service_account_env_name: str = None,
+    service_account_env_name: str = "SERVICE_ACCOUNT",
     subject: str = None,
     **kwargs,
 ):
@@ -115,7 +115,7 @@ def auth_bq(scopes: list[str] = None, **kwargs) -> bigquery.Client:
 def auth_gmail(
     scopes: [list[str], str] = None,
     service_account_blob: dict = None,
-    service_account_env_name: str = None,
+    service_account_env_name: str = "SERVICE_ACCOUNT",
     subject: str = None,
     **kwargs,
 ) -> Resource:
@@ -151,7 +151,7 @@ def auth_sheets(
     scopes: list[str] = None,
     cache_discovery: bool = False,
     service_account_blob: dict = None,
-    service_account_env_name: str = None,
+    service_account_env_name: str = "SERVICE_ACCOUNT",
     subject: str = None,
     **kwargs,
 ) -> Resource:
