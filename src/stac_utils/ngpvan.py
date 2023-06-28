@@ -152,7 +152,7 @@ class NGPVANClient(HTTPClient):
             next_url = next_full_url.split("/")[-1] if next_full_url else None
         return all_items
 
-    def format_person_json(row: dict, id_key: str, hasIdentifier: bool) -> dict:
+    def format_person_json(self, row: dict, id_key: str, has_identifier: bool) -> dict:
         formatted_json = {
             "firstName": row.get("first_name"),
             "lastName": row.get("last_name"),
@@ -160,11 +160,11 @@ class NGPVANClient(HTTPClient):
             "contactMode": "Person",
         }
 
-        if hasIdentifier and id_key is not None:
+        if has_identifier and id_key is not None:
             formatted_json["identifiers"] = [
                 {"type": "votervanid", "externalId": row.get(id_key)}
             ]
-        elif hasIdentifier and id_key is None:
+        elif has_identifier and id_key is None:
             raise ValueError("did not indicate name of id key column")
         elif row.get("custom_field_id") and row.get("custom_field_group_id"):
             formatted_json["customFieldValues"] = [
