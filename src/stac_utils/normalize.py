@@ -3,7 +3,7 @@ import re
 from email_validator import validate_email, EmailNotValidError
 
 
-def email_validation(email) -> str:
+def normalize_email(email) -> str:
     """
     Email validation method. Does not guess what the email is by removing not allowed characters;
     if email is not valid, it is removed.
@@ -52,7 +52,7 @@ def name_and_place_validation(name_or_place_input) -> str:
     return name_or_place_input
 
 
-def zip_validation(zip_input) -> str:
+def normalize_zip(zip_input) -> str:
     """
     Formats input zip to zip code 5
     :param zip_input: str, zipcode value from Actionkit
