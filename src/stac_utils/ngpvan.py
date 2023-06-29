@@ -32,7 +32,7 @@ class NGPVANClient(HTTPClient):
     max_connections = 5
 
     def __init__(
-            self, mode: int, app_name: str = None, api_key: str = None, *args, **kwargs
+        self, mode: int, app_name: str = None, api_key: str = None, *args, **kwargs
     ):
         self.app_name = app_name or os.environ.get("NGPVAN_APP_NAME")
         assert int(mode) in (0, 1)
@@ -59,10 +59,10 @@ class NGPVANClient(HTTPClient):
         return 2
 
     def transform_response(
-            self,
-            response: requests.Response,
-            return_headers: bool = False,
-            use_snake_case: bool = True,
+        self,
+        response: requests.Response,
+        return_headers: bool = False,
+        use_snake_case: bool = True,
     ) -> dict:
         """
         Transforms response given specifications and returns data
@@ -98,10 +98,10 @@ class NGPVANClient(HTTPClient):
         return data
 
     def check_for_error(
-            self,
-            response: requests.Response,
-            data: dict,
-            override_error_logging: bool = False,
+        self,
+        response: requests.Response,
+        data: dict,
+        override_error_logging: bool = False,
     ):
         """
         Checks for errors given specifications
@@ -114,9 +114,9 @@ class NGPVANClient(HTTPClient):
         if errors:
             location_error_text = "'location' is required by the specified Event"
             if (
-                    len(errors) == 1
-                    and errors[0].get("text") == location_error_text
-                    and override_error_logging
+                len(errors) == 1
+                and errors[0].get("text") == location_error_text
+                and override_error_logging
             ):
                 # This error means that the existing event needs a new location added
                 # so we will do that first, without logging an error, and then retry the signup
@@ -124,8 +124,8 @@ class NGPVANClient(HTTPClient):
 
             # successful 204 response code does not raise error (i.e. when applying ACs/SQs)
             elif (
-                    response.status_code == 204
-                    and errors == "Expecting value: line 1 column 1 (char 0)"
+                response.status_code == 204
+                and errors == "Expecting value: line 1 column 1 (char 0)"
             ):
                 pass
             else:
@@ -226,7 +226,7 @@ class NGPVANClient(HTTPClient):
         headers = {
             "Accept": "application/json",
             "Content-Type": "application/json",
-            "Authorization": os.getenv("VAN_AUTH")
+            "Authorization": os.getenv("VAN_AUTH"),
         }
         response = requests.post(van_phone_endpoint, json=payload, headers=headers)
         if response.status_code == 400:

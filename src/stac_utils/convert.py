@@ -29,5 +29,6 @@ def convert_to_snake_case(data: [str, dict, list]) -> [str, dict, list]:
 
     return new_data
 
+
 def strip_dict(full_dict: dict):
     return {k: v for k, v in full_dict.items() if v is not None}
