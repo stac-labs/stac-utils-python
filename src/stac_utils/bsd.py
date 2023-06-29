@@ -22,7 +22,7 @@ class BSDClient(HTTPClient):
         *args,
         **kwargs,
     ):
-        self.bsd_url = bsd_url or os.environ["BSD_URL"]
+        self.base_url = bsd_url or os.environ["BSD_URL"]
         self.bsd_api_id = bsd_api_id or os.environ["BSD_API_ID"]
         self.bsd_api_secret = bsd_api_secret or os.environ["BSD_API_SECRET"]
 
