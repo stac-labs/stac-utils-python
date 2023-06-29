@@ -34,22 +34,23 @@ def normalize_email(email) -> str:
         return email
 
 
-def name_and_place_validation(name_or_place_input) -> str:
+def normalize_proper_name(string: str, regex: str = "[\<\>]+|&#|[0-9]") -> str:
     """
     General validation for input fields, removing numbers, html tags and html special characters
-    :param name_or_place_input: str, the input field (i.e. city, first_name, last_name)
+    :param string: str, the input field (i.e. city, first_name, last_name)
+    :param regex:
     :return: str, the name or place input is returned after validation
     """
     # Set regex pattern
-    html_pattern = re.compile("[\<\>]+|&#|[0-9]")
+    html_pattern = re.compile(regex)
 
     # Handle NoneType
-    name_or_place_input = name_or_place_input or ""
+    string = string or ""
 
     # Remove html patterns and capitalize first letter of every word
-    name_or_place_input = html_pattern.sub("", name_or_place_input).title()
+    proper_string = html_pattern.sub("", string).title()
 
-    return name_or_place_input
+    return proper_string
 
 
 def normalize_zip(zip_input) -> str:
