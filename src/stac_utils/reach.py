@@ -4,7 +4,7 @@ import os
 
 import requests
 
-from stac_utils.http import HTTPClient
+from .http import HTTPClient
 
 logger = logging.getLogger(__name__)
 

@@ -1,7 +1,7 @@
 import os
 import json
 import requests
-from stac_utils.http import HTTPClient
+from .http import HTTPClient
 
 
 ROW_LIMIT = 10000

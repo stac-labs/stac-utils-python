@@ -6,7 +6,7 @@ import time
 import requests
 import xmltodict
 
-from stac_utils.http import HTTPClient
+from .http import HTTPClient
 
 
 class BSDClient(HTTPClient):
