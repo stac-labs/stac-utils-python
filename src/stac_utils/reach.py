@@ -24,9 +24,9 @@ class ReachClient(HTTPClient):
             "password": self.api_password,
         }
         endpoint = "/oauth/token"
-        with self.session_context() as session:
-            response = session.post(self.base_url + endpoint, body=body)
-            self.access_token = json.loads(response.text)["access_token"]
+        session = requests.Session()
+        response = session.post(self.base_url + endpoint, data=body)
+        self.access_token = json.loads(response.text)["access_token"]
 
     def create_session(self) -> requests.Session:
         """Create a session, set headers & auth"""
@@ -38,11 +38,3 @@ class ReachClient(HTTPClient):
         session.headers.update(headers)
         return session
 
-    def get_api_headers(self):
-        auth_info = {
-            "username": os.environ["REACH_API_USER"],
-            "password": os.environ["REACH_API_PASSWORD"],
-        }
-        r = requests.post("https://api.reach.vote/oauth/token", data=auth_info)
-        access_token = {"Authorization": "Bearer " + json.loads(r.text)["access_token"]}
-        return access_token
