@@ -29,6 +29,7 @@ class BSDClient(HTTPClient):
         super().__init__(*args, **kwargs)
 
     def generate_api_mac(self, current_time: str, url: str, params: dict = None):
+        """Generates api mac given inputs to be used for BSD API calls """
         params_str = f"api_ver=2&api_id={self.bsd_api_id}&api_ts={current_time}"
 
         if params:
@@ -63,6 +64,7 @@ class BSDClient(HTTPClient):
         override_data_printing: bool = False,
         **kwargs,
     ):
+        """Given inputs, calls BSD API"""
         params = params or {}
         current_time = str(int(time.time()))
         api_mac = self.generate_api_mac(current_time, endpoint, params)
@@ -88,4 +90,5 @@ class BSDClient(HTTPClient):
         )
 
     def transform_response(self, response: requests.Response, **kwargs):
+        """Transforms xml response to dict"""
         return xmltodict.parse(response.text, xml_attribs=False)
