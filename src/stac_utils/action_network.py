@@ -7,7 +7,7 @@ from .http import HTTPClient
 ROW_LIMIT = 10000
 
 
-class ActionnetworkClient(HTTPClient):
+class ActionNetworkClient(HTTPClient):
     base_url = "https://actionnetwork.org/api/v2"
 
     def __init__(self, api_token: str = None, *args, **kwargs):
