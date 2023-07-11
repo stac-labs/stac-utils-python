@@ -15,12 +15,14 @@ class ActionNetworkClient(HTTPClient):
         super().__init__(*args, **kwargs)
 
     def create_session(self) -> requests.Session:
+        """Creates ActionNetwork session"""
         headers = {"OSDI-API-Token": self.api_token, "Content-Type": "application/json"}
         session = requests.Session()
         session.headers.update(headers)
         return session
 
     def transform_response(self, response: requests.Response, **kwargs) -> dict:
+        """Transforms ActionNetwork response into dict"""
         try:
             data = response.json() or {}
         except json.decoder.JSONDecodeError:
@@ -31,4 +33,5 @@ class ActionNetworkClient(HTTPClient):
     def check_response_for_rate_limit(
         self, response: requests.Response
     ) -> [int, float, None]:
+        """Checks ActionNetwork response for rate limit, always returns 1"""
         return 1
