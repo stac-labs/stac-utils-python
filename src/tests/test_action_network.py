@@ -1,9 +1,6 @@
-import json
 import os
 import unittest
 from unittest.mock import MagicMock, patch, call
-
-import requests
 
 from src.stac_utils.action_network import ActionNetworkClient
 
