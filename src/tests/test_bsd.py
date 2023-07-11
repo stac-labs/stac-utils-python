@@ -1,11 +1,5 @@
-import hashlib
-import hmac
 import os
-import time
 import unittest
-
-import requests
-import xmltodict
 
 from unittest.mock import MagicMock, patch, call
 

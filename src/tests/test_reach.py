@@ -3,7 +3,7 @@ import unittest
 
 import requests
 
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock, patch
 
 from src.stac_utils.reach import ReachClient
 
