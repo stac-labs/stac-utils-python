@@ -63,6 +63,7 @@ class BSDClient(HTTPClient):
         override_data_printing: bool = False,
         **kwargs,
     ):
+        params = params or {}
         current_time = str(int(time.time()))
         api_mac = self.generate_api_mac(current_time, endpoint, params)
 
@@ -74,7 +75,7 @@ class BSDClient(HTTPClient):
         }
 
         new_params.update(**params)
-        super().call_api(
+        return super().call_api(
             method,
             endpoint,
             params=new_params,
