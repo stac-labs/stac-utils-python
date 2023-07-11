@@ -13,7 +13,7 @@ class TestNGPVAN(unittest.TestCase):
         self.test_client = NGPVANClient(mode=1)
 
     def test_init(self):
-        """Test that client intiates"""
+        """Test that client initiates"""
 
         NGPVANClient(mode=0)
         NGPVANClient(mode=1)
