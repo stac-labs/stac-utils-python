@@ -28,3 +28,10 @@ def convert_to_snake_case(data: [str, dict, list]) -> [str, dict, list]:
         new_data[k] = v
 
     return new_data
+
+
+def strip_dict(full_dict: dict):
+    """Removes None values from dictionaries
+    :param full_dict: dict to clean up
+    :return: dict without None values"""
+    return {k: v for k, v in full_dict.items() if v is not None}

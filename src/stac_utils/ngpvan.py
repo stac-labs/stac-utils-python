@@ -3,7 +3,7 @@ import logging
 import os
 import requests
 
-from .convert import convert_to_snake_case
+from .convert import convert_to_snake_case, strip_dict
 from .http import HTTPClient
 
 logger = logging.getLogger(__name__)
@@ -151,3 +151,82 @@ class NGPVANClient(HTTPClient):
             next_full_url = data.get("next_page_link")
             next_url = next_full_url.split("/")[-1] if next_full_url else None
         return all_items
+
+    @staticmethod
+    def format_person_json(row: dict, id_key: str, has_identifier: bool) -> dict:
+        formatted_json = {
+            "firstName": row.get("first_name"),
+            "lastName": row.get("last_name"),
+            "dateOfBirth": row.get("date_of_birth"),
+            "contactMode": "Person",
+        }
+
+        if has_identifier and id_key is not None:
+            formatted_json["identifiers"] = [
+                {"type": "votervanid", "externalId": row.get(id_key)}
+            ]
+        elif has_identifier and id_key is None:
+            raise ValueError("did not indicate name of id key column")
+        elif row.get("custom_field_id") and row.get("custom_field_group_id"):
+            formatted_json["customFieldValues"] = [
+                {
+                    "custom_field_id": row.get("custom_field_id"),
+                    "custom_field_group_id": row.get("custom_field_group_id"),
+                    "assignedValue": row.get(id_key),
+                }
+            ]
+        else:
+            print("No ID key used")
+
+        if row.get("email"):
+            formatted_json["emails"] = [{"email": row.get("email")}]
+
+        if row.get("phone"):
+            formatted_json["phones"] = [
+                {"phoneNumber": str(row.get("phone")).replace(".0", "")}
+            ]
+
+        if row.get("middle_name"):
+            formatted_json["middleName"] = row.get("middle_name")
+
+        address = {}
+
+        if row.get("street_address"):
+            address["addressLine1"] = row.get("street_address")
+
+        if row.get("city"):
+            address["city"] = row.get("city")
+
+        if row.get("state") or row.get("stateOrProvince"):
+            if row.get("state"):
+                address["stateOrProvince"] = row.get("state")
+            else:
+                address["stateOrProvince"] = row.get("stateOrProvince")
+
+        if row.get("zip") or row.get("zipOrPostalCode"):
+            if row.get("zip"):
+                address["zipOrPostalCode"] = row.get("zip")
+            else:
+                address["zipOrPostalCode"] = row.get("zipOrPostalCode")
+
+        if address:
+            formatted_json["addresses"] = [address]
+
+        return strip_dict(formatted_json)
+
+    def validate_phone(self, phone: str) -> str:
+        """
+        This method validates phone numbers using VAN's API, and if number is not valid the phone variable
+        is assigned an empty string
+        :param phone: str, phone number from ActionKit
+        :return: str, empty string if phone number was not valid, or returns the valid phone number
+        """
+        van_phone_endpoint = "people/findByPhone"
+        payload = {"phoneNumber": f"{phone}"}
+        try:
+            response = self.post(van_phone_endpoint, body=payload)
+            phone = response["findbyphone"]
+        except NGPVANException:
+            phone = ""
+
+        return phone
