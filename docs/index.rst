@@ -6,15 +6,19 @@ Welcome to stac-utils-python's documentation!
 .. autosummary::
    :toctree: _autosummary
 
+   stac_utils.action_network
    stac_utils.aws
    stac_utils.benchmark
+   stac_utils.bsd
    stac_utils.convert
    stac_utils.email
    stac_utils.google
    stac_utils.http
    stac_utils.listify
    stac_utils.ngpvan
+   stac_utils.normalize
    stac_utils.pandas_utils
+   stac_utils.reach
    stac_utils.secret_context
    stac_utils.secret_factory
    stac_utils.ticker_request
