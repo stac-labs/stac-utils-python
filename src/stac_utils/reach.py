@@ -37,4 +37,3 @@ class ReachClient(HTTPClient):
         headers = {"Authorization": "Bearer " + self.access_token}
         session.headers.update(headers)
         return session
-

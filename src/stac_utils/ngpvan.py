@@ -221,14 +221,12 @@ class NGPVANClient(HTTPClient):
         :param phone: str, phone number from ActionKit
         :return: str, empty string if phone number was not valid, or returns the valid phone number
         """
-        van_phone_endpoint = "https://api.securevan.com/v4/people/findByPhone"
+        van_phone_endpoint = "people/findByPhone"
         payload = {"phoneNumber": f"{phone}"}
-        headers = {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            "Authorization": os.getenv("VAN_AUTH"),
-        }
-        response = requests.post(van_phone_endpoint, json=payload, headers=headers)
-        if response.status_code == 400:
+        try:
+            response = self.post(van_phone_endpoint, body=payload)
+            phone = response["findbyphone"]
+        except NGPVANException:
             phone = ""
+
         return phone

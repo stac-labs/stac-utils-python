@@ -29,7 +29,7 @@ class BSDClient(HTTPClient):
         super().__init__(*args, **kwargs)
 
     def generate_api_mac(self, current_time: str, url: str, params: dict = None):
-        """Generates api mac given inputs to be used for BSD API calls """
+        """Generates api mac given inputs to be used for BSD API calls"""
         params_str = f"api_ver=2&api_id={self.bsd_api_id}&api_ts={current_time}"
 
         if params:
