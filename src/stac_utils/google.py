@@ -53,18 +53,33 @@ def get_credentials(
     return credentials
 
 
-def get_client(client_class, scopes: list[str], **kwargs):
+def get_client(
+    client_class,
+    scopes: [list[str], str] = None,
+    service_account_blob: dict = None,
+    service_account_env_name: str = "SERVICE_ACCOUNT",
+    subject: str = None,
+    **kwargs,
+):
     """
     Returns client of given class with given scopes
 
     :param client_class: Desired client class
     :param scopes: Desired scopes
+    :param service_account_blob: Service account blob
+    :param service_account_env_name: Environmental variable name for service account
+    :param subject: Service account subject
     :return: Client of given class, scopes
     """
 
     if "is_auto_credential" in kwargs:
         kwargs.pop("is_auto_credential")
-    credentials = get_credentials(scopes=scopes)
+    credentials = get_credentials(
+        scopes=scopes,
+        service_account_blob=service_account_blob,
+        service_account_env_name=service_account_env_name,
+        subject=subject,
+    )
     client = client_class(credentials=credentials, **kwargs)
     return client
 
@@ -97,11 +112,20 @@ def auth_bq(scopes: list[str] = None, **kwargs) -> bigquery.Client:
     return client
 
 
-def auth_gmail(scopes: list[str] = None, **kwargs) -> Resource:
+def auth_gmail(
+    scopes: [list[str], str] = None,
+    service_account_blob: dict = None,
+    service_account_env_name: str = "SERVICE_ACCOUNT",
+    subject: str = None,
+    **kwargs,
+) -> Resource:
     """
     Returns an initialized Gmail Client object
 
     :param scopes: Desired scopes. Defaults to `["gmail.labels", "gmail.modify", "gmail.readonly"]`
+    :param service_account_blob: Service account blob
+    :param service_account_env_name: Environmental variable name for service account
+    :param subject: Service account subject
     :return: Gmail client object
     """
 
@@ -109,7 +133,12 @@ def auth_gmail(scopes: list[str] = None, **kwargs) -> Resource:
         kwargs.pop("is_auto_credential")
     scopes = scopes or ["gmail.labels", "gmail.modify", "gmail.readonly"]
 
-    credentials = get_credentials(scopes=scopes)
+    credentials = get_credentials(
+        scopes=scopes,
+        service_account_blob=service_account_blob,
+        service_account_env_name=service_account_env_name,
+        subject=subject,
+    )
     return build("gmail", "v1", credentials=credentials, **kwargs)
 
 
@@ -119,13 +148,21 @@ def make_gmail_client(*args, **kwargs) -> Resource:
 
 
 def auth_sheets(
-    scopes: list[str] = None, cache_discovery: bool = False, **kwargs
+    scopes: list[str] = None,
+    cache_discovery: bool = False,
+    service_account_blob: dict = None,
+    service_account_env_name: str = "SERVICE_ACCOUNT",
+    subject: str = None,
+    **kwargs,
 ) -> Resource:
     """
     Returns an initialized Sheets client object
 
     :param scopes: Desired scopes, defaults to `[drive]`
     :param cache_discovery: `False` unless specified. If cache discovery is desired, set to `True`.
+    :param service_account_blob: Service account blob
+    :param service_account_env_name: Environmental variable name for service account
+    :param subject: Service account subject
     :return: Sheets client object
     """
 
@@ -133,7 +170,12 @@ def auth_sheets(
         kwargs.pop("is_auto_credential")
 
     scopes = scopes or ["drive"]
-    credentials = get_credentials(scopes=scopes)
+    credentials = get_credentials(
+        scopes=scopes,
+        service_account_blob=service_account_blob,
+        service_account_env_name=service_account_env_name,
+        subject=subject,
+    )
 
     return build(
         "sheets",
