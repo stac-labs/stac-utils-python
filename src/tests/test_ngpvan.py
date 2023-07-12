@@ -209,7 +209,6 @@ class TestNGPVAN(unittest.TestCase):
         )
 
     def test_format_person_json(self):
-
         self.assertEqual(
             NGPVANClient.format_person_json(
                 {
@@ -301,9 +300,79 @@ class TestNGPVAN(unittest.TestCase):
                 "dateOfBirth": "1984-01-01",
                 "contactMode": "Person",
                 "identifiers": [{"type": "votervanid", "externalId": None}],
-                "addresses": [{}],
             },
         )
+
+        self.assertEqual(
+            NGPVANClient.format_person_json(
+                {
+                    "first_name": "John",
+                    "last_name": "Smith",
+                    "date_of_birth": "1984-01-01",
+                },
+                None,
+                False,
+            ),
+            {
+                "firstName": "John",
+                "lastName": "Smith",
+                "dateOfBirth": "1984-01-01",
+                "contactMode": "Person",
+            },
+        )
+
+        self.assertRaises(
+            ValueError,
+            NGPVANClient.format_person_json,
+            {
+                "first_name": "John",
+                "last_name": "Smith",
+                "date_of_birth": "1984-01-01",
+            },
+            None,
+            True,
+        )
+
+        self.assertEqual(
+            NGPVANClient.format_person_json(
+                {
+                    "first_name": "John",
+                    "last_name": "Smith",
+                    "date_of_birth": "1984-01-01",
+                    "custom_field_id": "42",
+                    "custom_field_group_id": "42",
+                },
+                "van_id",
+                False,
+            ),
+            {
+                "firstName": "John",
+                "lastName": "Smith",
+                "dateOfBirth": "1984-01-01",
+                "contactMode": "Person",
+                "customFieldValues": [
+                    {
+                        "custom_field_id": "42",
+                        "custom_field_group_id": "42",
+                        "assignedValue": None,
+                    }
+                ],
+            },
+        )
+
+    def test_validate_phone(self):
+        self.test_client.post = MagicMock(return_value={"findbyphone": "555-123-4567"})
+        self.assertEqual(
+            "555-123-4567", self.test_client.validate_phone("555-123-4567")
+        )
+
+        self.test_client.post.assert_called_once_with(
+            "people/findByPhone", body={"phoneNumber": "555-123-4567"}
+        )
+
+    def test_validate_phone_bad_phone(self):
+        self.test_client.post = MagicMock(side_effect=NGPVANException)
+        self.assertEqual("", self.test_client.validate_phone("555-123-4567"))
 
 
 if __name__ == "__main__":
