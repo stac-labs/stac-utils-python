@@ -209,7 +209,7 @@ class NGPVANClient(HTTPClient):
             else:
                 address["zipOrPostalCode"] = row.get("zipOrPostalCode")
 
-        if address is not {}:
+        if address:
             formatted_json["addresses"] = [address]
 
         return strip_dict(formatted_json)
