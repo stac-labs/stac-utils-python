@@ -188,7 +188,6 @@ class NGPVANClient(HTTPClient):
         if row.get("middle_name"):
             formatted_json["middleName"] = row.get("middle_name")
 
-        # if row.get('street_address') or row.get('city') or row.get('stateOrProvince') or row.get('zipOrPostalCode'):
         address = {}
 
         if row.get("street_address"):
