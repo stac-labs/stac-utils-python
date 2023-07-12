@@ -208,6 +208,103 @@ class TestNGPVAN(unittest.TestCase):
             [{"foo": "bar"}],
         )
 
+    def test_format_person_json(self):
+
+        self.assertEqual(
+            NGPVANClient.format_person_json(
+                {
+                    "first_name": "John",
+                    "last_name": "Smith",
+                    "date_of_birth": "1984-01-01",
+                    "custom_field_id": "42",
+                    "custom_field_group_id": "42",
+                    "van_id": "12345",
+                    "email": "foo@bar.com",
+                    "phone": "817-555-1234",
+                    "middle_name": "Jacob",
+                    "street_address": "123 Main",
+                    "city": "Clinton",
+                    "state": "IA",
+                    "zip": "12345",
+                },
+                "van_id",
+                True,
+            ),
+            {
+                "firstName": "John",
+                "lastName": "Smith",
+                "dateOfBirth": "1984-01-01",
+                "contactMode": "Person",
+                "identifiers": [{"type": "votervanid", "externalId": "12345"}],
+                "emails": [{"email": "foo@bar.com"}],
+                "phones": [{"phoneNumber": "817-555-1234"}],
+                "middleName": "Jacob",
+                "addresses": [
+                    {
+                        "addressLine1": "123 Main",
+                        "city": "Clinton",
+                        "stateOrProvince": "IA",
+                        "zipOrPostalCode": "12345",
+                    }
+                ],
+            },
+        )
+
+        self.assertEqual(
+            NGPVANClient.format_person_json(
+                {
+                    "first_name": "John",
+                    "last_name": "Smith",
+                    "date_of_birth": "1984-01-01",
+                    "email": "foo@bar.com",
+                    "phone": "817-555-1234",
+                    "street_address": "123 Main",
+                    "city": "Clinton",
+                    "stateOrProvince": "IA",
+                    "zipOrPostalCode": "12345",
+                },
+                "van_id",
+                True,
+            ),
+            {
+                "firstName": "John",
+                "lastName": "Smith",
+                "dateOfBirth": "1984-01-01",
+                "contactMode": "Person",
+                "identifiers": [{"type": "votervanid", "externalId": None}],
+                "emails": [{"email": "foo@bar.com"}],
+                "phones": [{"phoneNumber": "817-555-1234"}],
+                "addresses": [
+                    {
+                        "addressLine1": "123 Main",
+                        "city": "Clinton",
+                        "stateOrProvince": "IA",
+                        "zipOrPostalCode": "12345",
+                    }
+                ],
+            },
+        )
+
+        self.assertEqual(
+            NGPVANClient.format_person_json(
+                {
+                    "first_name": "John",
+                    "last_name": "Smith",
+                    "date_of_birth": "1984-01-01",
+                },
+                "van_id",
+                True,
+            ),
+            {
+                "firstName": "John",
+                "lastName": "Smith",
+                "dateOfBirth": "1984-01-01",
+                "contactMode": "Person",
+                "identifiers": [{"type": "votervanid", "externalId": None}],
+                "addresses": [{}],
+            },
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

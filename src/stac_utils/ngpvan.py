@@ -152,7 +152,8 @@ class NGPVANClient(HTTPClient):
             next_url = next_full_url.split("/")[-1] if next_full_url else None
         return all_items
 
-    def format_person_json(self, row: dict, id_key: str, has_identifier: bool) -> dict:
+    @staticmethod
+    def format_person_json(row: dict, id_key: str, has_identifier: bool) -> dict:
         formatted_json = {
             "firstName": row.get("first_name"),
             "lastName": row.get("last_name"),
