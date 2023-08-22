@@ -13,6 +13,8 @@ from src.stac_utils.google import (
     auth_gcs,
     auth_gmail,
     auth_sheets,
+    auth_drive,
+    build_service,
     make_gmail_client,
     run_query,
     get_table,
@@ -136,34 +138,17 @@ class TestGoogle(unittest.TestCase):
 
         mock_get_client.assert_called_once_with(bigquery.Client, ["foo", "bar"])
 
-    @patch("src.stac_utils.google.get_credentials")
-    def test_auth_gmail(self, mock_get_credentials: MagicMock):
+    @patch("src.stac_utils.google.build_service")
+    def test_auth_gmail(self, mock_build_service: MagicMock):
         """Test it gets credentials & builds a gmail client"""
 
-        mock_credentials = MagicMock()
-        mock_get_credentials.return_value = mock_credentials
+        auth_gmail()
 
-        result_client = auth_gmail()
-
-        mock_get_credentials.assert_called_once_with(
-            scopes=["gmail.labels", "gmail.modify", "gmail.readonly"],
-            service_account_blob=None,
-            service_account_env_name="SERVICE_ACCOUNT",
-            subject=None,
-        )
-        self.assertIsInstance(result_client, Resource)
-
-    @patch("src.stac_utils.google.get_credentials")
-    def test_auth_gmail_other_scopes(self, mock_get_credentials: MagicMock):
-        """Test auth gmail with custom scopes"""
-
-        mock_credentials = MagicMock()
-        mock_get_credentials.return_value = mock_credentials
-
-        auth_gmail(["foo", "bar"])
-
-        mock_get_credentials.assert_called_once_with(
-            scopes=["foo", "bar"],
+        mock_build_service.assert_called_once_with(
+            "gmail",
+            "v1",
+            ["gmail.labels", "gmail.modify", "gmail.readonly"],
+            scopes=None,
             service_account_blob=None,
             service_account_env_name="SERVICE_ACCOUNT",
             subject=None,
@@ -176,37 +161,82 @@ class TestGoogle(unittest.TestCase):
         make_gmail_client("foo", bar="spam")
         mock_auth_gmail.assert_called_once_with("foo", bar="spam")
 
+    @patch("src.stac_utils.google.build_service")
+    def test_auth_sheets(self, mock_build_service: MagicMock):
+        """Test it gets credentials & builds a gmail client"""
+
+        auth_sheets()
+
+        mock_build_service.assert_called_once_with(
+            "sheets",
+            "v4",
+            ["drive"],
+            scopes=None,
+            service_account_blob=None,
+            service_account_env_name="SERVICE_ACCOUNT",
+            subject=None,
+        )
+
+    @patch("src.stac_utils.google.build_service")
+    def test_auth_drive(self, mock_build_service: MagicMock):
+        """Test it gets credentials & builds a gmail client"""
+
+        auth_drive()
+
+        mock_build_service.assert_called_once_with(
+            "drive",
+            "v3",
+            ["drive"],
+            scopes=None,
+            service_account_blob=None,
+            service_account_env_name="SERVICE_ACCOUNT",
+            subject=None,
+        )
+
+    @patch("src.stac_utils.google.build")
     @patch("src.stac_utils.google.get_credentials")
-    def test_auth_sheets(self, mock_get_credentials: MagicMock):
+    def test_build_service(
+        self, mock_get_credentials: MagicMock, mock_build: MagicMock
+    ):
         """Test it gets credentials & builds a sheets client"""
 
         mock_credentials = MagicMock()
         mock_get_credentials.return_value = mock_credentials
 
-        result_client = auth_sheets()
+        build_service("foo", "v1", ["bar"])
 
         mock_get_credentials.assert_called_once_with(
-            scopes=["drive"],
+            scopes=["bar"],
             service_account_blob=None,
             service_account_env_name="SERVICE_ACCOUNT",
             subject=None,
         )
-        self.assertIsInstance(result_client, Resource)
 
+        mock_build.assert_called_once_with(
+            "foo", "v1", credentials=mock_credentials, cache_discovery=False
+        )
+
+    @patch("src.stac_utils.google.build")
     @patch("src.stac_utils.google.get_credentials")
-    def test_auth_sheets_other_scopes(self, mock_get_credentials: MagicMock):
-        """Test auth sheets with custom scopes"""
+    def test_build_service_other_scopes(
+        self, mock_get_credentials: MagicMock, mock_build: MagicMock
+    ):
+        """Test it gets credentials & builds a sheets client"""
 
         mock_credentials = MagicMock()
         mock_get_credentials.return_value = mock_credentials
 
-        auth_sheets(["foo", "bar"])
+        build_service("foo", "v1", ["bar"], scopes=["spam"])
 
         mock_get_credentials.assert_called_once_with(
-            scopes=["foo", "bar"],
+            scopes=["spam"],
             service_account_blob=None,
             service_account_env_name="SERVICE_ACCOUNT",
             subject=None,
+        )
+
+        mock_build.assert_called_once_with(
+            "foo", "v1", credentials=mock_credentials, cache_discovery=False
         )
 
     @patch("src.stac_utils.google.Retry")
