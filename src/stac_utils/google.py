@@ -1,14 +1,18 @@
+import io
 import json
 import logging
 import os
 import sys
 
+import pandas
 from google.api_core.exceptions import InternalServerError
 from google.api_core.retry import if_exception_type, Retry
 from google.cloud import storage, bigquery
 from google.cloud.bigquery.table import Table
 from google.oauth2 import service_account
 from googleapiclient.discovery import build, Resource
+from googleapiclient.http import MediaIoBaseDownload
+from googleapiclient.errors import HttpError
 from inflection import parameterize, underscore
 
 from .listify import listify
@@ -186,6 +190,45 @@ def auth_sheets(
     )
 
 
+def auth_drive(
+    scopes: list[str] = None,
+    cache_discovery: bool = False,
+    service_account_blob: dict = None,
+    service_account_env_name: str = "SERVICE_ACCOUNT",
+    subject: str = None,
+    **kwargs,
+) -> Resource:
+    """
+    Returns an initialized Drive client object
+
+    :param scopes: Desired scopes, defaults to `[drive]`
+    :param cache_discovery: `False` unless specified. If cache discovery is desired, set to `True`.
+    :param service_account_blob: Service account blob
+    :param service_account_env_name: Environmental variable name for service account
+    :param subject: Service account subject
+    :return: Drive client object
+    """
+
+    if "is_auto_credential" in kwargs:
+        kwargs.pop("is_auto_credential")
+
+    scopes = scopes or ["drive"]
+    credentials = get_credentials(
+        scopes=scopes,
+        service_account_blob=service_account_blob,
+        service_account_env_name=service_account_env_name,
+        subject=subject,
+    )
+
+    return build(
+        "drive",
+        "v3",
+        credentials=credentials,
+        cache_discovery=cache_discovery,
+        **kwargs,
+    )
+
+
 def run_query(
     sql: str,
     client: bigquery.Client = None,
@@ -244,6 +287,7 @@ def create_table_from_dataframe(
     :param dataset_name: Desired BigQuery dataset name
     :param table_name: Desired BigQuery table name
     """
+
     column_name_conversion = {}
     column_definitions = []
     for column_index in range(len(dataframe.columns)):
@@ -262,12 +306,8 @@ def create_table_from_dataframe(
 
     dataframe = dataframe.rename(columns=column_name_conversion)
     table_definition_sql = f"""
-        DROP TABLE IF EXISTS 
-            {project_name}.{dataset_name}.{table_name} 
-        ;
-        CREATE TABLE {project_name}.{dataset_name}.{table_name} ( 
-            {", ".join(column_definitions)}
-        );
+        DROP TABLE IF EXISTS {project_name}.{dataset_name}.{table_name};
+        CREATE TABLE {project_name}.{dataset_name}.{table_name} ({", ".join(column_definitions)});
     """
     print(table_definition_sql)
     run_query(table_definition_sql, client=client)
@@ -453,6 +493,73 @@ def send_data_to_sheets(
         )
     response = request.execute()
     return response
+
+
+def get_dataframe_from_drive(
+    file_id: str, delimiter: str, header=1, client: Resource = None, **kwargs
+) -> pandas.DataFrame:
+    """
+    Get csv (UTF-8 encoding) file from Google Drive, process for upload into BQ, and convert to DataFrame.
+    Make sure to share the file to "anyone with the link" temporarily, while using this method.
+
+    :param file_id: The alphanumeric ID for your Google Drive csv file. Must be in UTF-8 encoding
+    :param delimiter: The delimiter for your file, will usually be a comma
+    :param header: 1 if there is a header in your file, 0 if no header in your file. Defaults to 1
+    :param client: Google Drive client
+    :return: Pandas Dataframe for upload into BQ
+    """
+
+    client = client or auth_drive(**kwargs)
+
+    try:
+        file_id = file_id
+        request = client.files().get_media(fileId=file_id)
+        file = io.BytesIO()
+        downloader = MediaIoBaseDownload(file, request)
+        done = False
+        while done is False:
+            status, done = downloader.next_chunk()
+            print(f"Download {int(status.progress() * 100)}.")
+
+        # take an unicode string and get data in an unicode stream.
+        s = str(file.getvalue(), "UTF-8")
+        data = io.StringIO(s)
+
+        # get number of max rows of data
+        column_length_list = [len(i.split(delimiter)) for i in data.readlines()]
+        number_of_columns = int(max(column_length_list))
+
+        # back to start of stream
+        data.seek(0)
+
+        # names parameter will handle cases where data spills over to non-named columns
+        df = pandas.read_csv(
+            data, sep=delimiter, dtype=object, names=range(number_of_columns)
+        )
+
+        # handle header, if exists
+        if header == 0:
+            df.columns = [f"Col_{i}" for i in range(number_of_columns)]
+        else:
+            # set column_names from first row, and handle NaN columns
+            df.columns = df.iloc[0]
+            df = df[1:]
+            df = df.reset_index(drop=True)
+
+            # rename unnamed columns
+            s = pandas.Series(df.columns)
+            s = s.fillna(
+                "Unnamed_" + (s.groupby(s.isnull()).cumcount() + 1).astype(str)
+            )
+            df.columns = s
+
+        # format column names to bq specifications
+        df.columns = df.columns.str.replace("[^A-Za-z0-9_]", "_", regex=True)
+        df.columns = df.columns.str.replace("^[0-9]", "_", regex=True)
+
+        return df
+    except HttpError as error:
+        print(f"An error occurred: {error}")
 
 
 def _sanitize_name(string: str) -> str:
