@@ -549,13 +549,12 @@ def text_stream_from_drive(
         file = io.BytesIO()
         downloader = MediaIoBaseDownload(file, request)
         done = False
-        while done is False:
+        while not done:
             status, done = downloader.next_chunk()
             print(f"Download {int(status.progress() * 100)}.")
 
-        # text stream
-        s = str(file.getvalue(), "UTF-8")
-        data = io.StringIO(s)
+        stream = str(file.getvalue(), "UTF-8")
+        data = io.StringIO(stream)
 
         return data
 
