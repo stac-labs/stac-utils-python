@@ -4,7 +4,6 @@ import logging
 import os
 import sys
 
-import pandas
 from google.api_core.exceptions import InternalServerError
 from google.api_core.retry import if_exception_type, Retry
 from google.cloud import storage, bigquery
@@ -306,9 +305,13 @@ def create_table_from_dataframe(
 
     dataframe = dataframe.rename(columns=column_name_conversion)
     table_definition_sql = f"""
-        DROP TABLE IF EXISTS {project_name}.{dataset_name}.{table_name};
-        CREATE TABLE {project_name}.{dataset_name}.{table_name} ({", ".join(column_definitions)});
-    """
+    DROP TABLE IF EXISTS 
+        foo.bar.spam 
+    ;
+    CREATE TABLE foo.bar.spam ( 
+        foo INT64, bar NUMERIC, spam STRING
+    );
+"""
     print(table_definition_sql)
     run_query(table_definition_sql, client=client)
     load_data_from_dataframe(client, dataframe, project_name, dataset_name, table_name)
@@ -495,24 +498,26 @@ def send_data_to_sheets(
     return response
 
 
-def get_dataframe_from_drive(
-    file_id: str, delimiter: str, header=1, client: Resource = None, **kwargs
-) -> pandas.DataFrame:
+def text_stream_from_drive(
+    file_id: str, client: Resource = None, **kwargs
+) -> io.StringIO:
     """
-    Get csv (UTF-8 encoding) file from Google Drive, process for upload into BQ, and convert to DataFrame.
-    Make sure to share the file to "anyone with the link" temporarily, while using this method.
+    Get csv (UTF-8 encoding) file from Google Drive and convert to a text stream.
+
+    The csv in the drive should be shared with the email associated with the service account ideally,
+    or to "anyone with the link" temporarily for this method to work.
+
+    Use this method in conjunction with the "get_dataframe_from_text_stream" in pandas_utils to
+    get a BigQuery formatted DataFrame.
 
     :param file_id: The alphanumeric ID for your Google Drive csv file. Must be in UTF-8 encoding
-    :param delimiter: The delimiter for your file, will usually be a comma
-    :param header: 1 if there is a header in your file, 0 if no header in your file. Defaults to 1
     :param client: Google Drive client
-    :return: Pandas Dataframe for upload into BQ
+    :return: text stream
     """
 
     client = client or auth_drive(**kwargs)
 
     try:
-        file_id = file_id
         request = client.files().get_media(fileId=file_id)
         file = io.BytesIO()
         downloader = MediaIoBaseDownload(file, request)
@@ -521,46 +526,14 @@ def get_dataframe_from_drive(
             status, done = downloader.next_chunk()
             print(f"Download {int(status.progress() * 100)}.")
 
-        # take an unicode string and get data in an unicode stream.
+        # text stream
         s = str(file.getvalue(), "UTF-8")
         data = io.StringIO(s)
 
-        # get number of max rows of data
-        column_length_list = [len(i.split(delimiter)) for i in data.readlines()]
-        number_of_columns = int(max(column_length_list))
+        return data
 
-        # back to start of stream
-        data.seek(0)
-
-        # names parameter will handle cases where data spills over to non-named columns
-        df = pandas.read_csv(
-            data, sep=delimiter, dtype=object, names=range(number_of_columns)
-        )
-
-        # handle header, if exists
-        if header == 0:
-            df.columns = [f"Col_{i}" for i in range(number_of_columns)]
-        else:
-            # set column_names from first row, and handle NaN columns
-            df.columns = df.iloc[0]
-            df = df[1:]
-            df = df.reset_index(drop=True)
-
-            # rename unnamed columns
-            s = pandas.Series(df.columns)
-            s = s.fillna(
-                "Unnamed_" + (s.groupby(s.isnull()).cumcount() + 1).astype(str)
-            )
-            df.columns = s
-
-        # format column names to bq specifications
-        df.columns = df.columns.str.replace("[^A-Za-z0-9_]", "_", regex=True)
-        df.columns = df.columns.str.replace("^[0-9]", "_", regex=True)
-
-        return df
-    except HttpError as error:
+    except (HttpError, UnicodeDecodeError, TypeError) as error:
         print(f"An error occurred: {error}")
-
 
 def _sanitize_name(string: str) -> str:
     valid_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890._"
