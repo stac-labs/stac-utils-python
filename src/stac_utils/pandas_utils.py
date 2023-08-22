@@ -41,7 +41,7 @@ def transform_to_lists(df: pd.DataFrame) -> list[list]:
 
 
 def get_dataframe_from_text_stream(
-    data: io.StringIO,  delimiter: str, header=1
+    data: io.StringIO, delimiter: str, header=1
 ) -> pd.DataFrame:
     """
     Convert a text stream into a pandas DataFrame. Columns edited for BigQuery upload.
@@ -60,9 +60,7 @@ def get_dataframe_from_text_stream(
     data.seek(0)
 
     # names parameter will handle cases where data spills over to non-named columns
-    df = pd.read_csv(
-        data, sep=delimiter, dtype=object, names=range(number_of_columns)
-    )
+    df = pd.read_csv(data, sep=delimiter, dtype=object, names=range(number_of_columns))
 
     # handle header, if exists
     if header == 0:
@@ -74,11 +72,11 @@ def get_dataframe_from_text_stream(
         df = df.reset_index(drop=True)
 
         # rename unnamed columns
-        s = pd.Series(df.columns)
-        s = s.fillna(
-            "Unnamed_" + (s.groupby(s.isnull()).cumcount() + 1).astype(str)
+        cols = pd.Series(df.columns)
+        cols = cols.fillna(
+            "Unnamed_" + (cols.groupby(cols.isnull()).cumcount() + 1).astype(str)
         )
-        df.columns = s
+        df.columns = cols
 
     # format column names to bq specifications
     df.columns = df.columns.str.replace("[^A-Za-z0-9_]", "_", regex=True)
