@@ -305,13 +305,13 @@ def create_table_from_dataframe(
 
     dataframe = dataframe.rename(columns=column_name_conversion)
     table_definition_sql = f"""
-    DROP TABLE IF EXISTS 
-        foo.bar.spam 
-    ;
-    CREATE TABLE foo.bar.spam ( 
-        foo INT64, bar NUMERIC, spam STRING
-    );
-"""
+        DROP TABLE IF EXISTS 
+            {project_name}.{dataset_name}.{table_name} 
+        ;
+        CREATE TABLE {project_name}.{dataset_name}.{table_name} ( 
+            {", ".join(column_definitions)}
+        );
+    """
     print(table_definition_sql)
     run_query(table_definition_sql, client=client)
     load_data_from_dataframe(client, dataframe, project_name, dataset_name, table_name)
