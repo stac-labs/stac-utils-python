@@ -556,7 +556,7 @@ def text_stream_from_drive(file_id: str, client: Resource = None, **kwargs) -> S
 
         return data
 
-    except (HttpError, UnicodeDecodeError, TypeError) as error:
+    except (HttpError, UnicodeDecodeError) as error:
         print(f"An error occurred: {error}")
 
 
