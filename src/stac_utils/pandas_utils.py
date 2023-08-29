@@ -1,5 +1,6 @@
 import pandas as pd
 import io
+import re
 
 from .google import send_data_to_sheets
 
@@ -79,7 +80,7 @@ def get_dataframe_from_text_stream(
         df.columns = cols
 
     # format column names to bq specifications
-    df.columns = df.columns.str.replace("[^A-Za-z0-9_]", "_", regex=True)
-    df.columns = df.columns.str.replace("^[0-9]", "_", regex=True)
+    df.rename(columns=lambda y: re.sub("[^A-Za-z0-9_]", "_", y.strip()), inplace=True)
+    df.rename(columns=lambda y: re.sub("^[0-9]", "_", y.strip()), inplace=True)
 
     return df
