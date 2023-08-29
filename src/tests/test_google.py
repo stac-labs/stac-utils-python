@@ -1,12 +1,16 @@
 import os
 import unittest
 from unittest.mock import MagicMock, patch, call
+import requests
 
 from io import StringIO, BytesIO
 
 import pandas as pd
 from google.cloud import storage, bigquery
 from googleapiclient.discovery import Resource
+from googleapiclient.errors import HttpError
+from googleapiclient.http import MediaIoBaseDownload
+
 
 from src.stac_utils.google import (
     get_credentials,
@@ -544,6 +548,38 @@ class TestGoogle(unittest.TestCase):
 
         # assert function output is StringIO type
         self.assertIsInstance(data, StringIO)
+
+    @patch("src.stac_utils.google.auth_drive")
+    def test_text_stream_from_drive_type_and_http_errors(
+            self, mock_auth_drive: MagicMock
+    ):
+        """Test text stream from drive"""
+        # client
+        mock_client = MagicMock()
+        mock_auth_drive.return_value = mock_client
+
+        mock_auth_drive.side_effect = HttpError(MagicMock(),b'test')
+
+        # request
+        mock_request = MagicMock()
+        mock_client.files.return_value.get_media.return_value = mock_request
+
+        # http error test
+        with self.assertRaises(HttpError):
+            text_stream_from_drive(file_id="foo")
+
+        # function call with no or not found file_id parameter raises TypeError
+        with self.assertRaises(TypeError):
+            text_stream_from_drive(client=mock_client)
+
+
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
