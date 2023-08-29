@@ -1,4 +1,4 @@
-import io
+from io import StringIO, BytesIO
 import json
 import logging
 import os
@@ -525,9 +525,7 @@ def send_data_to_sheets(
     return response
 
 
-def text_stream_from_drive(
-    file_id: str, client: Resource = None, **kwargs
-) -> io.StringIO:
+def text_stream_from_drive(file_id: str, client: Resource = None, **kwargs) -> StringIO:
     """
     Get csv (UTF-8 encoding) file from Google Drive and convert to a text stream.
 
@@ -546,7 +544,7 @@ def text_stream_from_drive(
 
     try:
         request = client.files().get_media(fileId=file_id)
-        file = io.BytesIO()
+        file = BytesIO()
         downloader = MediaIoBaseDownload(file, request)
         done = False
         while not done:
@@ -554,7 +552,7 @@ def text_stream_from_drive(
             print(f"Download {int(status.progress() * 100)}.")
 
         stream = str(file.getvalue(), "UTF-8")
-        data = io.StringIO(stream)
+        data = StringIO(stream)
 
         return data
 
