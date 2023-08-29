@@ -546,12 +546,27 @@ class TestGoogle(unittest.TestCase):
         self.assertIsInstance(data, StringIO)
 
     def test_text_stream_from_drive_http_errors(
-            self,
+        self,
     ):
         """Test text stream from drive"""
 
         mock_client = MagicMock()
-        mock_client.files.return_value.get_media.side_effect = HttpError(MagicMock(), b"")
+        mock_client.files.return_value.get_media.side_effect = HttpError(
+            MagicMock(), b""
+        )
+
+        # http error test
+        text_stream_from_drive(client=mock_client, file_id="foo")
+
+    def test_text_stream_from_drive_unicode_errors(
+        self,
+    ):
+        """Test text stream from drive"""
+
+        mock_client = MagicMock()
+        mock_client.files.return_value.get_media.side_effect = UnicodeDecodeError(
+            "Testing", b"spam", MagicMock(), MagicMock(), "Foo"
+        )
 
         # http error test
         text_stream_from_drive(client=mock_client, file_id="foo")
