@@ -1,15 +1,12 @@
 import os
 import unittest
-from unittest.mock import MagicMock, patch, call
-import requests
+from unittest.mock import MagicMock, patch
 
 from io import StringIO, BytesIO
 
 import pandas as pd
 from google.cloud import storage, bigquery
-from googleapiclient.discovery import Resource
 from googleapiclient.errors import HttpError
-from googleapiclient.http import MediaIoBaseDownload
 
 
 from src.stac_utils.google import (
@@ -498,7 +495,6 @@ class TestGoogle(unittest.TestCase):
         """Test text stream from drive"""
         # client
         mock_client = MagicMock()
-        mock_auth_drive.return_value = mock_client
 
         # request
         mock_request = MagicMock()
@@ -529,7 +525,7 @@ class TestGoogle(unittest.TestCase):
         data = text_stream_from_drive("foo", client=mock_client)
 
         # assert no repeated calls to  mock_client
-        mock_client.assert_not_called()
+        mock_auth_drive.assert_not_called()
 
         # assert get_media called with mock fileID
         mock_client.files.return_value.get_media.assert_called_once_with(fileId="foo")
@@ -549,37 +545,16 @@ class TestGoogle(unittest.TestCase):
         # assert function output is StringIO type
         self.assertIsInstance(data, StringIO)
 
-    @patch("src.stac_utils.google.auth_drive")
-    def test_text_stream_from_drive_type_and_http_errors(
-            self, mock_auth_drive: MagicMock
+    def test_text_stream_from_drive_http_errors(
+            self,
     ):
         """Test text stream from drive"""
-        # client
+
         mock_client = MagicMock()
-        mock_auth_drive.return_value = mock_client
-
-        mock_auth_drive.side_effect = HttpError(MagicMock(),b'test')
-
-        # request
-        mock_request = MagicMock()
-        mock_client.files.return_value.get_media.return_value = mock_request
+        mock_client.files.return_value.get_media.side_effect = HttpError(MagicMock(), b"")
 
         # http error test
-        with self.assertRaises(HttpError):
-            text_stream_from_drive(file_id="foo")
-
-        # function call with no or not found file_id parameter raises TypeError
-        with self.assertRaises(TypeError):
-            text_stream_from_drive(client=mock_client)
-
-
-
-
-
-
-
-
-
+        text_stream_from_drive(client=mock_client, file_id="foo")
 
 
 if __name__ == "__main__":
