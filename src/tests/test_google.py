@@ -1,10 +1,13 @@
 import os
 import unittest
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock, patch
+
+from io import StringIO, BytesIO
 
 import pandas as pd
 from google.cloud import storage, bigquery
-from googleapiclient.discovery import Resource
+from googleapiclient.errors import HttpError
+
 
 from src.stac_utils.google import (
     get_credentials,
@@ -13,6 +16,8 @@ from src.stac_utils.google import (
     auth_gcs,
     auth_gmail,
     auth_sheets,
+    auth_drive,
+    build_service,
     make_gmail_client,
     run_query,
     get_table,
@@ -24,6 +29,7 @@ from src.stac_utils.google import (
     get_data_from_sheets,
     send_data_to_sheets,
     _sanitize_name,
+    text_stream_from_drive,
 )
 
 
@@ -136,34 +142,17 @@ class TestGoogle(unittest.TestCase):
 
         mock_get_client.assert_called_once_with(bigquery.Client, ["foo", "bar"])
 
-    @patch("src.stac_utils.google.get_credentials")
-    def test_auth_gmail(self, mock_get_credentials: MagicMock):
+    @patch("src.stac_utils.google.build_service")
+    def test_auth_gmail(self, mock_build_service: MagicMock):
         """Test it gets credentials & builds a gmail client"""
 
-        mock_credentials = MagicMock()
-        mock_get_credentials.return_value = mock_credentials
+        auth_gmail()
 
-        result_client = auth_gmail()
-
-        mock_get_credentials.assert_called_once_with(
-            scopes=["gmail.labels", "gmail.modify", "gmail.readonly"],
-            service_account_blob=None,
-            service_account_env_name="SERVICE_ACCOUNT",
-            subject=None,
-        )
-        self.assertIsInstance(result_client, Resource)
-
-    @patch("src.stac_utils.google.get_credentials")
-    def test_auth_gmail_other_scopes(self, mock_get_credentials: MagicMock):
-        """Test auth gmail with custom scopes"""
-
-        mock_credentials = MagicMock()
-        mock_get_credentials.return_value = mock_credentials
-
-        auth_gmail(["foo", "bar"])
-
-        mock_get_credentials.assert_called_once_with(
-            scopes=["foo", "bar"],
+        mock_build_service.assert_called_once_with(
+            "gmail",
+            "v1",
+            ["gmail.labels", "gmail.modify", "gmail.readonly"],
+            scopes=None,
             service_account_blob=None,
             service_account_env_name="SERVICE_ACCOUNT",
             subject=None,
@@ -176,37 +165,82 @@ class TestGoogle(unittest.TestCase):
         make_gmail_client("foo", bar="spam")
         mock_auth_gmail.assert_called_once_with("foo", bar="spam")
 
+    @patch("src.stac_utils.google.build_service")
+    def test_auth_sheets(self, mock_build_service: MagicMock):
+        """Test it gets credentials & builds a gmail client"""
+
+        auth_sheets()
+
+        mock_build_service.assert_called_once_with(
+            "sheets",
+            "v4",
+            ["drive"],
+            scopes=None,
+            service_account_blob=None,
+            service_account_env_name="SERVICE_ACCOUNT",
+            subject=None,
+        )
+
+    @patch("src.stac_utils.google.build_service")
+    def test_auth_drive(self, mock_build_service: MagicMock):
+        """Test it gets credentials & builds a gmail client"""
+
+        auth_drive()
+
+        mock_build_service.assert_called_once_with(
+            "drive",
+            "v3",
+            ["drive"],
+            scopes=None,
+            service_account_blob=None,
+            service_account_env_name="SERVICE_ACCOUNT",
+            subject=None,
+        )
+
+    @patch("src.stac_utils.google.build")
     @patch("src.stac_utils.google.get_credentials")
-    def test_auth_sheets(self, mock_get_credentials: MagicMock):
+    def test_build_service(
+        self, mock_get_credentials: MagicMock, mock_build: MagicMock
+    ):
         """Test it gets credentials & builds a sheets client"""
 
         mock_credentials = MagicMock()
         mock_get_credentials.return_value = mock_credentials
 
-        result_client = auth_sheets()
+        build_service("foo", "v1", ["bar"])
 
         mock_get_credentials.assert_called_once_with(
-            scopes=["drive"],
+            scopes=["bar"],
             service_account_blob=None,
             service_account_env_name="SERVICE_ACCOUNT",
             subject=None,
         )
-        self.assertIsInstance(result_client, Resource)
 
+        mock_build.assert_called_once_with(
+            "foo", "v1", credentials=mock_credentials, cache_discovery=False
+        )
+
+    @patch("src.stac_utils.google.build")
     @patch("src.stac_utils.google.get_credentials")
-    def test_auth_sheets_other_scopes(self, mock_get_credentials: MagicMock):
-        """Test auth sheets with custom scopes"""
+    def test_build_service_other_scopes(
+        self, mock_get_credentials: MagicMock, mock_build: MagicMock
+    ):
+        """Test it gets credentials & builds a sheets client"""
 
         mock_credentials = MagicMock()
         mock_get_credentials.return_value = mock_credentials
 
-        auth_sheets(["foo", "bar"])
+        build_service("foo", "v1", ["bar"], scopes=["spam"])
 
         mock_get_credentials.assert_called_once_with(
-            scopes=["foo", "bar"],
+            scopes=["spam"],
             service_account_blob=None,
             service_account_env_name="SERVICE_ACCOUNT",
             subject=None,
+        )
+
+        mock_build.assert_called_once_with(
+            "foo", "v1", credentials=mock_credentials, cache_discovery=False
         )
 
     @patch("src.stac_utils.google.Retry")
@@ -452,6 +486,90 @@ class TestGoogle(unittest.TestCase):
         self.assertEqual(_sanitize_name("foo;DROP TABLE.bar"), "fooDROPTABLE.bar")
         self.assertEqual(_sanitize_name("foo???.bar"), "foo.bar")
         self.assertEqual(_sanitize_name("'foo'.'bar'"), "foo.bar")
+
+    @patch("src.stac_utils.google.MediaIoBaseDownload")
+    @patch("src.stac_utils.google.auth_drive")
+    def test_text_stream_from_drive_with_client(
+        self, mock_auth_drive: MagicMock, mock_media_download: MagicMock
+    ):
+        """Test text stream from drive"""
+        # client
+        mock_client = MagicMock()
+
+        # request
+        mock_request = MagicMock()
+        mock_client.files.return_value.get_media.return_value = mock_request
+
+        # downloader
+        mock_downloader = MagicMock()
+        mock_media_download.return_value = mock_downloader
+
+        # handle next_chunk iterable initial case
+        mock_download_progress = MagicMock()
+
+        # handle next_chunk iterable final case
+        mock_download_complete = MagicMock(progress=lambda: 1)
+
+        # downloader start case (at 1)
+        mock_downloader.next_chunk.return_value[
+            0
+        ].progress.return_value = mock_download_progress
+
+        # side effect to handle downloader range
+        # ("if side_effect is an iterable then each call to the mock will return the next value from the iterable")
+        mock_downloader.next_chunk.side_effect = [
+            (mock_download_progress, False),
+            (mock_download_complete, True),
+        ]
+        # function call
+        data = text_stream_from_drive("foo", client=mock_client)
+
+        # assert no repeated calls to  mock_client
+        mock_auth_drive.assert_not_called()
+
+        # assert get_media called with mock fileID
+        mock_client.files.return_value.get_media.assert_called_once_with(fileId="foo")
+
+        # assert the file input in mock_media_download is BytesIO
+        self.assertIsInstance(mock_media_download.call_args.args[0], BytesIO)
+
+        # assert the request input in MediaIoBaseDownload is equal to mock_request
+        self.assertEqual(mock_media_download.call_args.args[1], mock_request)
+
+        # assert mock_media_download is called once, to create downloader
+        mock_media_download.assert_called_once()
+
+        # assert downloader called twice
+        self.assertEqual(mock_downloader.next_chunk.call_count, 2)
+
+        # assert function output is StringIO type
+        self.assertIsInstance(data, StringIO)
+
+    def test_text_stream_from_drive_http_errors(
+        self,
+    ):
+        """Test text stream from drive"""
+
+        mock_client = MagicMock()
+        mock_client.files.return_value.get_media.side_effect = HttpError(
+            MagicMock(), b""
+        )
+
+        # http error test
+        text_stream_from_drive(client=mock_client, file_id="foo")
+
+    def test_text_stream_from_drive_unicode_errors(
+        self,
+    ):
+        """Test text stream from drive"""
+
+        mock_client = MagicMock()
+        mock_client.files.return_value.get_media.side_effect = UnicodeDecodeError(
+            "Testing", b"spam", MagicMock(), MagicMock(), "Foo"
+        )
+
+        # http error test
+        text_stream_from_drive(client=mock_client, file_id="foo")
 
 
 if __name__ == "__main__":

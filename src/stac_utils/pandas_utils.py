@@ -1,4 +1,6 @@
 import pandas as pd
+import io
+import re
 
 from .google import send_data_to_sheets
 
@@ -37,3 +39,48 @@ def transform_to_lists(df: pd.DataFrame) -> list[list]:
     for row in df.itertuples(index=False):
         row_data.append([str(col) for col in row])
     return row_data
+
+
+def get_dataframe_from_text_stream(
+    data: io.StringIO, delimiter: str, header=1
+) -> pd.DataFrame:
+    """
+    Convert a text stream into a pandas DataFrame. Columns edited for BigQuery upload.
+
+    :param data: text stream
+    :param delimiter: The delimiter for your file, will usually be a comma
+    :param header: 1 if there is a header in your file, 0 if no header in your file. Defaults to 1
+    :return: Pandas Dataframe for upload into BQ
+    """
+
+    # get number of max rows of data
+    column_length_list = [len(i.split(delimiter)) for i in data.readlines()]
+    number_of_columns = int(max(column_length_list))
+
+    # back to start of stream
+    data.seek(0)
+
+    # names parameter will handle cases where data spills over to non-named columns
+    df = pd.read_csv(data, sep=delimiter, dtype=object, names=range(number_of_columns))
+
+    # handle header, if exists
+    if header == 0:
+        df.columns = [f"Col_{i}" for i in range(number_of_columns)]
+    else:
+        # set column_names from first row, and handle NaN columns
+        df.columns = df.iloc[0]
+        df = df[1:]
+        df = df.reset_index(drop=True)
+
+        # rename unnamed columns
+        cols = pd.Series(df.columns)
+        cols = cols.fillna(
+            "Unnamed_" + (cols.groupby(cols.isnull()).cumcount() + 1).astype(str)
+        )
+        df.columns = cols
+
+    # format column names to bq specifications
+    df.rename(columns=lambda y: re.sub("[^A-Za-z0-9_]", "_", y.strip()), inplace=True)
+    df.rename(columns=lambda y: re.sub("^[0-9]", "_", y.strip()), inplace=True)
+
+    return df

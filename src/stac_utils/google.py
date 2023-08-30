@@ -1,3 +1,4 @@
+from io import StringIO, BytesIO
 import json
 import logging
 import os
@@ -9,6 +10,8 @@ from google.cloud import storage, bigquery
 from google.cloud.bigquery.table import Table
 from google.oauth2 import service_account
 from googleapiclient.discovery import build, Resource
+from googleapiclient.http import MediaIoBaseDownload
+from googleapiclient.errors import HttpError
 from inflection import parameterize, underscore
 
 from .listify import listify
@@ -128,18 +131,16 @@ def auth_gmail(
     :param subject: Service account subject
     :return: Gmail client object
     """
-
-    if "is_auto_credential" in kwargs:
-        kwargs.pop("is_auto_credential")
-    scopes = scopes or ["gmail.labels", "gmail.modify", "gmail.readonly"]
-
-    credentials = get_credentials(
+    return build_service(
+        "gmail",
+        "v1",
+        ["gmail.labels", "gmail.modify", "gmail.readonly"],
         scopes=scopes,
         service_account_blob=service_account_blob,
         service_account_env_name=service_account_env_name,
         subject=subject,
+        **kwargs,
     )
-    return build("gmail", "v1", credentials=credentials, **kwargs)
 
 
 def make_gmail_client(*args, **kwargs) -> Resource:
@@ -165,11 +166,79 @@ def auth_sheets(
     :param subject: Service account subject
     :return: Sheets client object
     """
+    return build_service(
+        "sheets",
+        "v4",
+        ["drive"],
+        scopes=scopes,
+        service_account_blob=service_account_blob,
+        service_account_env_name=service_account_env_name,
+        subject=subject,
+        **kwargs,
+    )
+
+
+def auth_drive(
+    scopes: list[str] = None,
+    cache_discovery: bool = False,
+    service_account_blob: dict = None,
+    service_account_env_name: str = "SERVICE_ACCOUNT",
+    subject: str = None,
+    **kwargs,
+) -> Resource:
+    """
+    Returns an initialized Drive client object
+
+    :param scopes: Desired scopes, defaults to `[drive]`
+    :param cache_discovery: `False` unless specified. If cache discovery is desired, set to `True`.
+    :param service_account_blob: Service account blob
+    :param service_account_env_name: Environmental variable name for service account
+    :param subject: Service account subject
+    :return: Drive client object
+    """
+
+    return build_service(
+        "drive",
+        "v3",
+        ["drive"],
+        scopes=scopes,
+        service_account_blob=service_account_blob,
+        service_account_env_name=service_account_env_name,
+        subject=subject,
+        **kwargs,
+    )
+
+
+def build_service(
+    service: str,
+    version: str,
+    default_scopes: list[str],
+    scopes: list[str] = None,
+    cache_discovery: bool = False,
+    service_account_blob: dict = None,
+    service_account_env_name: str = "SERVICE_ACCOUNT",
+    subject: str = None,
+    **kwargs,
+) -> Resource:
+    """
+    Authorization for Google services, including "drive", "cloud-platform", "sheets",
+    or any other service that uses build.
+
+    :param service: "drive", "cloud-platform", "sheets", or any other service that uses build
+    :param version: version of service
+    :param default_scopes: default scopes for this service
+    :param scopes: scopes provided by user
+    :param cache_discovery: `False` unless specified. If cache discovery is desired, set to `True`.
+    :param service_account_blob: Service account blob
+    :param service_account_env_name: Environmental variable name for service account
+    :param subject: Service account subject
+    :return: client object
+    """
 
     if "is_auto_credential" in kwargs:
         kwargs.pop("is_auto_credential")
 
-    scopes = scopes or ["drive"]
+    scopes = scopes or default_scopes
     credentials = get_credentials(
         scopes=scopes,
         service_account_blob=service_account_blob,
@@ -178,8 +247,8 @@ def auth_sheets(
     )
 
     return build(
-        "sheets",
-        "v4",
+        service,
+        version,
         credentials=credentials,
         cache_discovery=cache_discovery,
         **kwargs,
@@ -244,6 +313,7 @@ def create_table_from_dataframe(
     :param dataset_name: Desired BigQuery dataset name
     :param table_name: Desired BigQuery table name
     """
+
     column_name_conversion = {}
     column_definitions = []
     for column_index in range(len(dataframe.columns)):
@@ -453,6 +523,41 @@ def send_data_to_sheets(
         )
     response = request.execute()
     return response
+
+
+def text_stream_from_drive(file_id: str, client: Resource = None, **kwargs) -> StringIO:
+    """
+    Get csv (UTF-8 encoding) file from Google Drive and convert to a text stream.
+
+    The csv in the drive should be shared with the email associated with the service account ideally,
+    or to "anyone with the link" temporarily for this method to work.
+
+    Use this method in conjunction with the "get_dataframe_from_text_stream" in pandas_utils to
+    get a BigQuery formatted DataFrame.
+
+    :param file_id: The alphanumeric ID for your Google Drive csv file. Must be in UTF-8 encoding
+    :param client: Google Drive client
+    :return: text stream
+    """
+
+    client = client or auth_drive(**kwargs)
+
+    try:
+        request = client.files().get_media(fileId=file_id)
+        file = BytesIO()
+        downloader = MediaIoBaseDownload(file, request)
+        done = False
+        while not done:
+            status, done = downloader.next_chunk()
+            print(f"Download {int(status.progress() * 100)}.")
+
+        stream = str(file.getvalue(), "UTF-8")
+        data = StringIO(stream)
+
+        return data
+
+    except (HttpError, UnicodeDecodeError) as error:
+        print(f"An error occurred: {error}")
 
 
 def _sanitize_name(string: str) -> str:
