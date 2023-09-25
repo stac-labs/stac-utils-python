@@ -4,7 +4,7 @@ import logging
 import os
 import sys
 
-from google.api_core.exceptions import InternalServerError
+from google.api_core.exceptions import InternalServerError, NotFound
 from google.api_core.retry import if_exception_type, Retry
 from google.cloud import storage, bigquery
 from google.cloud.bigquery.table import Table
