@@ -56,7 +56,7 @@ def database_to_google_sheets(
     google_sheet_id: str, google_sheet_range: str, google_sheet_headers: str
 ):
     """
-    Establishes database connection, runs query, and sends query results to Google sheet
+    Establishes Postgres database connection, runs query, and sends query results to Google sheet
 
     :param google_sheet_id: ID of destination Google sheet
     :param google_sheet_range: Range in destination Google sheet
