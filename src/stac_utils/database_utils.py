@@ -3,10 +3,9 @@ import os
 import psycopg
 
 from stac_utils.google import send_data_to_sheets
-from stac_utils import listify
 
 
-def make_postgresql_connection(
+def make_postgres_connection(
     pg_host: str = None,
     pg_db: str = None,
     pg_user: str = None,
@@ -35,7 +34,7 @@ def make_postgresql_connection(
     return engine
 
 
-def run_query(engine: psycopg.Connection, sql: str) -> list[list]:
+def run_postgres_query(engine: psycopg.Connection, sql: str) -> list[list]:
     """
     Given Postgres connection, runs SQL query on database and returns results
 
@@ -52,8 +51,12 @@ def run_query(engine: psycopg.Connection, sql: str) -> list[list]:
     return data
 
 
-def database_to_google_sheets(
-    google_sheet_id: str, google_sheet_range: str, google_sheet_headers: str
+def postgres_to_google_sheets(
+    google_sheet_id: str,
+    google_sheet_range: str,
+    google_sheet_headers: list[str],
+    sql_query: str,
+    engine: psycopg.Connection = None,
 ):
     """
     Establishes Postgres database connection, runs query, and sends query results to Google sheet
@@ -61,14 +64,12 @@ def database_to_google_sheets(
     :param google_sheet_id: ID of destination Google sheet
     :param google_sheet_range: Range in destination Google sheet
     :param google_sheet_headers: Headers for destination Google sheet
+    :param sql_query:
+    :param engine:
     """
-    google_sheet_id = google_sheet_id or os.environ["GOOGLE_SHEET_ID"]
-    sheet_range = google_sheet_range or os.environ["GOOGLE_SHEET_RANGE"]
-    sheet_headers = listify(google_sheet_headers) or listify(
-        os.environ["GOOGLE_SHEET_HEADERS"]
-    )
 
-    sql_query = os.environ["SQL_QUERY"]
-    engine = make_postgresql_connection()
-    data = run_query(engine, sql_query)
-    send_data_to_sheets([sheet_headers] + data, google_sheet_id, sheet_range)
+    engine = engine or make_postgres_connection()
+    data = run_postgres_query(engine, sql_query)
+    send_data_to_sheets(
+        [google_sheet_headers] + data, google_sheet_id, google_sheet_range
+    )
