@@ -565,7 +565,7 @@ def copy_file(file_id: str, new_file_name: str = None, client: Resource = None) 
     new_file = client.files().copy(file_id).execute()
     new_file_id = new_file["id"]
     if new_file_name:
-        client.files().update(new_file_id, body = {"name": new_file_name}).execute()
+        client.files().update(new_file_id, body={"name": new_file_name}).execute()
 
     return new_file_id
 
