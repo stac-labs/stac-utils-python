@@ -13,6 +13,16 @@ def make_postgresql_connection(
     pg_pw: str = None,
     pg_port: int = None,
 ) -> psycopg.Connection:
+    """
+    Makes a connection with a Postgres database and returns engine
+
+    :param pg_host: Host for Postgres database
+    :param pg_db: Postgres database name
+    :param pg_user: Postgres database username
+    :param pg_pw: Postgres database password
+    :param pg_port: Postgres database port, defaults to `5432`
+    :return: engine
+    """
     host = pg_host or os.environ["PG_HOST"]
     dbname = pg_db or os.environ["PG_DB"]
     user = pg_user or os.environ["PG_USER"]
@@ -26,6 +36,13 @@ def make_postgresql_connection(
 
 
 def run_query(engine: psycopg.Connection, sql: str) -> list[list]:
+    """
+    Given Postgres connection, runs SQL query on database and returns results
+
+    :param engine: Engine for Postgres database connection
+    :param sql: SQL query to run
+    :return: Results of SQL query as list of lists
+    """
     data = []
     with engine.cursor() as cursor:
         cursor.execute(sql)
@@ -35,10 +52,21 @@ def run_query(engine: psycopg.Connection, sql: str) -> list[list]:
     return data
 
 
-def run_database_to_sheets():
-    google_sheet_id = os.environ["GOOGLE_SHEET_ID"]
-    sheet_range = os.environ["GOOGLE_SHEET_RANGE"]
-    sheet_headers = listify(os.environ["GOOGLE_SHEET_HEADERS"])
+def database_to_google_sheets(
+    google_sheet_id: str, google_sheet_range: str, google_sheet_headers: str
+):
+    """
+    Establishes database connection, runs query, and sends query results to Google sheet
+
+    :param google_sheet_id: ID of destination Google sheet
+    :param google_sheet_range: Range in destination Google sheet
+    :param google_sheet_headers: Headers for destination Google sheet
+    """
+    google_sheet_id = google_sheet_id or os.environ["GOOGLE_SHEET_ID"]
+    sheet_range = google_sheet_range or os.environ["GOOGLE_SHEET_RANGE"]
+    sheet_headers = listify(google_sheet_headers) or listify(
+        os.environ["GOOGLE_SHEET_HEADERS"]
+    )
 
     sql_query = os.environ["SQL_QUERY"]
     engine = make_postgresql_connection()
