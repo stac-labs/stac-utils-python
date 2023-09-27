@@ -61,7 +61,13 @@ def get_dataframe_from_text_stream(
     data.seek(0)
 
     # names parameter will handle cases where data spills over to non-named columns
-    df = pd.read_csv(data, sep=delimiter, dtype=object, names=range(number_of_columns), on_bad_lines = 'warn')
+    df = pd.read_csv(
+        data,
+        sep=delimiter,
+        dtype=object,
+        names=range(number_of_columns),
+        on_bad_lines="warn",
+    )
 
     # handle header, if exists
     if header == 0:
