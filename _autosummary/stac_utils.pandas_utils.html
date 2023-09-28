@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>stac_utils.pandas_utils &mdash; stac-utils-python 0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="stac_utils.reach" href="stac_utils.reach.html" />
+    <link rel="prev" title="stac_utils.normalize" href="stac_utils.normalize.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            stac-utils-python
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.action_network.html">stac_utils.action_network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.aws.html">aws</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.benchmark.html">stac_utils.benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.bsd.html">stac_utils.bsd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.convert.html">convert</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.email.html">stac_utils.email</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.google.html">stac_utils.google</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.http.html">http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.listify.html">stac_utils.listify</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.ngpvan.html">stac_utils.ngpvan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.normalize.html">stac_utils.normalize</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">stac_utils.pandas_utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.pandas_utils.get_dataframe_from_text_stream"><code class="docutils literal notranslate"><span class="pre">get_dataframe_from_text_stream()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.pandas_utils.send_dataframe_to_sheets"><code class="docutils literal notranslate"><span class="pre">send_dataframe_to_sheets()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.pandas_utils.transform_to_lists"><code class="docutils literal notranslate"><span class="pre">transform_to_lists()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.reach.html">stac_utils.reach</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.secret_context.html">secret_context</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.secret_factory.html">secret_factory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.ticker_request.html">stac_utils.ticker_request</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.time.html">stac_utils.time</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.truthy.html">stac_utils.truthy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">stac-utils-python</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">stac_utils.pandas_utils</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_autosummary/stac_utils.pandas_utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-stac_utils.pandas_utils">
+<span id="stac-utils-pandas-utils"></span><h1>stac_utils.pandas_utils<a class="headerlink" href="#module-stac_utils.pandas_utils" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.pandas_utils.get_dataframe_from_text_stream">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.pandas_utils.</span></span><span class="sig-name descname"><span class="pre">get_dataframe_from_text_stream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">StringIO</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#stac_utils.pandas_utils.get_dataframe_from_text_stream" title="Permalink to this definition"></a></dt>
+<dd><p>Convert a text stream into a pandas DataFrame. Columns edited for BigQuery upload.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – text stream</p></li>
+<li><p><strong>delimiter</strong> – The delimiter for your file, will usually be a comma</p></li>
+<li><p><strong>header</strong> – 1 if there is a header in your file, 0 if no header in your file. Defaults to 1</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Pandas Dataframe for upload into BQ</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.pandas_utils.send_dataframe_to_sheets">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.pandas_utils.</span></span><span class="sig-name descname"><span class="pre">send_dataframe_to_sheets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spreadsheet_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'RAW'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#stac_utils.pandas_utils.send_dataframe_to_sheets" title="Permalink to this definition"></a></dt>
+<dd><p>Posts the DataFrame to the Google Sheet and returns the API response</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – Specified Pandas DataFrame</p></li>
+<li><p><strong>spreadsheet_id</strong> – Google Sheets spreadsheet ID</p></li>
+<li><p><strong>range</strong> – Specified range within sheet</p></li>
+<li><p><strong>input_option</strong> – Defaults to <cite>RAW</cite></p></li>
+<li><p><strong>client</strong> – Google Sheets client</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>API response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.pandas_utils.transform_to_lists">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.pandas_utils.</span></span><span class="sig-name descname"><span class="pre">transform_to_lists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stac_utils.pandas_utils.transform_to_lists" title="Permalink to this definition"></a></dt>
+<dd><p>Transforms given Pandas DataFrame into list of lists</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>df</strong> – Given Pandas DataFrame</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Data from specified DataFrame as list of lists</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="stac_utils.normalize.html" class="btn btn-neutral float-left" title="stac_utils.normalize" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="stac_utils.reach.html" class="btn btn-neutral float-right" title="stac_utils.reach" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Stac Labs.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

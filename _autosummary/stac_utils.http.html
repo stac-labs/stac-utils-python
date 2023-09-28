@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>http &mdash; stac-utils-python 0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="stac_utils.listify" href="stac_utils.listify.html" />
+    <link rel="prev" title="stac_utils.google" href="stac_utils.google.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            stac-utils-python
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.action_network.html">stac_utils.action_network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.aws.html">aws</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.benchmark.html">stac_utils.benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.bsd.html">stac_utils.bsd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.convert.html">convert</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.email.html">stac_utils.email</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.google.html">stac_utils.google</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">http</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.http.Client"><code class="docutils literal notranslate"><span class="pre">Client</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.Client.call_api"><code class="docutils literal notranslate"><span class="pre">Client.call_api()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.Client.check_for_error"><code class="docutils literal notranslate"><span class="pre">Client.check_for_error()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.Client.create_session"><code class="docutils literal notranslate"><span class="pre">Client.create_session()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.Client.session"><code class="docutils literal notranslate"><span class="pre">Client.session</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.Client.session_context"><code class="docutils literal notranslate"><span class="pre">Client.session_context()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.Client.transform_response"><code class="docutils literal notranslate"><span class="pre">Client.transform_response()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.http.HTTPClient"><code class="docutils literal notranslate"><span class="pre">HTTPClient</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.HTTPClient.call_api"><code class="docutils literal notranslate"><span class="pre">HTTPClient.call_api()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.HTTPClient.check_for_error"><code class="docutils literal notranslate"><span class="pre">HTTPClient.check_for_error()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.HTTPClient.check_response_for_rate_limit"><code class="docutils literal notranslate"><span class="pre">HTTPClient.check_response_for_rate_limit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.HTTPClient.clean_up"><code class="docutils literal notranslate"><span class="pre">HTTPClient.clean_up()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.HTTPClient.create_session"><code class="docutils literal notranslate"><span class="pre">HTTPClient.create_session()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.HTTPClient.delete"><code class="docutils literal notranslate"><span class="pre">HTTPClient.delete()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.HTTPClient.format_url"><code class="docutils literal notranslate"><span class="pre">HTTPClient.format_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.HTTPClient.get"><code class="docutils literal notranslate"><span class="pre">HTTPClient.get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.HTTPClient.patch"><code class="docutils literal notranslate"><span class="pre">HTTPClient.patch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.HTTPClient.post"><code class="docutils literal notranslate"><span class="pre">HTTPClient.post()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.HTTPClient.put"><code class="docutils literal notranslate"><span class="pre">HTTPClient.put()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.HTTPClient.rate_limits"><code class="docutils literal notranslate"><span class="pre">HTTPClient.rate_limits</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.HTTPClient.refresh_auth"><code class="docutils literal notranslate"><span class="pre">HTTPClient.refresh_auth()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.HTTPClient.transform_response"><code class="docutils literal notranslate"><span class="pre">HTTPClient.transform_response()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.HTTPClient.update"><code class="docutils literal notranslate"><span class="pre">HTTPClient.update()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.HTTPClient.update_rate_limits"><code class="docutils literal notranslate"><span class="pre">HTTPClient.update_rate_limits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.http.HTTPClient.wait_for_rate"><code class="docutils literal notranslate"><span class="pre">HTTPClient.wait_for_rate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.listify.html">stac_utils.listify</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.ngpvan.html">stac_utils.ngpvan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.normalize.html">stac_utils.normalize</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.pandas_utils.html">stac_utils.pandas_utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.reach.html">stac_utils.reach</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.secret_context.html">secret_context</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.secret_factory.html">secret_factory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.ticker_request.html">stac_utils.ticker_request</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.time.html">stac_utils.time</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.truthy.html">stac_utils.truthy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">stac-utils-python</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">http</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_autosummary/stac_utils.http.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-stac_utils.http">
+<span id="http"></span><h1>http<a class="headerlink" href="#module-stac_utils.http" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="stac_utils.http.Client">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stac_utils.http.</span></span><span class="sig-name descname"><span class="pre">Client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.http.Client" title="Permalink to this definition"></a></dt>
+<dd><p>Basic API client class</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.http.Client.call_api">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">call_api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.http.Client.call_api" title="Permalink to this definition"></a></dt>
+<dd><p>Make an API request</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.http.Client.check_for_error">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_for_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.http.Client.check_for_error" title="Permalink to this definition"></a></dt>
+<dd><p>Check a valid API response for error messages
+and raise an exception as needed</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.http.Client.create_session">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.http.Client.create_session" title="Permalink to this definition"></a></dt>
+<dd><p>Create a session, set headers &amp; auth</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stac_utils.http.Client.session">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">session</span></span><a class="headerlink" href="#stac_utils.http.Client.session" title="Permalink to this definition"></a></dt>
+<dd><p>Instead of passing session around, use the client’s
+current context manager</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.http.Client.session_context">
+<span class="sig-name descname"><span class="pre">session_context</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.http.Client.session_context" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a context manager for a session</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.http.Client.transform_response">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transform_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.http.Client.transform_response" title="Permalink to this definition"></a></dt>
+<dd><p>Transform the response from the API</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stac_utils.http.HTTPClient">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stac_utils.http.</span></span><span class="sig-name descname"><span class="pre">HTTPClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.http.HTTPClient" title="Permalink to this definition"></a></dt>
+<dd><p>HTTP Client class built on Client class</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.http.HTTPClient.call_api">
+<span class="sig-name descname"><span class="pre">call_api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_snake_case</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override_error_logging</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override_data_printing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.http.HTTPClient.call_api" title="Permalink to this definition"></a></dt>
+<dd><p>Basic API request, retries on failures, parses errors</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> – Specified API method</p></li>
+<li><p><strong>endpoint</strong> – Specified API endpoint</p></li>
+<li><p><strong>params</strong> – Specified parameters for API call</p></li>
+<li><p><strong>body</strong> – Specified body for API call</p></li>
+<li><p><strong>return_headers</strong> – <cite>False</cite> by default, set <cite>True</cite> if returning headers is desired</p></li>
+<li><p><strong>use_snake_case</strong> – <cite>True</cite> by default, set <cite>False</cite> if camel case or other is desired</p></li>
+<li><p><strong>override_error_logging</strong> – <cite>False</cite> by default, set <cite>True</cite> if logging not desired</p></li>
+<li><p><strong>override_data_printing</strong> – <cite>False</cite> by default, set <cite>True</cite> if data printing not desired</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Data from API call</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.http.HTTPClient.check_for_error">
+<span class="sig-name descname"><span class="pre">check_for_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.http.HTTPClient.check_for_error" title="Permalink to this definition"></a></dt>
+<dd><p>Check a valid API response for error messages
+and raise an exception as needed</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.http.HTTPClient.check_response_for_rate_limit">
+<span class="sig-name descname"><span class="pre">check_response_for_rate_limit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Response</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stac_utils.http.HTTPClient.check_response_for_rate_limit" title="Permalink to this definition"></a></dt>
+<dd><p>Inspect the response for rate limit information</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.http.HTTPClient.clean_up">
+<span class="sig-name descname"><span class="pre">clean_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.http.HTTPClient.clean_up" title="Permalink to this definition"></a></dt>
+<dd><p>Clean up step to free memory that wouldn’t normally be
+garbage collected (ie: soup.decompose() for BeautifulSoup)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.http.HTTPClient.create_session">
+<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Session</span></span></span><a class="headerlink" href="#stac_utils.http.HTTPClient.create_session" title="Permalink to this definition"></a></dt>
+<dd><p>Create a session, set headers &amp; auth</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.http.HTTPClient.delete">
+<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.http.HTTPClient.delete" title="Permalink to this definition"></a></dt>
+<dd><p>Convenience wrapper for DELETE</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.http.HTTPClient.format_url">
+<span class="sig-name descname"><span class="pre">format_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#stac_utils.http.HTTPClient.format_url" title="Permalink to this definition"></a></dt>
+<dd><p>Prepare the URL for a request</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>endpoint</strong> – Specified API endpoint</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>URL</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.http.HTTPClient.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.http.HTTPClient.get" title="Permalink to this definition"></a></dt>
+<dd><p>Convenience wrapper for GET</p>
+<p>Example usage: <cite>self.van.get(f”events/{event_id}?$expand=locations,roles,shifts”)</cite></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.http.HTTPClient.patch">
+<span class="sig-name descname"><span class="pre">patch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.http.HTTPClient.patch" title="Permalink to this definition"></a></dt>
+<dd><p>Convenience wrapper for PATCH</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.http.HTTPClient.post">
+<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.http.HTTPClient.post" title="Permalink to this definition"></a></dt>
+<dd><p>Convenience wrapper for POST.</p>
+<p>Example usage: <cite>self.van.post(“signups”, body=payload)</cite></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.http.HTTPClient.put">
+<span class="sig-name descname"><span class="pre">put</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.http.HTTPClient.put" title="Permalink to this definition"></a></dt>
+<dd><p>Convenience wrapper for PUT</p>
+<p>Example usage: <cite>self.van.put(endpoint, params=params, body=payload)</cite></p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="stac_utils.http.HTTPClient.rate_limits">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rate_limits</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#stac_utils.http.HTTPClient.rate_limits" title="Permalink to this definition"></a></dt>
+<dd><p>Get the rate limits for all the resources</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.http.HTTPClient.refresh_auth">
+<span class="sig-name descname"><span class="pre">refresh_auth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Response</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.http.HTTPClient.refresh_auth" title="Permalink to this definition"></a></dt>
+<dd><p>Makes a blocking auth request to the API</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.http.HTTPClient.transform_response">
+<span class="sig-name descname"><span class="pre">transform_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Response</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.http.HTTPClient.transform_response" title="Permalink to this definition"></a></dt>
+<dd><p>Transform the response from the API</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.http.HTTPClient.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.http.HTTPClient.update" title="Permalink to this definition"></a></dt>
+<dd><p>Convenience wrapper for UPDATE</p>
+<p>Example usage:
+self.match_dict.update(
+{str(self.json_created[“vanId”]): str(response[“vanId”])}
+)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.http.HTTPClient.update_rate_limits">
+<span class="sig-name descname"><span class="pre">update_rate_limits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stac_utils.http.HTTPClient.update_rate_limits" title="Permalink to this definition"></a></dt>
+<dd><p>Update the rate limits for the API
+This could be a static function or calling the API</p>
+<p>Rate limits are a tuple of the number of requests allowed
+over a number of seconds.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.http.HTTPClient.wait_for_rate">
+<span class="sig-name descname"><span class="pre">wait_for_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Response</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.http.HTTPClient.wait_for_rate" title="Permalink to this definition"></a></dt>
+<dd><p>Wait for the rate limit to pass</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>endpoint</strong> – Specified API endpoint</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="stac_utils.google.html" class="btn btn-neutral float-left" title="stac_utils.google" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="stac_utils.listify.html" class="btn btn-neutral float-right" title="stac_utils.listify" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Stac Labs.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

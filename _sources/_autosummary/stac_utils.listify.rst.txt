@@ -1,0 +1,6 @@
+﻿stac\_utils.listify
+===================
+
+.. currentmodule:: stac_utils
+
+.. autofunction:: listify

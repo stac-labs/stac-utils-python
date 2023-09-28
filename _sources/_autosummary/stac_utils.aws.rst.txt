@@ -1,0 +1,5 @@
+﻿aws
+==============
+
+.. automodule:: stac_utils.aws
+    :members:

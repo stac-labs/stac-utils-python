@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>stac_utils.google &mdash; stac-utils-python 0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="http" href="stac_utils.http.html" />
+    <link rel="prev" title="stac_utils.email" href="stac_utils.email.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            stac-utils-python
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.action_network.html">stac_utils.action_network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.aws.html">aws</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.benchmark.html">stac_utils.benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.bsd.html">stac_utils.bsd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.convert.html">convert</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.email.html">stac_utils.email</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">stac_utils.google</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.auth_bq"><code class="docutils literal notranslate"><span class="pre">auth_bq()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.auth_drive"><code class="docutils literal notranslate"><span class="pre">auth_drive()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.auth_gcs"><code class="docutils literal notranslate"><span class="pre">auth_gcs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.auth_gmail"><code class="docutils literal notranslate"><span class="pre">auth_gmail()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.auth_sheets"><code class="docutils literal notranslate"><span class="pre">auth_sheets()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.build_service"><code class="docutils literal notranslate"><span class="pre">build_service()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.create_table_from_dataframe"><code class="docutils literal notranslate"><span class="pre">create_table_from_dataframe()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.get_client"><code class="docutils literal notranslate"><span class="pre">get_client()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.get_credentials"><code class="docutils literal notranslate"><span class="pre">get_credentials()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.get_data_from_sheets"><code class="docutils literal notranslate"><span class="pre">get_data_from_sheets()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.get_table"><code class="docutils literal notranslate"><span class="pre">get_table()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.get_table_for_loading"><code class="docutils literal notranslate"><span class="pre">get_table_for_loading()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.load_data_from_dataframe"><code class="docutils literal notranslate"><span class="pre">load_data_from_dataframe()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.load_data_from_list"><code class="docutils literal notranslate"><span class="pre">load_data_from_list()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.make_gmail_client"><code class="docutils literal notranslate"><span class="pre">make_gmail_client()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.run_query"><code class="docutils literal notranslate"><span class="pre">run_query()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.send_data_to_sheets"><code class="docutils literal notranslate"><span class="pre">send_data_to_sheets()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.text_stream_from_drive"><code class="docutils literal notranslate"><span class="pre">text_stream_from_drive()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.upload_data_to_gcs"><code class="docutils literal notranslate"><span class="pre">upload_data_to_gcs()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.http.html">http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.listify.html">stac_utils.listify</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.ngpvan.html">stac_utils.ngpvan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.normalize.html">stac_utils.normalize</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.pandas_utils.html">stac_utils.pandas_utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.reach.html">stac_utils.reach</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.secret_context.html">secret_context</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.secret_factory.html">secret_factory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.ticker_request.html">stac_utils.ticker_request</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.time.html">stac_utils.time</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.truthy.html">stac_utils.truthy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">stac-utils-python</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">stac_utils.google</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_autosummary/stac_utils.google.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-stac_utils.google">
+<span id="stac-utils-google"></span><h1>stac_utils.google<a class="headerlink" href="#module-stac_utils.google" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.google.auth_bq">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.google.</span></span><span class="sig-name descname"><span class="pre">auth_bq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scopes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Client</span></span></span><a class="headerlink" href="#stac_utils.google.auth_bq" title="Permalink to this definition"></a></dt>
+<dd><p>Returns an initialized BigQuery client object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>scopes</strong> – Desired scopes</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>BigQuery client object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.google.auth_drive">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.google.</span></span><span class="sig-name descname"><span class="pre">auth_drive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scopes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_discovery</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">service_account_blob</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">service_account_env_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'SERVICE_ACCOUNT'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Resource</span></span></span><a class="headerlink" href="#stac_utils.google.auth_drive" title="Permalink to this definition"></a></dt>
+<dd><p>Returns an initialized Drive client object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scopes</strong> – Desired scopes, defaults to <cite>[drive]</cite></p></li>
+<li><p><strong>cache_discovery</strong> – <cite>False</cite> unless specified. If cache discovery is desired, set to <cite>True</cite>.</p></li>
+<li><p><strong>service_account_blob</strong> – Service account blob</p></li>
+<li><p><strong>service_account_env_name</strong> – Environmental variable name for service account</p></li>
+<li><p><strong>subject</strong> – Service account subject</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Drive client object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.google.auth_gcs">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.google.</span></span><span class="sig-name descname"><span class="pre">auth_gcs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scopes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Client</span></span></span><a class="headerlink" href="#stac_utils.google.auth_gcs" title="Permalink to this definition"></a></dt>
+<dd><p>Returns an initialized Storage client object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>scopes</strong> – Desired scopes. The default scope is <cite>cloud-platform</cite>, but other common scopes include <cite>gmail</cite>, <cite>drive</cite>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>GCS client object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.google.auth_gmail">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.google.</span></span><span class="sig-name descname"><span class="pre">auth_gmail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">scopes:</span> <span class="pre">[list[str],</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">service_account_blob:</span> <span class="pre">dict</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">service_account_env_name:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'SERVICE_ACCOUNT',</span> <span class="pre">subject:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">**kwargs</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Resource</span></span></span><a class="headerlink" href="#stac_utils.google.auth_gmail" title="Permalink to this definition"></a></dt>
+<dd><p>Returns an initialized Gmail Client object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scopes</strong> – Desired scopes. Defaults to <cite>[“gmail.labels”, “gmail.modify”, “gmail.readonly”]</cite></p></li>
+<li><p><strong>service_account_blob</strong> – Service account blob</p></li>
+<li><p><strong>service_account_env_name</strong> – Environmental variable name for service account</p></li>
+<li><p><strong>subject</strong> – Service account subject</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Gmail client object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.google.auth_sheets">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.google.</span></span><span class="sig-name descname"><span class="pre">auth_sheets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scopes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_discovery</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">service_account_blob</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">service_account_env_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'SERVICE_ACCOUNT'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Resource</span></span></span><a class="headerlink" href="#stac_utils.google.auth_sheets" title="Permalink to this definition"></a></dt>
+<dd><p>Returns an initialized Sheets client object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scopes</strong> – Desired scopes, defaults to <cite>[drive]</cite></p></li>
+<li><p><strong>cache_discovery</strong> – <cite>False</cite> unless specified. If cache discovery is desired, set to <cite>True</cite>.</p></li>
+<li><p><strong>service_account_blob</strong> – Service account blob</p></li>
+<li><p><strong>service_account_env_name</strong> – Environmental variable name for service account</p></li>
+<li><p><strong>subject</strong> – Service account subject</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sheets client object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.google.build_service">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.google.</span></span><span class="sig-name descname"><span class="pre">build_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_scopes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scopes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_discovery</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">service_account_blob</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">service_account_env_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'SERVICE_ACCOUNT'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Resource</span></span></span><a class="headerlink" href="#stac_utils.google.build_service" title="Permalink to this definition"></a></dt>
+<dd><p>Authorization for Google services, including “drive”, “cloud-platform”, “sheets”,
+or any other service that uses build.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>service</strong> – “drive”, “cloud-platform”, “sheets”, or any other service that uses build</p></li>
+<li><p><strong>version</strong> – version of service</p></li>
+<li><p><strong>default_scopes</strong> – default scopes for this service</p></li>
+<li><p><strong>scopes</strong> – scopes provided by user</p></li>
+<li><p><strong>cache_discovery</strong> – <cite>False</cite> unless specified. If cache discovery is desired, set to <cite>True</cite>.</p></li>
+<li><p><strong>service_account_blob</strong> – Service account blob</p></li>
+<li><p><strong>service_account_env_name</strong> – Environmental variable name for service account</p></li>
+<li><p><strong>subject</strong> – Service account subject</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>client object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.google.create_table_from_dataframe">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.google.</span></span><span class="sig-name descname"><span class="pre">create_table_from_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pd.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.google.create_table_from_dataframe" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a BigQuery table from Pandas dataframe</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>client</strong> – BigQuery client</p></li>
+<li><p><strong>dataframe</strong> – Pandas dataframe to turn into BigQuery table</p></li>
+<li><p><strong>project_name</strong> – Desired BigQuery project name</p></li>
+<li><p><strong>dataset_name</strong> – Desired BigQuery dataset name</p></li>
+<li><p><strong>table_name</strong> – Desired BigQuery table name</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.google.get_client">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.google.</span></span><span class="sig-name descname"><span class="pre">get_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">client_class,</span> <span class="pre">scopes:</span> <span class="pre">[list[str],</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">service_account_blob:</span> <span class="pre">dict</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">service_account_env_name:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'SERVICE_ACCOUNT',</span> <span class="pre">subject:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">**kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.google.get_client" title="Permalink to this definition"></a></dt>
+<dd><p>Returns client of given class with given scopes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>client_class</strong> – Desired client class</p></li>
+<li><p><strong>scopes</strong> – Desired scopes</p></li>
+<li><p><strong>service_account_blob</strong> – Service account blob</p></li>
+<li><p><strong>service_account_env_name</strong> – Environmental variable name for service account</p></li>
+<li><p><strong>subject</strong> – Service account subject</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Client of given class, scopes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.google.get_credentials">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.google.</span></span><span class="sig-name descname"><span class="pre">get_credentials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">service_account_blob:</span> <span class="pre">dict</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">service_account_env_name:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'SERVICE_ACCOUNT',</span> <span class="pre">scopes:</span> <span class="pre">[list[str],</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">subject:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">None</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">[&lt;class</span> <span class="pre">'google.oauth2.service_account.Credentials'&gt;,</span> <span class="pre">None]</span></span></span><a class="headerlink" href="#stac_utils.google.get_credentials" title="Permalink to this definition"></a></dt>
+<dd><p>Loads a Google Service Account into a Credentials object with the given scopes. Either include blob or environment name. It defaults to using the SERVICE_ACCOUNT if included in os.environ.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>service_account_blob</strong> – Service account blob</p></li>
+<li><p><strong>service_account_env_name</strong> – Environmental variable name for service account</p></li>
+<li><p><strong>scopes</strong> – Desired service account scopes</p></li>
+<li><p><strong>subject</strong> – Service account subject</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Service account credentials</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.google.get_data_from_sheets">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.google.</span></span><span class="sig-name descname"><span class="pre">get_data_from_sheets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spreadsheet_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Resource</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stac_utils.google.get_data_from_sheets" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the sheet data in the form of a list of lists</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spreadsheet_id</strong> – Google Sheets spreadsheet ID</p></li>
+<li><p><strong>range</strong> – Range within sheet</p></li>
+<li><p><strong>client</strong> – Google Sheets client</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of lists of data from specified spreadsheet</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.google.get_table">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.google.</span></span><span class="sig-name descname"><span class="pre">get_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stac_utils.google.get_table" title="Permalink to this definition"></a></dt>
+<dd><p>Performs a select * from the given table in BigQuery</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>table_name</strong> – Desired table</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Results of a <cite>select all</cite> from given table</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.google.get_table_for_loading">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.google.</span></span><span class="sig-name descname"><span class="pre">get_table_for_loading</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Table</span></span></span><a class="headerlink" href="#stac_utils.google.get_table_for_loading" title="Permalink to this definition"></a></dt>
+<dd><p>Gets a BigQuery table for loading given project, dataset, and table name details</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>client</strong> – BigQuery client</p></li>
+<li><p><strong>project_name</strong> – Specified BigQuery project name</p></li>
+<li><p><strong>dataset_name</strong> – Specified BigQuery dataset name</p></li>
+<li><p><strong>table_name</strong> – Specified BigQuery table name</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Specified table</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.google.load_data_from_dataframe">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.google.</span></span><span class="sig-name descname"><span class="pre">load_data_from_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pd.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_exceptions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.google.load_data_from_dataframe" title="Permalink to this definition"></a></dt>
+<dd><p>Loads data from the specified dataframe into the specified table in BigQuery</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>client</strong> – BigQuery client</p></li>
+<li><p><strong>dataframe</strong> – Specified Pandas dataframe</p></li>
+<li><p><strong>project_name</strong> – Specified BigQuery project</p></li>
+<li><p><strong>dataset_name</strong> – Specified BigQuery project name</p></li>
+<li><p><strong>table_name</strong> – Specified BigQuery table name</p></li>
+<li><p><strong>retry_exceptions</strong> – Desired retry exceptions</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.google.load_data_from_list">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.google.</span></span><span class="sig-name descname"><span class="pre">load_data_from_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_exceptions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.google.load_data_from_list" title="Permalink to this definition"></a></dt>
+<dd><p>Loads data from the specified list[dict] into the specified table in BigQuery</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>client</strong> – BigQuery client</p></li>
+<li><p><strong>data</strong> – List to load to table</p></li>
+<li><p><strong>project_name</strong> – Specified BigQuery project name</p></li>
+<li><p><strong>dataset_name</strong> – Specified BigQuery dataset name</p></li>
+<li><p><strong>table_name</strong> – Specified BigQuery table name</p></li>
+<li><p><strong>retry_exceptions</strong> – Desired retry exceptions</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.google.make_gmail_client">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.google.</span></span><span class="sig-name descname"><span class="pre">make_gmail_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Resource</span></span></span><a class="headerlink" href="#stac_utils.google.make_gmail_client" title="Permalink to this definition"></a></dt>
+<dd><p>Deprecated alias</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.google.run_query">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.google.</span></span><span class="sig-name descname"><span class="pre">run_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sql</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Client</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_exceptions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">job_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">QueryJobConfig</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stac_utils.google.run_query" title="Permalink to this definition"></a></dt>
+<dd><p>Performs a SQL query in BigQuery</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sql</strong> – SQL query to be performed</p></li>
+<li><p><strong>client</strong> – BigQuery client</p></li>
+<li><p><strong>retry_exceptions</strong> – Specified retry exceptions</p></li>
+<li><p><strong>job_config</strong> – Specified query job config</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Results of SQL query</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.google.send_data_to_sheets">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.google.</span></span><span class="sig-name descname"><span class="pre">send_data_to_sheets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spreadsheet_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'RAW'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Resource</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_overwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#stac_utils.google.send_data_to_sheets" title="Permalink to this definition"></a></dt>
+<dd><p>Posts the data to the Google Sheet and returns the API response</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Data to post to specified Google Sheets spreadsheet</p></li>
+<li><p><strong>spreadsheet_id</strong> – Specified Google Sheets spreadsheet ID</p></li>
+<li><p><strong>range</strong> – Specified range within sheet</p></li>
+<li><p><strong>input_option</strong> – Specified input option, <cite>RAW</cite> by default</p></li>
+<li><p><strong>client</strong> – Google Sheets client</p></li>
+<li><p><strong>is_overwrite</strong> – Overwrite option, defaults to <cite>True</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Google Sheets API response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.google.text_stream_from_drive">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.google.</span></span><span class="sig-name descname"><span class="pre">text_stream_from_drive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Resource</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">StringIO</span></span></span><a class="headerlink" href="#stac_utils.google.text_stream_from_drive" title="Permalink to this definition"></a></dt>
+<dd><p>Get csv (UTF-8 encoding) file from Google Drive and convert to a text stream.</p>
+<p>The csv in the drive should be shared with the email associated with the service account ideally,
+or to “anyone with the link” temporarily for this method to work.</p>
+<p>Use this method in conjunction with the “get_dataframe_from_text_stream” in pandas_utils to
+get a BigQuery formatted DataFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_id</strong> – The alphanumeric ID for your Google Drive csv file. Must be in UTF-8 encoding</p></li>
+<li><p><strong>client</strong> – Google Drive client</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>text stream</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.google.upload_data_to_gcs">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.google.</span></span><span class="sig-name descname"><span class="pre">upload_data_to_gcs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bucket_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Client</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.google.upload_data_to_gcs" title="Permalink to this definition"></a></dt>
+<dd><p>Uploads the given file to a specified path in a GCS Bucket</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bucket_name</strong> – Specified GCS bucket</p></li>
+<li><p><strong>filename</strong> – Name of file to upload</p></li>
+<li><p><strong>destination_filename</strong> – Name for file once loaded</p></li>
+<li><p><strong>destination_path</strong> – Desired path for file once loaded</p></li>
+<li><p><strong>client</strong> – GCS client</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="stac_utils.email.html" class="btn btn-neutral float-left" title="stac_utils.email" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="stac_utils.http.html" class="btn btn-neutral float-right" title="http" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Stac Labs.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
