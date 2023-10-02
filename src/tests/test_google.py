@@ -28,6 +28,7 @@ from src.stac_utils.google import (
     upload_data_to_gcs,
     get_data_from_sheets,
     send_data_to_sheets,
+    copy_file,
     _sanitize_name,
     text_stream_from_drive,
 )
@@ -570,6 +571,39 @@ class TestGoogle(unittest.TestCase):
 
         # http error test
         text_stream_from_drive(client=mock_client, file_id="foo")
+
+    @patch("src.stac_utils.google.auth_drive")
+    def test_copy_file_no_client(self, mock_auth_drive: MagicMock):
+        mock_client = MagicMock()
+        mock_auth_drive.return_value = mock_client
+        mock_file_id = MagicMock()
+
+        copy_file(mock_file_id)
+        mock_auth_drive.assert_called_once()
+        mock_client.files.return_value.copy.return_value.execute.assert_called_once()
+        mock_client.files.return_value.update.return_value.execute.assert_not_called()
+
+    @patch("src.stac_utils.google.auth_drive")
+    def test_copy_file_provided_client(self, mock_auth_drive: MagicMock):
+        mock_client = MagicMock()
+        mock_file_id = MagicMock()
+
+        copy_file(mock_file_id, client=mock_client)
+        mock_auth_drive.assert_not_called()
+        mock_client.files.return_value.copy.return_value.execute.assert_called_once()
+        mock_client.files.return_value.update.return_value.execute.assert_not_called()
+
+    @patch("src.stac_utils.google.auth_drive")
+    def test_copy_file_new_file_name(self, mock_auth_drive: MagicMock):
+        mock_client = MagicMock()
+        mock_auth_drive.return_value = mock_client
+        mock_file_id = MagicMock()
+        mock_new_file_name = "foo"
+
+        copy_file(mock_file_id, mock_new_file_name)
+        mock_auth_drive.assert_called_once()
+        mock_client.files.return_value.copy.return_value.execute.assert_called_once()
+        mock_client.files.return_value.update.return_value.execute.assert_called_once()
 
 
 if __name__ == "__main__":
