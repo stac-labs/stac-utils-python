@@ -64,8 +64,8 @@ def postgres_to_google_sheets(
     :param google_sheet_id: ID of destination Google sheet
     :param google_sheet_range: Range in destination Google sheet
     :param google_sheet_headers: Headers for destination Google sheet
-    :param sql_query:
-    :param engine:
+    :param sql_query: SQL query to run
+    :param engine: Postgres database connection
     """
 
     engine = engine or make_postgres_connection()
