@@ -6,6 +6,7 @@ build
 bumpversion
 freezegun
 pandas
+psycopg
 selenium
 webdriver-manager
 sphinx

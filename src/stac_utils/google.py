@@ -560,6 +560,16 @@ def text_stream_from_drive(file_id: str, client: Resource = None, **kwargs) -> S
         print(f"An error occurred: {error}")
 
 
+def copy_file(file_id: str, new_file_name: str = None, client: Resource = None) -> str:
+    client = client or auth_drive()
+    new_file = client.files().copy(fileId=file_id, supportsAllDrives=True).execute()
+    new_file_id = new_file["id"]
+    if new_file_name:
+        client.files().update(fileId=new_file_id, supportsAllDrives=True, body={"name": new_file_name}).execute()
+
+    return new_file_id
+
+
 def _sanitize_name(string: str) -> str:
     valid_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890._"
 
