@@ -57,12 +57,13 @@ class JiraClient(HTTPClient):
         except Exception as E:
             data = {"errors": str(E)}
 
-        data["http_status_code"] = response.status_code
-
         return data
 
     # def get_jira_issue_url(self, issue_key: str) -> str:
     #     return f"{self.base_url}/rest/api/3/issue/{issue_key}/"
+
+    def get_service_desks(self) -> dict:
+        return self.get(self.base_service_desk_endpoint, override_data_printing=True)
 
     def get_issue_types(self, project_id: str) -> list[dict]:
         return self.get(
@@ -70,9 +71,6 @@ class JiraClient(HTTPClient):
             params={"projectId": project_id},
             override_data_printing=True,
         )
-
-    def get_service_desks(self) -> dict:
-        return self.get(self.base_service_desk_endpoint, override_data_printing=True)
 
     def find_or_create_user(
         self, email_address: str, first_name: str, last_name: str
