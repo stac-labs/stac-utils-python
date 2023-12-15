@@ -15,6 +15,7 @@ Welcome to stac-utils-python's documentation!
    stac_utils.email
    stac_utils.google
    stac_utils.http
+   stac_utils.jira
    stac_utils.listify
    stac_utils.ngpvan
    stac_utils.normalize

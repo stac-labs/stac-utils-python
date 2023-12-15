@@ -52,7 +52,14 @@ class JiraClient(HTTPClient):
     def transform_response(self, response: requests.Response, **kwargs):
         """Transform the response from the API to JSON"""
 
-        return response.json() or {}
+        try:
+            data = response.json() or {}
+        except Exception as E:
+            data = {"errors": str(E)}
+
+        data["http_status_code"] = response.status_code
+
+        return data
 
     # def get_jira_issue_url(self, issue_key: str) -> str:
     #     return f"{self.base_url}/rest/api/3/issue/{issue_key}/"
@@ -85,6 +92,7 @@ class JiraClient(HTTPClient):
 
         return new_user.get("accountId")
 
+    ## TODO move this back to the other repo?
     def build_create_issue_payload(
         self,
         jira_board: str,
@@ -95,7 +103,7 @@ class JiraClient(HTTPClient):
         issue_type_lookup: str = "Task",
         reporter_id: int = None,
     ) -> dict:
-        service_desk_response = self.get_service_desks()
+        service_desk_response = self.get_service_desks(override_data_printing=True)
         service_desk = [
             board
             for board in service_desk_response.get("values")
@@ -109,7 +117,7 @@ class JiraClient(HTTPClient):
 
         service_desk_id = service_desk[0].get("projectId")
 
-        issue_type_response = self.get_issue_types(service_desk_id)
+        issue_type_response = self.get_issue_types(service_desk_id, override_data_printing=True)
         issue_type = [
             it for it in issue_type_response if it.get("name") == issue_type_lookup
         ]
@@ -121,7 +129,7 @@ class JiraClient(HTTPClient):
 
         if reporter_id is None:
             reporter_id = self.find_or_create_user(
-                reporter_email, reporter_first_name, reporter_last_name
+                reporter_email, reporter_first_name, reporter_last_name, override_data_printing=True
             )
 
         return {
