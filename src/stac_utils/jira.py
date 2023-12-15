@@ -66,11 +66,13 @@ class JiraClient(HTTPClient):
 
     def get_issue_types(self, project_id: str) -> list[dict]:
         return self.get(
-            "rest/api/3/issuetype/project", params={"projectId": project_id}
+            "rest/api/3/issuetype/project",
+            params={"projectId": project_id},
+            override_data_printing=True,
         )
 
     def get_service_desks(self) -> dict:
-        return self.get(self.base_service_desk_endpoint)
+        return self.get(self.base_service_desk_endpoint, override_data_printing=True)
 
     def find_or_create_user(
         self, email_address: str, first_name: str, last_name: str
@@ -88,6 +90,7 @@ class JiraClient(HTTPClient):
                 "email": email_address,
                 "displayName": f"{first_name} {last_name}",
             },
+            override_data_printing=True
         )
 
         return new_user.get("accountId")
@@ -103,7 +106,7 @@ class JiraClient(HTTPClient):
         issue_type_lookup: str = "Task",
         reporter_id: int = None,
     ) -> dict:
-        service_desk_response = self.get_service_desks(override_data_printing=True)
+        service_desk_response = self.get_service_desks()
         service_desk = [
             board
             for board in service_desk_response.get("values")
@@ -117,7 +120,7 @@ class JiraClient(HTTPClient):
 
         service_desk_id = service_desk[0].get("projectId")
 
-        issue_type_response = self.get_issue_types(service_desk_id, override_data_printing=True)
+        issue_type_response = self.get_issue_types(service_desk_id)
         issue_type = [
             it for it in issue_type_response if it.get("name") == issue_type_lookup
         ]
@@ -129,7 +132,9 @@ class JiraClient(HTTPClient):
 
         if reporter_id is None:
             reporter_id = self.find_or_create_user(
-                reporter_email, reporter_first_name, reporter_last_name, override_data_printing=True
+                reporter_email,
+                reporter_first_name,
+                reporter_last_name,
             )
 
         return {
