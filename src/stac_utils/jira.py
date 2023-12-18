@@ -48,18 +48,23 @@ class JiraClient(HTTPClient):
         return session
 
     def transform_response(self, response: requests.Response, **kwargs):
-        """Transform the response from the API to JSON"""
+        """Transforms the response from the API to JSON"""
 
         try:
             data = response.json() or {}
         except Exception as E:
-            data = {"errors": str(E)}
+            data = {"errors": str(E), "http_status_code": response.status_code}
 
         return data
 
     @staticmethod
     def get_issue_url(issue_key: str) -> str:
-        return f"rest/api/3/issue/{issue_key}/"
+        """Returns the API end point to GET an issue"""
+        return f"rest/api/3/issue/{issue_key}"
 
     def get_issue_transitions_url(self, issue_key: str) -> str:
+        """
+        Returns the API end point to GET the transitions now
+        possible for an issue, given its current status
+        """
         return f"{self.get_issue_url(issue_key)}/transitions"
