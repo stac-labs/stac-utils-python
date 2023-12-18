@@ -57,13 +57,15 @@ class TestJiraClient(unittest.TestCase):
         self.assertEqual({"fooBar": "spam"}, test_data)
 
     def test_transform_response_when_no_json(self):
-        """Test transform response handles normal data"""
+        """Test transform response handles 204 with no body"""
 
         mock_response = MagicMock()
         mock_response.status_code = 204
         mock_response.url = "foo.bar/spam"
         mock_response.headers = {"user-agent": "nee"}
-        mock_response.json = MagicMock(side_effect=Exception("Expecting value: line 1 column 1 (char 0)"))
+        mock_response.json = MagicMock(
+            side_effect=Exception("Expecting value: line 1 column 1 (char 0)")
+        )
 
         test_data = self.test_client.transform_response(mock_response)
         self.assertEqual({}, test_data)
@@ -79,6 +81,8 @@ class TestJiraClient(unittest.TestCase):
         self.assertEqual({"errors": "foo", "http_status_code": 42}, test_data)
 
     def test_get_issue_urls(self):
+        """Test issue-specific endpoints are correctly generated"""
+
         test_issue_key = "ABC-1"
         self.assertEqual(
             "rest/api/3/issue/ABC-1", self.test_client.get_issue_url(test_issue_key)
