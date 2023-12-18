@@ -56,6 +56,18 @@ class TestJiraClient(unittest.TestCase):
         test_data = self.test_client.transform_response(mock_response)
         self.assertEqual({"fooBar": "spam"}, test_data)
 
+    def test_transform_response_when_no_json(self):
+        """Test transform response handles normal data"""
+
+        mock_response = MagicMock()
+        mock_response.status_code = 204
+        mock_response.url = "foo.bar/spam"
+        mock_response.headers = {"user-agent": "nee"}
+        mock_response.json = MagicMock(side_effect=Exception("Expecting value: line 1 column 1 (char 0)"))
+
+        test_data = self.test_client.transform_response(mock_response)
+        self.assertEqual({}, test_data)
+
     def test_transform_response_exception(self):
         """Test transform response handles exception in the response"""
 

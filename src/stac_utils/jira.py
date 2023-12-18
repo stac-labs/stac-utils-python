@@ -53,7 +53,13 @@ class JiraClient(HTTPClient):
         try:
             data = response.json() or {}
         except Exception as E:
-            data = {"errors": str(E), "http_status_code": response.status_code}
+            if (
+                response.status_code == 204
+                and str(E) == "Expecting value: line 1 column 1 (char 0)"
+            ):
+                data = {}
+            else:
+                data = {"errors": str(E), "http_status_code": response.status_code}
 
         return data
 
