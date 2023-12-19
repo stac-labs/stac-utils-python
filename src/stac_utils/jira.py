@@ -3,6 +3,7 @@ import os
 
 import requests
 
+from json.decoder import JSONDecodeError
 from .http import HTTPClient
 
 logger = logging.getLogger(__name__)
@@ -52,14 +53,13 @@ class JiraClient(HTTPClient):
 
         try:
             data = response.json() or {}
-        except Exception as E:
-            if (
-                response.status_code == 204
-                and str(E) == "Expecting value: line 1 column 1 (char 0)"
-            ):
+        except JSONDecodeError as E:
+            if response.status_code == 204:
                 data = {}
             else:
                 data = {"errors": str(E), "http_status_code": response.status_code}
+        except Exception as E:
+            data = {"errors": str(E), "http_status_code": response.status_code}
 
         return data
 
