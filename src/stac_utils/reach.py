@@ -10,6 +10,15 @@ logger = logging.getLogger(__name__)
 
 
 class ReachClient(HTTPClient):
+    """
+    Reach Client class built on basic HTTP Client class
+
+    Parameters
+    ==========
+    api_user: username, will pick up "REACH_API_USER" if it's in the environment
+    api_password: password, will pick up "REACH_API_PASSWORD" if it's in the environment
+    """
+    
     base_url = "https://api.reach.vote/api/v1"
 
     def __init__(self, api_user: str = None, api_password: str = None, *args, **kwargs):
@@ -19,6 +28,7 @@ class ReachClient(HTTPClient):
         super().__init__(*args, **kwargs)
 
     def refresh_auth(self, response: requests.Response):
+        """Refreshes authorization in case of no access token"""
         body = {
             "username": self.api_user,
             "password": self.api_password,
