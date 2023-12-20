@@ -49,6 +49,7 @@
 <li class="toctree-l1"><a class="reference internal" href="_autosummary/stac_utils.email.html">stac_utils.email</a></li>
 <li class="toctree-l1"><a class="reference internal" href="_autosummary/stac_utils.google.html">stac_utils.google</a></li>
 <li class="toctree-l1"><a class="reference internal" href="_autosummary/stac_utils.http.html">http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_autosummary/stac_utils.jira.html">stac_utils.jira</a></li>
 <li class="toctree-l1"><a class="reference internal" href="_autosummary/stac_utils.listify.html">stac_utils.listify</a></li>
 <li class="toctree-l1"><a class="reference internal" href="_autosummary/stac_utils.ngpvan.html">stac_utils.ngpvan</a></li>
 <li class="toctree-l1"><a class="reference internal" href="_autosummary/stac_utils.normalize.html">stac_utils.normalize</a></li>
@@ -96,6 +97,7 @@
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
+ | <a href="#J"><strong>J</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
@@ -192,6 +194,8 @@
 </li>
         <li><a href="_autosummary/stac_utils.http.html#stac_utils.http.HTTPClient.create_session">(stac_utils.http.HTTPClient method)</a>
 </li>
+        <li><a href="_autosummary/stac_utils.jira.html#stac_utils.jira.JiraClient.create_session">(stac_utils.jira.JiraClient method)</a>
+</li>
         <li><a href="_autosummary/stac_utils.ngpvan.html#stac_utils.ngpvan.NGPVANClient.create_session">(stac_utils.ngpvan.NGPVANClient method)</a>
 </li>
         <li><a href="_autosummary/stac_utils.reach.html#stac_utils.reach.ReachClient.create_session">(stac_utils.reach.ReachClient method)</a>
@@ -243,8 +247,12 @@
 </li>
       <li><a href="_autosummary/stac_utils.pandas_utils.html#stac_utils.pandas_utils.get_dataframe_from_text_stream">get_dataframe_from_text_stream() (in module stac_utils.pandas_utils)</a>
 </li>
+      <li><a href="_autosummary/stac_utils.jira.html#stac_utils.jira.JiraClient.get_issue_transitions_url">get_issue_transitions_url() (stac_utils.jira.JiraClient method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/stac_utils.jira.html#stac_utils.jira.JiraClient.get_issue_url">get_issue_url() (stac_utils.jira.JiraClient static method)</a>
+</li>
       <li><a href="_autosummary/stac_utils.time.html#stac_utils.time.get_now_tz">get_now_tz() (in module stac_utils.time)</a>
 </li>
       <li><a href="_autosummary/stac_utils.ngpvan.html#stac_utils.ngpvan.NGPVANClient.get_paginated_items">get_paginated_items() (stac_utils.ngpvan.NGPVANClient method)</a>
@@ -264,6 +272,14 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/stac_utils.http.html#stac_utils.http.HTTPClient">HTTPClient (class in stac_utils.http)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="J">J</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/stac_utils.jira.html#stac_utils.jira.JiraClient">JiraClient (class in stac_utils.jira)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -310,6 +326,8 @@
         <li><a href="_autosummary/stac_utils.google.html#module-stac_utils.google">stac_utils.google</a>
 </li>
         <li><a href="_autosummary/stac_utils.http.html#module-stac_utils.http">stac_utils.http</a>
+</li>
+        <li><a href="_autosummary/stac_utils.jira.html#module-stac_utils.jira">stac_utils.jira</a>
 </li>
         <li><a href="_autosummary/stac_utils.ngpvan.html#module-stac_utils.ngpvan">stac_utils.ngpvan</a>
 </li>
@@ -448,8 +466,6 @@
         <li><a href="_autosummary/stac_utils.email.html#module-stac_utils.email">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     stac_utils.google
 
@@ -457,11 +473,20 @@
         <li><a href="_autosummary/stac_utils.google.html#module-stac_utils.google">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     stac_utils.http
 
       <ul>
         <li><a href="_autosummary/stac_utils.http.html#module-stac_utils.http">module</a>
+</li>
+      </ul></li>
+      <li>
+    stac_utils.jira
+
+      <ul>
+        <li><a href="_autosummary/stac_utils.jira.html#module-stac_utils.jira">module</a>
 </li>
       </ul></li>
       <li>
@@ -542,6 +567,8 @@
         <li><a href="_autosummary/stac_utils.http.html#stac_utils.http.Client.transform_response">(stac_utils.http.Client method)</a>
 </li>
         <li><a href="_autosummary/stac_utils.http.html#stac_utils.http.HTTPClient.transform_response">(stac_utils.http.HTTPClient method)</a>
+</li>
+        <li><a href="_autosummary/stac_utils.jira.html#stac_utils.jira.JiraClient.transform_response">(stac_utils.jira.JiraClient method)</a>
 </li>
         <li><a href="_autosummary/stac_utils.ngpvan.html#stac_utils.ngpvan.NGPVANClient.transform_response">(stac_utils.ngpvan.NGPVANClient method)</a>
 </li>
