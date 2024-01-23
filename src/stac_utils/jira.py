@@ -49,7 +49,12 @@ class JiraClient(HTTPClient):
         return session
 
     def transform_response(self, response: requests.Response, **kwargs):
-        """Transforms the response from the API to JSON"""
+        """
+        Transforms the response from the API to JSON
+
+        :param response: API response
+        :return: JSON data
+        """
 
         try:
             data = response.json() or {}
@@ -65,12 +70,20 @@ class JiraClient(HTTPClient):
 
     @staticmethod
     def get_issue_url(issue_key: str) -> str:
-        """Returns the API end point to GET an issue"""
+        """
+        Returns the API end point to GET an issue
+
+        :param issue_key: string with the Jira ticket ID
+        :return: endpoint string to GET info about the ticket
+        """
         return f"rest/api/3/issue/{issue_key}"
 
     def get_issue_transitions_url(self, issue_key: str) -> str:
         """
         Returns the API end point to GET the transitions now
         possible for an issue, given its current status
+
+        :param issue_key: string with the Jira ticket ID
+        :return: endpoint string to interact with the ticket's transitions
         """
         return f"{self.get_issue_url(issue_key)}/transitions"
