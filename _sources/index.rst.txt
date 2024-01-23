@@ -12,6 +12,7 @@ Welcome to stac-utils-python's documentation!
    stac_utils.bsd
    stac_utils.convert
    stac_utils.database_utils
+   stac_utils.eid
    stac_utils.email
    stac_utils.google
    stac_utils.http

@@ -1,0 +1,5 @@
+﻿eid
+==============
+
+.. automodule:: stac_utils.eid
+    :members:
