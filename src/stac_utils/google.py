@@ -489,6 +489,7 @@ def send_data_to_sheets(
     input_option: str = "RAW",
     client: Resource = None,
     is_overwrite: bool = True,
+    is_fill_in_nulls: bool = False,
     **kwargs,
 ) -> dict:
     """
@@ -502,6 +503,9 @@ def send_data_to_sheets(
     :param is_overwrite: Overwrite option, defaults to `True`
     :return: Google Sheets API response
     """
+
+    if is_fill_in_nulls:
+        data = [[value if value is not None else "" for value in item] for item in data]
 
     client = client or auth_sheets(**kwargs)
 
@@ -565,7 +569,9 @@ def copy_file(file_id: str, new_file_name: str = None, client: Resource = None) 
     new_file = client.files().copy(fileId=file_id, supportsAllDrives=True).execute()
     new_file_id = new_file["id"]
     if new_file_name:
-        client.files().update(fileId=new_file_id, supportsAllDrives=True, body={"name": new_file_name}).execute()
+        client.files().update(
+            fileId=new_file_id, supportsAllDrives=True, body={"name": new_file_name}
+        ).execute()
 
     return new_file_id
 

@@ -476,6 +476,22 @@ class TestGoogle(unittest.TestCase):
         send_data_to_sheets([[]], "foo", "bar", is_overwrite=False, client=mock_client)
         mock_auth_sheets.assert_not_called()
 
+    @patch("src.stac_utils.google.auth_sheets")
+    def test_send_data_to_sheets_with_null_overwrite(self, mock_auth_sheets: MagicMock):
+        """test send to sheets with null overwrite"""
+        mock_client = MagicMock()
+        mock_auth_sheets.return_value = mock_client
+        mock_modifier = MagicMock()
+        mock_client.spreadsheets.return_value.values.return_value = mock_modifier
+        send_data_to_sheets([[1, None, 2], [3, 4, 5]], "foo", "bar", is_fill_in_nulls=True)
+        mock_modifier.append.assert_not_called()
+        mock_modifier.update.assert_called_once_with(
+            spreadsheetId="foo",
+            range="bar",
+            valueInputOption="RAW",
+            body={"values": [[1, "", 2], [3, 4, 5]]},
+        )
+
     def test__sanitize_name(self):
         """Test sanitize name"""
 
@@ -512,9 +528,9 @@ class TestGoogle(unittest.TestCase):
         mock_download_complete = MagicMock(progress=lambda: 1)
 
         # downloader start case (at 1)
-        mock_downloader.next_chunk.return_value[
-            0
-        ].progress.return_value = mock_download_progress
+        mock_downloader.next_chunk.return_value[0].progress.return_value = (
+            mock_download_progress
+        )
 
         # side effect to handle downloader range
         # ("if side_effect is an iterable then each call to the mock will return the next value from the iterable")

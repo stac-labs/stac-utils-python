@@ -2,6 +2,7 @@ def convert_to_eid(id: int) -> str:
     """
     Convert an ID, such as a VAN ID or an export request ID, into an EID string.
     Useful for creating direct links to VoteBuilder.
+
     :param id: ID number to convert
     :return: EID
     """
