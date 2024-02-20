@@ -2,6 +2,10 @@ import json
 import os
 import requests
 
+from smtplib import SMTP_SSL
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 from . import listify
 
 
@@ -62,3 +66,47 @@ class Emailer:
 
         resp = requests.post(request_url, auth=("api", self.api_key), data=email_data)
         resp.raise_for_status()
+
+
+class SMTPEmailer:
+    """
+    Sets up SMTP Emailer for Google accounts, if an app password is enabled.
+    """
+
+    def __init__(
+        self,
+        username: str = None,
+        password: str = None,
+    ):
+        self.username = username or os.environ["GOOGLE_USERNAME"]
+        self.password = password or os.environ["GOOGLE_APP_PASSWORD"]
+        self.client = SMTP_SSL("smtp.gmail.com", 465)
+        self.client.ehlo()
+        self.client.login(self.username, self.password)
+
+    def send_email(
+        self,
+        subject: str,
+        body: str,
+        emails: list[str] = None,
+        reply_to: list[str] = None,
+    ):
+        """
+        Sends email given specified details. Include the body with the raw HTML directly.
+
+        :param subject: Subject of email
+        :param body: Body of email
+        :param emails: List of email addresses receiving email
+        :param reply_to: List of reply-to addresses for email
+        """
+        email_data = MIMEMultipart()
+        email_data["To"] = ",".join(emails)
+        email_data["From"] = self.username
+        email_data["Subject"] = subject
+        if reply_to:
+            email_data["Reply-To"] = ",".join(reply_to)
+        email_data.attach(MIMEText(body, "html"))
+
+        return self.client.sendmail(
+            self.username, emails, email_data.as_string()
+        )
