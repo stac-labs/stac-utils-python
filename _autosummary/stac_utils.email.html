@@ -55,6 +55,10 @@
 <li class="toctree-l3"><a class="reference internal" href="#stac_utils.email.Emailer.send_email"><code class="docutils literal notranslate"><span class="pre">Emailer.send_email()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.email.SMTPEmailer"><code class="docutils literal notranslate"><span class="pre">SMTPEmailer</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.email.SMTPEmailer.send_email"><code class="docutils literal notranslate"><span class="pre">SMTPEmailer.send_email()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="stac_utils.google.html">stac_utils.google</a></li>
@@ -116,6 +120,28 @@
 <li><p><strong>reply_to</strong> – Reply-to for email</p></li>
 <li><p><strong>template</strong> – Specified template for email</p></li>
 <li><p><strong>variables</strong> – Specified variables for email template</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stac_utils.email.SMTPEmailer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stac_utils.email.</span></span><span class="sig-name descname"><span class="pre">SMTPEmailer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.email.SMTPEmailer" title="Permalink to this definition"></a></dt>
+<dd><p>Sets up SMTP Emailer for Google accounts, if an app password is enabled.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.email.SMTPEmailer.send_email">
+<span class="sig-name descname"><span class="pre">send_email</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emails</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reply_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.email.SMTPEmailer.send_email" title="Permalink to this definition"></a></dt>
+<dd><p>Sends email given specified details. Include the body with the raw HTML directly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>subject</strong> – Subject of email</p></li>
+<li><p><strong>body</strong> – Body of email</p></li>
+<li><p><strong>emails</strong> – List of email addresses receiving email</p></li>
+<li><p><strong>reply_to</strong> – List of reply-to addresses for email</p></li>
 </ul>
 </dd>
 </dl>
