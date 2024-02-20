@@ -1,10 +1,11 @@
 import os
+import re
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, ANY
 
 import requests
 
-from src.stac_utils.email import Emailer
+from src.stac_utils.email import Emailer, SMTPEmailer
 
 
 class TestEmailer(unittest.TestCase):
@@ -149,6 +150,72 @@ class TestEmailer(unittest.TestCase):
             body="bar",
             emails=["spam@foo.bar"],
         )
+
+
+class TestSMTPEmailer(unittest.TestCase):
+    @patch("src.stac_utils.email.SMTP_SSL")
+    def test_init(self, mock_smtp: MagicMock):
+        """Test init method"""
+        test_emailer = SMTPEmailer("foo@bar", "spam")
+        mock_smtp.assert_called_once()
+        test_emailer.client.ehlo.assert_called_once()
+        test_emailer.client.login.assert_called_once_with("foo@bar", "spam")
+
+    @patch("src.stac_utils.email.SMTP_SSL")
+    def test_init_env_keys(self, mock_smtp: MagicMock):
+        """Test init method with env api keys"""
+        test_keys = {"GOOGLE_USERNAME": "foo@bar", "GOOGLE_APP_PASSWORD": "spam"}
+        with patch.dict(os.environ, values=test_keys):
+            test_emailer = SMTPEmailer()
+            self.assertEqual("spam", test_emailer.password)
+            self.assertEqual("foo@bar", test_emailer.username)
+            mock_smtp.assert_called_once()
+            test_emailer.client.ehlo.assert_called_once()
+            test_emailer.client.login.assert_called_once_with("foo@bar", "spam")
+
+    def test_init_no_keys(self):
+        """Test init when no keys present anywhere"""
+        self.assertRaises(KeyError, SMTPEmailer)
+
+    @patch("src.stac_utils.email.SMTP_SSL")
+    def test_send_email(self, mock_smtp: MagicMock):
+        """Test send email"""
+        test_emailer = SMTPEmailer("foo@bar", "spam")
+        test_emailer.send_email("foo", body="foobarspam", emails=["spam@foo.bar"])
+        test_emailer.client.sendmail.assert_called_once_with(
+            "foo@bar", ["spam@foo.bar"], ANY
+        )
+        argument_string = test_emailer.client.sendmail.call_args[0][2]
+        assert re.search("To: spam@foo.bar", argument_string)
+        assert re.search("From: foo@bar", argument_string)
+        assert re.search("Subject: foo", argument_string)
+        assert re.search("foobarspam", argument_string)
+
+    @patch("src.stac_utils.email.SMTP_SSL")
+    def test_send_email_no_body(self, mock_smtp: MagicMock):
+        """Test send email with no body"""
+
+        test_emailer = SMTPEmailer("foo@bar", "spam")
+        self.assertRaises(
+            TypeError, test_emailer.send_email, "foo", emails=["spam@foo.bar"]
+        )
+
+    @patch("src.stac_utils.email.SMTP_SSL")
+    def test_send_email_custom_reply_to(self, mock_stmp: MagicMock):
+        """Test send email with custom reply to"""
+        test_emailer = SMTPEmailer("foo@bar", "spam")
+        test_emailer.send_email(
+            "foo",
+            body="foobarspam",
+            emails=["spam@foo.bar", "spamB@foo.bar"],
+            reply_to=["spamC@foo.bar", "spamD@foo.bar"],
+        )
+        test_emailer.client.sendmail.assert_called_once_with(
+            "foo@bar", ["spam@foo.bar", "spamB@foo.bar"], ANY
+        )
+        argument_string = test_emailer.client.sendmail.call_args[0][2]
+        assert re.search("To: spam@foo.bar,spamB@foo.bar", argument_string)
+        assert re.search("Reply-To: spamC@foo.bar,spamD@foo.bar", argument_string)
 
 
 if __name__ == "__main__":
