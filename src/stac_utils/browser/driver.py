@@ -3,7 +3,6 @@ import tempfile
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 
 
 class ChromeDriver:
@@ -34,13 +33,11 @@ class ChromeDriver:
             self.binary_location = "/opt/chrome/chrome"
         if not self.run_locally and not self.driver_location:
             self.driver_location = "/opt/chromedriver"
-        elif not self.driver_location:
-            self.driver_location = ChromeDriverManager().install()
         self.driver = None
 
     def __enter__(self):
         service = Service(
-            self.driver_location,
+            executable_path=self.driver_location,
             service_args=["--enable-logging=stdout"],
             log_path=None if self.run_locally else "/tmp/chromedriver.log",
         )
