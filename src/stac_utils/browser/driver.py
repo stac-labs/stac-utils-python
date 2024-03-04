@@ -2,7 +2,7 @@ import os
 import tempfile
 
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.service import Service, DEFAULT_EXECUTABLE_PATH
 
 
 class ChromeDriver:
@@ -37,7 +37,7 @@ class ChromeDriver:
 
     def __enter__(self):
         service = Service(
-            executable_path=self.driver_location,
+            executable_path=self.driver_location or DEFAULT_EXECUTABLE_PATH,
             service_args=["--enable-logging=stdout"],
             log_path=None if self.run_locally else "/tmp/chromedriver.log",
         )
