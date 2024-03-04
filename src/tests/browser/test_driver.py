@@ -5,14 +5,12 @@ from unittest.mock import MagicMock, patch, call
 from src.stac_utils.browser.driver import ChromeDriver
 
 
-mock_manager = MagicMock()
 mock_service = MagicMock()
 mock_webdriver = MagicMock()
 
 
 @patch("src.stac_utils.browser.driver.webdriver", new=mock_webdriver)
 @patch("src.stac_utils.browser.driver.Service", new=mock_service)
-@patch("src.stac_utils.browser.driver.ChromeDriverManager", new=mock_manager)
 class TestChromeDriver(unittest.TestCase):
     def test_init(self):
         """Test init"""
@@ -53,10 +51,8 @@ class TestChromeDriver(unittest.TestCase):
     def test_init_local_no_driver(self):
         """Test init run locally and no driver location"""
 
-        mock_manager.return_value.install.return_value = "./foo"
         test_driver = ChromeDriver(run_locally=True)
-        mock_manager.return_value.install.assert_called_once()
-        self.assertEqual("./foo", test_driver.driver_location)
+        self.assertIsNone(test_driver.driver_location)
 
     @patch("tempfile.TemporaryDirectory")
     def test_context_manager(self, mock_temp_dir: MagicMock):
