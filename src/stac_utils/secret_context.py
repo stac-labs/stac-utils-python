@@ -46,5 +46,38 @@ def secrets(
         values.update(dictionary)
 
     # the patcher doesn't like non-string keys OR values
-    values = {str(k): str(v) if v is not None else "" for k, v in values.items()}
+    values = {
+        str(k): str(v)
+        if v is not None
+        else ""
+        for k, v in values.items()
+    }
     return patch.dict(os.environ, values=values)
+
+
+def safe_dump_to_json(value) -> str:
+    if type(value) in [dict]:
+        return json.dumps({str(k): safe_dump_to_json(v) for k, v in value.items()})
+
+    if type(value) in [list, tuple]:
+        return json.dumps([safe_dump_to_json(v) for v in value])
+
+    if value is None:
+        return ""
+
+    return str(value)
+
+
+def safe_load_from_json(value: str):
+    try:
+        loaded = json.loads(value)
+    except json.decoder.JSONDecodeError:
+        loaded = value
+
+    if type(loaded) in [dict]:
+        return {k: safe_load_from_json(v) for k, v in loaded.items()}
+
+    if type(loaded) in [list]:
+        return [safe_load_from_json(v) for v in loaded]
+
+    return value
