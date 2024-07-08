@@ -308,14 +308,14 @@ class TestGoogle(unittest.TestCase):
     ):
         """Test create table from dataframe"""
 
-        mock_df = pd.DataFrame([{"foo": 1, "bar": 2.5, "spam": "spam"}])
+        mock_df = pd.DataFrame([{"foo": 1, "bar": 2.5, "spam": "spam", "baz": False}])
 
         table_definition_sql = f"""
         DROP TABLE IF EXISTS 
             foo.bar.spam 
         ;
         CREATE TABLE foo.bar.spam ( 
-            foo INT64, bar NUMERIC, spam STRING
+            foo INT64, bar NUMERIC, spam STRING, baz BOOL
         );
     """
 
