@@ -5,7 +5,7 @@ pytest-runner
 build
 bumpversion
 freezegun
-pandas
+pandas==2.2.1
 psycopg
 selenium
 webdriver-manager
