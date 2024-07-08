@@ -18,6 +18,10 @@ from .listify import listify
 
 RETRY_EXCEPTIONS = [InternalServerError]
 
+logging.basicConfig()
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 def get_credentials(
     service_account_blob: dict = None,
@@ -320,13 +324,15 @@ def create_table_from_dataframe(
         column_name = dataframe.columns[column_index]
         db_column_name = underscore(parameterize(column_name))
         column_name_conversion[column_name] = db_column_name
-        datatype = dataframe.dtypes[column_index].name
+        datatype = dataframe.dtypes.iloc[column_index].name
         if datatype == "object":
             column_definitions.append(f"{db_column_name} STRING")
         elif datatype == "int64":
             column_definitions.append(f"{db_column_name} INT64")
         elif datatype == "float64":
             column_definitions.append(f"{db_column_name} NUMERIC")
+        elif datatype == "bool":
+            column_definitions.append(f"{db_column_name} BOOL")
         else:
             raise ValueError(f"Unknown data type {datatype} on column {column_name}")
 
@@ -341,7 +347,7 @@ def create_table_from_dataframe(
     """
     print(table_definition_sql)
     run_query(table_definition_sql, client=client)
-    load_data_from_dataframe(client, dataframe, project_name, dataset_name, table_name)
+    load_data_from_dataframe(client, dataframe, project_name, dataset_name, table_name, retry_exceptions=[NotFound, *RETRY_EXCEPTIONS])
 
 
 def get_table_for_loading(
@@ -395,8 +401,10 @@ def load_data_from_dataframe(
         chunk_size=10000,
         retry=retry_policy,
     )
+    
+    logger.info(f"inserted {len(results)} rows")
+    print(results)
 
-    logging.info(f"inserted {len(results)} rows")
 
 
 def load_data_from_list(
@@ -423,7 +431,7 @@ def load_data_from_list(
     retry_policy = Retry(predicate=if_exception_type(*retry_exceptions))
     results = client.insert_rows(table=table, rows=data, retry=retry_policy)
 
-    logging.info(f"inserted {len(results)} rows")
+    logger.info(f"inserted {len(results)} rows")
 
 
 def upload_data_to_gcs(
