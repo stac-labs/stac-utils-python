@@ -3,7 +3,6 @@ import json
 import logging
 import os
 import sys
-import itertools
 
 from google.api_core.exceptions import InternalServerError, NotFound
 from google.api_core.retry import if_exception_type, Retry
@@ -411,12 +410,13 @@ def load_data_from_dataframe(
         retry=retry_policy,
     )
 
-    print(f"completed insert to {table}")
-    if len(results) > 0:
-        # any result from insert_rows_to_dataframe indicates errors in some rows, log them
-        logger.error(f"Errors encountered inserting to {table}")
-        errors = itertools.chain(results)
-        logger.error(errors)
+    print(f"completed insert to {table}, results below")
+    print(results)
+
+    for result in results:
+        if len(result) > 0:
+            logger.error(f"Errors encountered inserting to {table}")
+            logger.error(result)
 
 
 def load_data_from_list(
