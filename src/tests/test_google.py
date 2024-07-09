@@ -483,7 +483,9 @@ class TestGoogle(unittest.TestCase):
         mock_auth_sheets.return_value = mock_client
         mock_modifier = MagicMock()
         mock_client.spreadsheets.return_value.values.return_value = mock_modifier
-        send_data_to_sheets([[1, None, 2], [3, 4, 5]], "foo", "bar", is_fill_in_nulls=True)
+        send_data_to_sheets(
+            [[1, None, 2], [3, 4, 5]], "foo", "bar", is_fill_in_nulls=True
+        )
         mock_modifier.append.assert_not_called()
         mock_modifier.update.assert_called_once_with(
             spreadsheetId="foo",

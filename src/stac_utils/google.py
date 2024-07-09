@@ -24,6 +24,7 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+
 def get_credentials(
     service_account_blob: dict = None,
     service_account_env_name: str = "SERVICE_ACCOUNT",
@@ -348,7 +349,14 @@ def create_table_from_dataframe(
     """
     print(table_definition_sql)
     run_query(table_definition_sql, client=client)
-    load_data_from_dataframe(client, dataframe, project_name, dataset_name, table_name, retry_exceptions=[NotFound, *RETRY_EXCEPTIONS])
+    load_data_from_dataframe(
+        client,
+        dataframe,
+        project_name,
+        dataset_name,
+        table_name,
+        retry_exceptions=[NotFound, *RETRY_EXCEPTIONS],
+    )
 
 
 def get_table_for_loading(
@@ -403,10 +411,10 @@ def load_data_from_dataframe(
         retry=retry_policy,
     )
 
-    print(f'completed insert to {table}')
+    print(f"completed insert to {table}")
     if len(results) > 0:
         # any result from insert_rows_to_dataframe indicates errors in some rows, log them
-        logger.error(f'Errors encountered inserting to {table}')
+        logger.error(f"Errors encountered inserting to {table}")
         errors = itertools.chain(results)
         logger.error(errors)
 
