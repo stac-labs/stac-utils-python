@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import sys
+import itertools
 
 from google.api_core.exceptions import InternalServerError, NotFound
 from google.api_core.retry import if_exception_type, Retry
@@ -17,6 +18,11 @@ from inflection import parameterize, underscore
 from .listify import listify
 
 RETRY_EXCEPTIONS = [InternalServerError]
+
+logging.basicConfig()
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 def get_credentials(
@@ -320,13 +326,15 @@ def create_table_from_dataframe(
         column_name = dataframe.columns[column_index]
         db_column_name = underscore(parameterize(column_name))
         column_name_conversion[column_name] = db_column_name
-        datatype = dataframe.dtypes[column_index].name
+        datatype = dataframe.dtypes.iloc[column_index].name
         if datatype == "object":
             column_definitions.append(f"{db_column_name} STRING")
         elif datatype == "int64":
             column_definitions.append(f"{db_column_name} INT64")
         elif datatype == "float64":
             column_definitions.append(f"{db_column_name} NUMERIC")
+        elif datatype == "bool":
+            column_definitions.append(f"{db_column_name} BOOL")
         else:
             raise ValueError(f"Unknown data type {datatype} on column {column_name}")
 
@@ -341,7 +349,14 @@ def create_table_from_dataframe(
     """
     print(table_definition_sql)
     run_query(table_definition_sql, client=client)
-    load_data_from_dataframe(client, dataframe, project_name, dataset_name, table_name)
+    load_data_from_dataframe(
+        client,
+        dataframe,
+        project_name,
+        dataset_name,
+        table_name,
+        retry_exceptions=[NotFound, *RETRY_EXCEPTIONS],
+    )
 
 
 def get_table_for_loading(
@@ -396,7 +411,12 @@ def load_data_from_dataframe(
         retry=retry_policy,
     )
 
-    logging.info(f"inserted {len(results)} rows")
+    print(f"completed insert to {table}")
+    if len(results) > 0:
+        # any result from insert_rows_to_dataframe indicates errors in some rows, log them
+        logger.error(f"Errors encountered inserting to {table}")
+        errors = itertools.chain(results)
+        logger.error(errors)
 
 
 def load_data_from_list(
@@ -423,7 +443,7 @@ def load_data_from_list(
     retry_policy = Retry(predicate=if_exception_type(*retry_exceptions))
     results = client.insert_rows(table=table, rows=data, retry=retry_policy)
 
-    logging.info(f"inserted {len(results)} rows")
+    logger.info(f"inserted {len(results)} rows")
 
 
 def upload_data_to_gcs(
