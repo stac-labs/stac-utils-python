@@ -43,6 +43,17 @@ def write_secret(region_name: str, secret_name: str, secret: dict):
     )
 
 
+def split_s3_url(url: str) -> tuple[str, str, str]:
+    prefix = "s3://"
+    if url.startswith(prefix):
+        url = url[len(prefix):]
+
+    bucket, _, fpath = url.partition("/")
+    path, _, file_name = fpath.partition("/")
+
+    return bucket, path, file_name
+
+
 def load_from_s3(bucket: str, path: str, file_name: str) -> dict:
     """
     Returns data from s3 given bucket, path, and file name
