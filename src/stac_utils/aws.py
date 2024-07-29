@@ -1,9 +1,13 @@
 import json
+import logging
 import os.path as op
 from tempfile import TemporaryDirectory
 
 import boto3
 from botocore.exceptions import ClientError
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_secret(region_name: str, secret_name: str) -> dict:
@@ -77,6 +81,7 @@ def load_from_s3(bucket: str, path: str, file_name: str) -> dict:
                 raise e
             data = {}
         except json.JSONDecodeError:
+            logger.warning(f"{key} is not a JSON file!")
             data = {}
 
     return data
