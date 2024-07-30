@@ -134,7 +134,33 @@ class TestSecretsContext(unittest.TestCase):
         pass
 
     def test_get_env(self):
-        pass
+        """ Test get_env """
+
+        test_env = {"FOO": "BAR"}
+        with patch.dict(os.environ, values=test_env):
+            self.assertEqual(
+                get_env("FOO"),
+                test_env["FOO"],
+            )
+
+    def test_get_env_no_value(self):
+        """ Test get_env when value doesn't exist"""
+
+        test_env = {"FOO": "BAR"}
+        with patch.dict(os.environ, values=test_env):
+            self.assertIsNone(
+                get_env("SPAM"),
+            )
+
+    def test_get_env_with_default(self):
+        """ Test get_env """
+
+        test_env = {"FOO": "BAR"}
+        with patch.dict(os.environ, values=test_env):
+            self.assertEqual(
+                get_env("SPAM", "TOAST"),
+                "TOAST",
+            )
 
 
 if __name__ == "__main__":
