@@ -58,7 +58,7 @@ def split_s3_url(url: str) -> tuple[str, str, str]:
     return bucket, path, file_name
 
 
-def load_from_s3(bucket: str, path: str, file_name: str) -> dict:
+def load_from_s3(bucket: str, path: [str, None], file_name: str) -> dict:
     """
     Returns data from s3 given bucket, path, and file name
 
@@ -67,6 +67,7 @@ def load_from_s3(bucket: str, path: str, file_name: str) -> dict:
     :param file_name: Name of file to load
     :return: Data from specified file
     """
+    path = path or ""
     s3 = boto3.resource("s3").Bucket(bucket)
     key = (path.strip("/") + "/" + file_name).lstrip("/")
 
@@ -87,7 +88,7 @@ def load_from_s3(bucket: str, path: str, file_name: str) -> dict:
     return data
 
 
-def save_to_s3(data: dict, bucket: str, path: str, file_name: str):
+def save_to_s3(data: dict, bucket: str, path: [str, None], file_name: str):
     """
     Saves data to s3 in specified location
 
@@ -97,6 +98,7 @@ def save_to_s3(data: dict, bucket: str, path: str, file_name: str):
     :param file_name: Desired file name
     :return: Data
     """
+    path = path or ""
     s3 = boto3.resource("s3").Bucket(bucket)
     key = (path.strip("/") + "/" + file_name).lstrip("/")
 
