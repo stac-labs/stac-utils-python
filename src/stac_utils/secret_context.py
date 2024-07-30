@@ -54,8 +54,7 @@ def secrets(
         values["SECRET_S3_URL"] = ""
 
     if s3_url:
-        bucket, path, file_name = split_s3_url(s3_url)
-        values.update(load_from_s3(bucket, path, file_name))
+        values.update(load_from_s3(*split_s3_url(s3_url)))
 
     if file_name:
         values.update(json.load(open(file_name, "rt")))
