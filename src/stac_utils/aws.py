@@ -68,7 +68,7 @@ def load_from_s3(bucket: str, path: str, file_name: str) -> dict:
     :return: Data from specified file
     """
     s3 = boto3.resource("s3").Bucket(bucket)
-    key = path.strip("/") + "/" + file_name
+    key = (path.strip("/") + "/" + file_name).lstrip("/")
 
     data = {}
     with TemporaryDirectory() as temp:
