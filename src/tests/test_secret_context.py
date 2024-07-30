@@ -1,8 +1,8 @@
 import os
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
-from src.stac_utils.secret_context import secrets
+from src.stac_utils.secret_context import secrets, safe_load_from_json, safe_dump_to_json, get_env
 
 
 class TestSecretsContext(unittest.TestCase):
@@ -13,7 +13,7 @@ class TestSecretsContext(unittest.TestCase):
             pass
 
     @patch("src.stac_utils.secret_context.get_secret")
-    def test_secrets_aws_secret(self, mock_get_secret):
+    def test_secrets_aws_secret(self, mock_get_secret: MagicMock):
         """Test that AWS secrets"""
         mock_get_secret.return_value = {"FOO": "BAR"}
         with patch.dict(
@@ -25,7 +25,7 @@ class TestSecretsContext(unittest.TestCase):
         mock_get_secret.assert_called_once_with("us-east-1", "spam-credentials")
 
     @patch("src.stac_utils.secret_context.get_secret")
-    def test_secrets_aws_secret_parameter_name(self, mock_get_secret):
+    def test_secrets_aws_secret_parameter_name(self, mock_get_secret: MagicMock):
         """Test loading secrets specified in parameter over environ SECRET_NAME"""
         mock_get_secret.return_value = {"FOO": "BAR"}
         with patch.dict(
@@ -35,6 +35,30 @@ class TestSecretsContext(unittest.TestCase):
             with secrets(aws_region="us-west-2", secret_name="foo-credentials"):
                 self.assertEqual("BAR", os.environ["FOO"])
         mock_get_secret.assert_called_once_with("us-west-2", "foo-credentials")
+
+    @patch("src.stac_utils.secret_context.load_from_s3")
+    def test_secrets_s3_url(self, mock_load_from_s3: MagicMock):
+        """Test that S3 URL works from env"""
+        mock_load_from_s3.return_value = {"FOO": "BAR"}
+        with patch.dict(
+            os.environ,
+            values={"SECRET_S3_URL": "foo/bar/spam"},
+        ):
+            with secrets():
+                self.assertEqual("BAR", os.environ["FOO"])
+        mock_load_from_s3.assert_called_once_with("foo", "bar", "spam")
+
+    @patch("src.stac_utils.secret_context.load_from_s3")
+    def test_secrets_s3_url_parameter_name(self, mock_load_from_s3: MagicMock):
+        """Test loading secrets specified in parameter over environ SECRET_S3_URL"""
+        mock_load_from_s3.return_value = {"FOO": "BAR"}
+        with patch.dict(
+            os.environ,
+            values={"SECRET_S3_URL": "foo/bar/spam"},
+        ):
+            with secrets(s3_url="foo/bar/spam"):
+                self.assertEqual("BAR", os.environ["FOO"])
+        mock_load_from_s3.assert_called_once_with("foo", "bar", "spam")
 
     def test_secrets_json_secrets(self):
         """Test loading json secrets"""
@@ -49,13 +73,15 @@ class TestSecretsContext(unittest.TestCase):
         with secrets(dictionary=test_dict):
             self.assertEqual("BAR", os.environ["FOO"])
 
+    @patch("src.stac_utils.secret_context.load_from_s3")
     @patch("src.stac_utils.secret_context.get_secret")
-    def test_secrets_priority_order(self, mock_get_secret):
+    def test_secrets_priority_order(self, mock_get_secret: MagicMock, mock_load_from_s3: MagicMock):
         """Test that secrets from AWS, dictionary & files are prioritized correctly
-        Dictionary > File > AWS parameter secret > AWS environ secret > os.environ
+        Dictionary > File > S3 URL secret > AWS secret > os.environ
         """
 
         mock_get_secret.return_value = {"FOO": "NO"}
+        mock_load_from_s3.return_value = {"FOO": "BAR"}
         test_dict = {"FOO": "SPAM"}
         with patch.dict(
             os.environ,
@@ -66,6 +92,7 @@ class TestSecretsContext(unittest.TestCase):
                 file_name="src/tests/mock-credentials.json",
                 aws_region="us-west-2",
                 secret_name="foo-credentials",
+                s3_url="s3://bar-bucket/spam_path/foo_key.json"
             ):
                 self.assertEqual("SPAM", os.environ["FOO"])
 
@@ -99,6 +126,15 @@ class TestSecretsContext(unittest.TestCase):
         test_dict = {"FOO": None}
         with secrets(dictionary=test_dict):
             pass
+
+    def test_safe_load_from_json(self):
+        pass
+
+    def test_safe_dump_to_json(self):
+        pass
+
+    def test_get_env(self):
+        pass
 
 
 if __name__ == "__main__":
