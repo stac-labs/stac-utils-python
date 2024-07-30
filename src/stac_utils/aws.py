@@ -53,7 +53,7 @@ def split_s3_url(url: str) -> tuple[str, str, str]:
         url = url[len(prefix):]
 
     bucket, _, fpath = url.partition("/")
-    path, _, file_name = fpath.partition("/")
+    path, _, file_name = fpath.rpartition("/")
 
     return bucket, path, file_name
 
