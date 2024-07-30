@@ -98,7 +98,7 @@ def save_to_s3(data: dict, bucket: str, path: str, file_name: str):
     :return: Data
     """
     s3 = boto3.resource("s3").Bucket(bucket)
-    key = path.strip("/") + "/" + file_name
+    key = (path.strip("/") + "/" + file_name).lstrip("/")
 
     with TemporaryDirectory() as temp:
         temp_file = op.join(temp, file_name)
