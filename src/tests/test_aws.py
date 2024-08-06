@@ -1,9 +1,15 @@
 import json
 import unittest
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock, patch
 from botocore.exceptions import ClientError
 
-from src.stac_utils.aws import get_secret, write_secret, load_from_s3, save_to_s3
+from src.stac_utils.aws import (
+    get_secret,
+    write_secret,
+    load_from_s3,
+    save_to_s3,
+    split_s3_url,
+)
 
 
 class TestAWS(unittest.TestCase):
@@ -62,6 +68,27 @@ class TestAWS(unittest.TestCase):
         result_data = load_from_s3("foo", "bar", "spam")
         self.assertEqual(mock_data, result_data)
         mock_boto.return_value.Bucket.return_value.download_file.assert_called_once()
+        self.assertEqual(
+            mock_boto.return_value.Bucket.return_value.download_file.call_args[0][0],
+            "bar/spam",
+        )
+
+    @patch("json.load")
+    @patch("src.stac_utils.aws.open")
+    @patch("boto3.resource")
+    def test_load_from_s3_no_path(
+        self, mock_boto: MagicMock, mock_open: MagicMock, mock_load: MagicMock
+    ):
+        """Test load from s3 when path is None"""
+        mock_data = {"foo": "bar"}
+        mock_load.return_value = mock_data
+        result_data = load_from_s3("foo", None, "spam")
+        self.assertEqual(mock_data, result_data)
+        mock_boto.return_value.Bucket.return_value.download_file.assert_called_once()
+        self.assertEqual(
+            mock_boto.return_value.Bucket.return_value.download_file.call_args[0][0],
+            "spam",
+        )
 
     @patch("json.load")
     @patch("src.stac_utils.aws.open")
@@ -127,6 +154,30 @@ class TestAWS(unittest.TestCase):
             ClientError({"Error": {"Message": "spam"}}, "foo")
         )
         self.assertRaises(ClientError, save_to_s3, mock_data, "foo", "bar", "spam")
+
+    def test_split_s3_url(self):
+        """Test split S3 url"""
+
+        test_url = "s3://foo-bucket/bar-path/spam-key.json"
+        self.assertTupleEqual(
+            split_s3_url(test_url), ("foo-bucket", "bar-path", "spam-key.json")
+        )
+
+    def test_split_s3_url_no_prefix(self):
+        """Test split S3 url with no prefix"""
+
+        test_url = "foo-bucket/bar-path/spam-key.json"
+        self.assertTupleEqual(
+            split_s3_url(test_url), ("foo-bucket", "bar-path", "spam-key.json")
+        )
+
+    def test_split_s3_url_no_path(self):
+        """Test split S3 url with no path"""
+
+        test_url = "s3://foo-bucket/spam-key.json"
+        self.assertTupleEqual(
+            split_s3_url(test_url), ("foo-bucket", "", "spam-key.json")
+        )
 
 
 if __name__ == "__main__":

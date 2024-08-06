@@ -1,9 +1,13 @@
 import json
+import logging
 import os.path as op
 from tempfile import TemporaryDirectory
 
 import boto3
 from botocore.exceptions import ClientError
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_secret(region_name: str, secret_name: str) -> dict:
@@ -43,7 +47,18 @@ def write_secret(region_name: str, secret_name: str, secret: dict):
     )
 
 
-def load_from_s3(bucket: str, path: str, file_name: str) -> dict:
+def split_s3_url(url: str) -> tuple[str, str, str]:
+    prefix = "s3://"
+    if url.startswith(prefix):
+        url = url[len(prefix) :]
+
+    bucket, _, fpath = url.partition("/")
+    path, _, file_name = fpath.rpartition("/")
+
+    return bucket, path, file_name
+
+
+def load_from_s3(bucket: str, path: [str, None], file_name: str) -> dict:
     """
     Returns data from s3 given bucket, path, and file name
 
@@ -52,8 +67,9 @@ def load_from_s3(bucket: str, path: str, file_name: str) -> dict:
     :param file_name: Name of file to load
     :return: Data from specified file
     """
+    path = path or ""
     s3 = boto3.resource("s3").Bucket(bucket)
-    key = path.strip("/") + "/" + file_name
+    key = (path.strip("/") + "/" + file_name).lstrip("/")
 
     data = {}
     with TemporaryDirectory() as temp:
@@ -66,12 +82,13 @@ def load_from_s3(bucket: str, path: str, file_name: str) -> dict:
                 raise e
             data = {}
         except json.JSONDecodeError:
+            logger.warning(f"{key} is not a JSON file!")
             data = {}
 
     return data
 
 
-def save_to_s3(data: dict, bucket: str, path: str, file_name: str):
+def save_to_s3(data: dict, bucket: str, path: [str, None], file_name: str):
     """
     Saves data to s3 in specified location
 
@@ -81,8 +98,9 @@ def save_to_s3(data: dict, bucket: str, path: str, file_name: str):
     :param file_name: Desired file name
     :return: Data
     """
+    path = path or ""
     s3 = boto3.resource("s3").Bucket(bucket)
-    key = path.strip("/") + "/" + file_name
+    key = (path.strip("/") + "/" + file_name).lstrip("/")
 
     with TemporaryDirectory() as temp:
         temp_file = op.join(temp, file_name)
