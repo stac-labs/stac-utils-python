@@ -2,7 +2,7 @@ import os
 import unittest
 from unittest.mock import patch, MagicMock
 
-from src.stac_utils.secret_context import secrets, safe_load_from_json, safe_dump_to_json, get_env
+from src.stac_utils.secret_context import secrets, safe_load_string_to_json, safe_dump_json_to_string, get_env
 
 
 class TestSecretsContext(unittest.TestCase):
@@ -105,7 +105,7 @@ class TestSecretsContext(unittest.TestCase):
                 self.assertEqual("BAR", os.environ["FOO"])
 
     @patch("src.stac_utils.secret_context.get_secret")
-    def test_secrets_nested_aws_secret(self, mock_get_secret):
+    def test_secrets_nested_aws_secret(self, mock_get_secret: MagicMock):
         """Test that SECRET_NAME gets popped off os.environ once an AWS secret has been loaded"""
 
         mock_get_secret.return_value = {"FOO": "BAR"}
@@ -127,11 +127,36 @@ class TestSecretsContext(unittest.TestCase):
         with secrets(dictionary=test_dict):
             pass
 
-    def test_safe_load_from_json(self):
-        pass
+    def test_safe_dump_and_load(self):
+        """ Test safe_dump_json_to_string & safe_load_string_to_json basic cases """
 
-    def test_safe_dump_to_json(self):
-        pass
+        test_items = [
+            {"FOO": "BAR"},
+            ["FOO", "BAR"],
+            "FOO",
+        ]
+
+        for test_item in test_items:
+            self.assertEquals(
+                test_item,
+                safe_load_string_to_json(safe_dump_json_to_string(test_item))
+            )
+
+    def test_test_safe_dump_and_load_nested(self):
+        """ Test safe_dump_json_to_string & safe_load_string_to_json nested cases """
+
+        test_items = [
+            {"FOO": {"BAR": "SPAM"}},
+            [{"FOO": "BAR"}, {"FOO": "BAR"}],
+            [{"FOO": {"BAR": "SPAM"}}, {"FOO": {"BAR": "SPAM"}}],
+            {"FOO": {"BAR": {"BAR": {"BAR": {"BAR": "SPAM"}}}}},
+        ]
+
+        for test_item in test_items:
+            self.assertEquals(
+                test_item,
+                safe_load_string_to_json(safe_dump_json_to_string(test_item))
+            )
 
     def test_get_env(self):
         """ Test get_env """
@@ -143,6 +168,19 @@ class TestSecretsContext(unittest.TestCase):
                 test_env["FOO"],
             )
 
+    @patch("src.stac_utils.secret_context.safe_load_string_to_json")
+    def test_get_env_safe_load(self, mock_safe_load: MagicMock):
+        """ Test get_env that it uses safe_load_string_to_json"""
+
+        test_env = {"SPAM": '{"FOO": "BAR"}'}
+        mock_safe_load.return_value = {"FOO": "BAR"}
+        with patch.dict(os.environ, values=test_env):
+            self.assertEqual(
+                get_env("SPAM"),
+                {"FOO": "BAR"},
+            )
+            mock_safe_load.assert_called_once_with(test_env["SPAM"])
+
     def test_get_env_no_value(self):
         """ Test get_env when value doesn't exist"""
 
@@ -153,7 +191,7 @@ class TestSecretsContext(unittest.TestCase):
             )
 
     def test_get_env_with_default(self):
-        """ Test get_env """
+        """ Test get_env with a provided default """
 
         test_env = {"FOO": "BAR"}
         with patch.dict(os.environ, values=test_env):
