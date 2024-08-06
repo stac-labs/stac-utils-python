@@ -63,20 +63,20 @@ def secrets(
 
     # the patcher doesn't like non-string keys OR values
     values = {
-        str(k): safe_dump_to_json(v) if v is not None else "" for k, v in values.items()
+        str(k): safe_dump_json_to_string(v) if v is not None else "" for k, v in values.items()
     }
 
     return patch.dict(os.environ, values=values)
 
 
-def safe_dump_to_json(value: [list, dict, str, int, tuple, float, None]) -> str:
+def safe_dump_json_to_string(value: [list, dict, str, int, tuple, float, None]) -> str:
     """Utility function to encode values to string, working through nested dictionaries & list"""
 
     if type(value) in [dict]:
-        return json.dumps({str(k): safe_dump_to_json(v) for k, v in value.items()})
+        return json.dumps({str(k): safe_dump_json_to_string(v) for k, v in value.items()})
 
     if type(value) in [list, tuple]:
-        return json.dumps([safe_dump_to_json(v) for v in value])
+        return json.dumps([safe_dump_json_to_string(v) for v in value])
 
     if value is None:
         return ""
@@ -84,7 +84,7 @@ def safe_dump_to_json(value: [list, dict, str, int, tuple, float, None]) -> str:
     return str(value)
 
 
-def safe_load_from_json(value: str) -> [list, dict, str, int, float, None]:
+def safe_load_string_to_json(value: str) -> [list, dict, str, int, float, None]:
     """Utility function to decode values from string, restoring all nested dictionaries & list"""
 
     try:
@@ -93,10 +93,10 @@ def safe_load_from_json(value: str) -> [list, dict, str, int, float, None]:
         loaded = value
 
     if type(loaded) in [dict]:
-        return {k: safe_load_from_json(v) for k, v in loaded.items()}
+        return {k: safe_load_string_to_json(v) for k, v in loaded.items()}
 
     if type(loaded) in [list]:
-        return [safe_load_from_json(v) for v in loaded]
+        return [safe_load_string_to_json(v) for v in loaded]
 
     return loaded
 
@@ -109,4 +109,4 @@ def get_env(key: str, default=None) -> [list, dict, str]:
     if value is None:
         return None
 
-    return safe_load_from_json(value)
+    return safe_load_string_to_json(value)
