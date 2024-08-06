@@ -3,7 +3,13 @@ import unittest
 from unittest.mock import MagicMock, patch
 from botocore.exceptions import ClientError
 
-from src.stac_utils.aws import get_secret, write_secret, load_from_s3, save_to_s3, split_s3_url
+from src.stac_utils.aws import (
+    get_secret,
+    write_secret,
+    load_from_s3,
+    save_to_s3,
+    split_s3_url,
+)
 
 
 class TestAWS(unittest.TestCase):
@@ -154,8 +160,7 @@ class TestAWS(unittest.TestCase):
 
         test_url = "s3://foo-bucket/bar-path/spam-key.json"
         self.assertTupleEqual(
-            split_s3_url(test_url),
-            ("foo-bucket", "bar-path", "spam-key.json")
+            split_s3_url(test_url), ("foo-bucket", "bar-path", "spam-key.json")
         )
 
     def test_split_s3_url_no_prefix(self):
@@ -163,8 +168,7 @@ class TestAWS(unittest.TestCase):
 
         test_url = "foo-bucket/bar-path/spam-key.json"
         self.assertTupleEqual(
-            split_s3_url(test_url),
-            ("foo-bucket", "bar-path", "spam-key.json")
+            split_s3_url(test_url), ("foo-bucket", "bar-path", "spam-key.json")
         )
 
     def test_split_s3_url_no_path(self):
@@ -172,8 +176,7 @@ class TestAWS(unittest.TestCase):
 
         test_url = "s3://foo-bucket/spam-key.json"
         self.assertTupleEqual(
-            split_s3_url(test_url),
-            ("foo-bucket", "", "spam-key.json")
+            split_s3_url(test_url), ("foo-bucket", "", "spam-key.json")
         )
 
 

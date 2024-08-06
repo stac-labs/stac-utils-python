@@ -63,7 +63,8 @@ def secrets(
 
     # the patcher doesn't like non-string keys OR values
     values = {
-        str(k): safe_dump_json_to_string(v) if v is not None else "" for k, v in values.items()
+        str(k): safe_dump_json_to_string(v) if v is not None else ""
+        for k, v in values.items()
     }
 
     return patch.dict(os.environ, values=values)
@@ -73,7 +74,9 @@ def safe_dump_json_to_string(value: [list, dict, str, int, tuple, float, None]) 
     """Utility function to encode values to string, working through nested dictionaries & list"""
 
     if type(value) in [dict]:
-        return json.dumps({str(k): safe_dump_json_to_string(v) for k, v in value.items()})
+        return json.dumps(
+            {str(k): safe_dump_json_to_string(v) for k, v in value.items()}
+        )
 
     if type(value) in [list, tuple]:
         return json.dumps([safe_dump_json_to_string(v) for v in value])
