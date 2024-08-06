@@ -109,7 +109,4 @@ def get_env(key: str, default=None) -> [list, dict, str]:
 
     value = os.environ.get(key, default=default)
 
-    if value is None:
-        return None
-
     return safe_load_string_to_json(value)
