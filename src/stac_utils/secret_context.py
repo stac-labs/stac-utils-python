@@ -82,7 +82,7 @@ def safe_dump_json_to_string(value: [list, dict, str, int, tuple, float, None]) 
         return json.dumps([safe_dump_json_to_string(v) for v in value])
 
     if value is None:
-        return ""
+        return "null"
 
     return str(value)
 
@@ -92,7 +92,7 @@ def safe_load_string_to_json(value: str) -> [list, dict, str, int, float, None]:
 
     try:
         loaded = json.loads(value)
-    except json.decoder.JSONDecodeError:
+    except (json.decoder.JSONDecodeError, TypeError):
         loaded = value
 
     if type(loaded) in [dict]:

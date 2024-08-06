@@ -141,6 +141,10 @@ class TestSecretsContext(unittest.TestCase):
             {"FOO": "BAR"},
             ["FOO", "BAR"],
             "FOO",
+            "",
+            1,
+            1.1,
+            None,
         ]
 
         for test_item in test_items:
