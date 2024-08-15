@@ -62,7 +62,6 @@ class ChromeDriver:
         options.add_argument("--disable-dev-tools")
         options.add_argument("--disable-blink-features=AutomationControlled") 
         options.add_argument("--no-zygote")
-        options.add_argument("--disable-dev-tools")
         options.add_argument(f"--user-data-dir={tempfile.mkdtemp()}")
         options.add_argument(f"--data-path={tempfile.mkdtemp()}")
         options.add_argument(f"--disk-cache-dir={tempfile.mkdtemp()}")
