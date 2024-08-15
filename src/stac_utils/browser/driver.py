@@ -80,6 +80,8 @@ class ChromeDriver:
 
         self.driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})") 
 
+        print('working off the browser tricks repo')
+
         return self.driver
 
     def __exit__(self, *args):
