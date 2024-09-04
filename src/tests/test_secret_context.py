@@ -148,7 +148,7 @@ class TestSecretsContext(unittest.TestCase):
         ]
 
         for test_item in test_items:
-            self.assertEquals(
+            self.assertEqual(
                 test_item, safe_load_string_to_json(safe_dump_json_to_string(test_item))
             )
 
@@ -163,7 +163,7 @@ class TestSecretsContext(unittest.TestCase):
         ]
 
         for test_item in test_items:
-            self.assertEquals(
+            self.assertEqual(
                 test_item, safe_load_string_to_json(safe_dump_json_to_string(test_item))
             )
 
