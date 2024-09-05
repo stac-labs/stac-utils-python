@@ -71,6 +71,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.send_data_to_sheets"><code class="docutils literal notranslate"><span class="pre">send_data_to_sheets()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.text_stream_from_drive"><code class="docutils literal notranslate"><span class="pre">text_stream_from_drive()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.upload_data_to_gcs"><code class="docutils literal notranslate"><span class="pre">upload_data_to_gcs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.google.upload_file_to_drive"><code class="docutils literal notranslate"><span class="pre">upload_file_to_drive()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="stac_utils.http.html">http</a></li>
@@ -449,6 +450,32 @@ get a BigQuery formatted DataFrame.</p>
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.google.upload_file_to_drive">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.google.</span></span><span class="sig-name descname"><span class="pre">upload_file_to_drive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">credentials</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Credentials</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gdrive_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">existing_mime_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gdrive_mime_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'application/vnd.google-apps.spreadsheet'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permissions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[{'type':</span> <span class="pre">'domain',</span> <span class="pre">'role':</span> <span class="pre">'reader',</span> <span class="pre">'domain':</span> <span class="pre">'staclabs.io'}]</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#stac_utils.google.upload_file_to_drive" title="Permalink to this definition"></a></dt>
+<dd><p>Uploads a local file to Google Drive.</p>
+<p>By default, it uploads an Excel file and converts it to a Google Sheet. Specify the
+Mime Type parameters if you want to upload a CSV to a Google Sheet, a Word doc to a
+Google Doc, etc.</p>
+<p>By default, it will give all of staclabs read-only permission on the new file. You
+can adjust that by specifying the desired permissions. Send an empty array to make it
+only visible to the service account’s user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>credentials</strong> – Credentials for Google</p></li>
+<li><p><strong>local_path</strong> – Path to the file on the local drive</p></li>
+<li><p><strong>gdrive_file_name</strong> – Name we should give the uploaded file</p></li>
+<li><p><strong>existing_mime_type</strong> – Mime type of the local file (defaults to Excel)</p></li>
+<li><p><strong>gdrive_mime_type</strong> – Mime type of the resulting file (defaults to Google Sheets)</p></li>
+<li><p><strong>permissions</strong> – Array of Google permissions objects specifying who should access the</p></li>
+</ul>
+</dd>
+</dl>
+<p>new file. Defaults to giving everyone at stac labs read-only permissions.
+:return: id of the file on Google drive</p>
 </dd></dl>
 
 </section>
