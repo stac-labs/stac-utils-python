@@ -608,6 +608,26 @@ def upload_file_to_drive(credentials: service_account.Credentials,
                             "domain": "staclabs.io",
                             }]
                         ) -> str:
+    """
+    Uploads a local file to Google Drive. 
+    
+    By default, it uploads an Excel file and converts it to a Google Sheet. Specify the 
+    Mime Type parameters if you want to upload a CSV to a Google Sheet, a Word doc to a
+    Google Doc, etc.
+
+    By default, it will give all of staclabs read-only permission on the new file. You
+    can adjust that by specifying the desired permissions. Send an empty array to make it
+    only visible to the service account's user.
+
+    :param credentials: Credentials for Google
+    :param local_path: Path to the file on the local drive
+    :param gdrive_file_name: Name we should give the uploaded file
+    :param existing_mime_type: Mime type of the local file (defaults to Excel)
+    :param gdrive_mime_type: Mime type of the resulting file (defaults to Google Sheets)
+    :param permissions: Array of Google permissions objects specifying who should access the 
+    new file. Defaults to giving everyone at stac labs read-only permissions.
+    :return: id of the file on Google drive
+    """
     service = build("drive", "v3", credentials=credentials)
     file_metadata = {
             "name": gdrive_file_name,
