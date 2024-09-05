@@ -4,6 +4,8 @@ import logging
 import os
 import sys
 
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
 from google.api_core.exceptions import InternalServerError, NotFound
 from google.api_core.retry import if_exception_type, Retry
 from google.cloud import storage, bigquery
@@ -594,6 +596,45 @@ def copy_file(file_id: str, new_file_name: str = None, client: Resource = None) 
         ).execute()
 
     return new_file_id
+
+def upload_file_to_drive(credentials: service_account.Credentials,
+                         local_path: str,
+                         gdrive_file_name: str,
+                         existing_mime_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                         gdrive_mime_type = 'application/vnd.google-apps.spreadsheet',
+                         permissions = [{
+                            "type": "domain",
+                            "role": "reader",
+                            "domain": "staclabs.io",
+                            }]
+                        ) -> str:
+    service = build("drive", "v3", credentials=credentials)
+    file_metadata = {
+            "name": gdrive_file_name,
+            "mimeType": gdrive_mime_type
+        }
+    media = MediaFileUpload(local_path,
+                            mimetype=existing_mime_type,
+                            resumable=True)
+    file = (
+            service.files()
+            .create(body=file_metadata, media_body=media, fields="id")
+            .execute()
+        )
+    fileId = file['id']
+
+    batch = service.new_batch_http_request()
+    for perm in permissions:
+        batch.add(
+            service.permissions().create(
+                fileId=fileId,
+                body=perm,
+                fields="id",
+            )
+        )
+    batch.execute()
+
+    return fileId
 
 
 def _sanitize_name(string: str) -> str:
