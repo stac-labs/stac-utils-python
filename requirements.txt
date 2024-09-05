@@ -5,6 +5,7 @@ pytest-runner
 build
 bumpversion
 freezegun
+google-api-python-client
 pandas==2.2.1
 psycopg
 selenium
