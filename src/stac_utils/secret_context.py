@@ -40,6 +40,9 @@ def secrets(
         # if we nest secrets
         values["SECRET_NAME"] = ""
 
+    print('secret_name')
+    print(secret_name)
+
     if secret_name:
         values.update(
             get_secret(
@@ -47,6 +50,7 @@ def secrets(
                 secret_name or os.environ["SECRET_NAME"],
             )
         )
+        print(values.keys())
     if not s3_url and os.environ.get("SECRET_S3_URL"):
         s3_url = os.environ.get("SECRET_S3_URL")
         # blank secret s3 url in the context, so it doesn't get loaded a second time
