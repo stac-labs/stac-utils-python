@@ -4,6 +4,8 @@ import logging
 import os
 import sys
 
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
 from google.api_core.exceptions import InternalServerError, NotFound
 from google.api_core.retry import if_exception_type, Retry
 from google.cloud import storage, bigquery
@@ -594,6 +596,65 @@ def copy_file(file_id: str, new_file_name: str = None, client: Resource = None) 
         ).execute()
 
     return new_file_id
+
+def upload_file_to_drive(credentials: service_account.Credentials,
+                         local_path: str,
+                         gdrive_file_name: str,
+                         existing_mime_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                         gdrive_mime_type = 'application/vnd.google-apps.spreadsheet',
+                         permissions = [{
+                            "type": "domain",
+                            "role": "reader",
+                            "domain": "staclabs.io",
+                            }]
+                        ) -> str:
+    """
+    Uploads a local file to Google Drive. 
+    
+    By default, it uploads an Excel file and converts it to a Google Sheet. Specify the 
+    Mime Type parameters if you want to upload a CSV to a Google Sheet, a Word doc to a
+    Google Doc, etc.
+
+    By default, it will give all of staclabs read-only permission on the new file. You
+    can adjust that by specifying the desired permissions. Send an empty array to make it
+    only visible to the service account's user.
+
+    :param credentials: Credentials for Google
+    :param local_path: Path to the file on the local drive
+    :param gdrive_file_name: Name we should give the uploaded file
+    :param existing_mime_type: Mime type of the local file (defaults to Excel)
+    :param gdrive_mime_type: Mime type of the resulting file (defaults to Google Sheets)
+    :param permissions: Array of Google permissions objects specifying who should access the 
+    new file. Defaults to giving everyone at stac labs read-only permissions.
+    :return: id of the file on Google drive
+    """
+    service = build("drive", "v3", credentials=credentials)
+    file_metadata = {
+            "name": gdrive_file_name,
+            "mimeType": gdrive_mime_type
+        }
+    media = MediaFileUpload(local_path,
+                            mimetype=existing_mime_type,
+                            resumable=True)
+    file = (
+            service.files()
+            .create(body=file_metadata, media_body=media, fields="id")
+            .execute()
+        )
+    fileId = file['id']
+
+    batch = service.new_batch_http_request()
+    for perm in permissions:
+        batch.add(
+            service.permissions().create(
+                fileId=fileId,
+                body=perm,
+                fields="id",
+            )
+        )
+    batch.execute()
+
+    return fileId
 
 
 def _sanitize_name(string: str) -> str:
