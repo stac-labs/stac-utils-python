@@ -2,6 +2,7 @@ import os
 import tempfile
 
 from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
@@ -20,22 +21,25 @@ class ChromeDriver:
         run_locally: bool = False,
         binary_location: str = None,
         driver_location: str = None,
+        remote_executor: str = None,
     ):
         self.temp_dir = None
         self.download_directory = download_directory
         self.binary_location = binary_location or os.environ.get("CHROME_BINARY")
         self.driver_location = driver_location or os.environ.get("CHROME_DRIVER")
+        self.remote_executor = remote_executor or os.environ.get("CHROME_REMOTE_URL")
         self.run_locally = run_locally
 
         # if it's not being run locally then it must be headless
         self.is_headless = is_headless or not self.run_locally
 
-        if not self.run_locally and not self.binary_location:
-            self.binary_location = "/opt/chrome/chrome"
-        if not self.run_locally and not self.driver_location:
-            self.driver_location = "/opt/chromedriver"
-        elif not self.driver_location:
-            self.driver_location = ChromeDriverManager().install()
+        if not self.remote_executor:
+            if not self.run_locally and not self.binary_location:
+                self.binary_location = "/opt/chrome/chrome"
+            if not self.run_locally and not self.driver_location:
+                self.driver_location = "/opt/chromedriver"
+            elif not self.driver_location:
+                self.driver_location = ChromeDriverManager().install()
         self.driver = None
 
     def __enter__(self):
@@ -49,7 +53,8 @@ class ChromeDriver:
             self.download_directory = self.temp_dir.name
 
         options = webdriver.ChromeOptions()
-        if self.binary_location:
+
+        if not self.remote_executor and self.binary_location:
             options.binary_location = self.binary_location
         if not self.run_locally:
             options.add_argument("--single-process")
@@ -70,7 +75,14 @@ class ChromeDriver:
         )
         options.add_experimental_option("useAutomationExtension", False) 
 
-        self.driver = webdriver.Chrome(service=service, options=options)
+        if not self.remote_executor:
+            self.driver = webdriver.Chrome(service=service, options=options)
+        else: 
+            self.driver = webdriver.Remote(
+                command_executor='http://selenium-chrome:4444/wd/hub',
+                options=options,
+                desired_capabilities=DesiredCapabilities.CHROME
+            )
 
         """ Tack the (temp) download directory onto the driver object
             so it can be referenced by the script
