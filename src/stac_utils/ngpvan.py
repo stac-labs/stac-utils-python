@@ -179,7 +179,7 @@ class NGPVANClient(HTTPClient):
             print("No ID key used")
 
         if row.get("email"):
-            formatted_json["emails"] = [{"email": row.get("email")}]
+            formatted_json["emails"] = [{"email": row.get("email").strip()}]
 
         if row.get("phone"):
             formatted_json["phones"] = [
