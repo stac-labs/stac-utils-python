@@ -47,8 +47,9 @@ class Emailer:
         :param template: Specified template for email
         :param variables: Specified variables for email template
         """
+        cleaned_emails = [email.strip() for email in emails]
         email_data = {
-            "to": ",".join(emails),
+            "to": ",".join(cleaned_emails),
             "from": from_addr or self.from_addr,
             "subject": subject,
             "h:Reply-to": listify(reply_to) or self.reply_to,
@@ -107,6 +108,4 @@ class SMTPEmailer:
             email_data["Reply-To"] = ",".join(reply_to)
         email_data.attach(MIMEText(body, "html"))
 
-        return self.client.sendmail(
-            self.username, emails, email_data.as_string()
-        )
+        return self.client.sendmail(self.username, emails, email_data.as_string())

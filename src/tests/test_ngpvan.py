@@ -321,6 +321,26 @@ class TestNGPVAN(unittest.TestCase):
             },
         )
 
+        self.assertEqual(
+            NGPVANClient.format_person_json(
+                {
+                    "first_name": "John",
+                    "last_name": "Smith",
+                    "date_of_birth": "1984-01-01",
+                    "email": "foo@aol.com\t\t\t",
+                },
+                None,
+                False,
+            ),
+            {
+                "firstName": "John",
+                "lastName": "Smith",
+                "dateOfBirth": "1984-01-01",
+                "emails": [{"email": "foo@aol.com"}],
+                "contactMode": "Person",
+            },
+        )
+
         self.assertRaises(
             ValueError,
             NGPVANClient.format_person_json,
