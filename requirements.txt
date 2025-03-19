@@ -11,3 +11,4 @@ psycopg
 selenium
 webdriver-manager
 sphinx
+pre-commit
