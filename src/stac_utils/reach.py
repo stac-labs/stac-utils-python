@@ -18,7 +18,7 @@ class ReachClient(HTTPClient):
     api_user: username, will pick up "REACH_API_USER" if it's in the environment
     api_password: password, will pick up "REACH_API_PASSWORD" if it's in the environment
     """
-    
+
     base_url = "https://api.reach.vote/api/v1"
 
     def __init__(self, api_user: str = None, api_password: str = None, *args, **kwargs):

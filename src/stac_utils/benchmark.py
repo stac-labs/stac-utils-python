@@ -46,11 +46,9 @@ def make_msg(msg: str, t: float) -> str:
     h, m = divmod(m, 60)
     d, h = divmod(h, 24)
     if d:
-        msg = (
-            f"{msg}: {d:.0f} days, " f"{h:.0f} hours, {m:.0f} minutes, {s:.0f} seconds"
-        )
+        msg = f"{msg}: {d:.0f} days, {h:.0f} hours, {m:.0f} minutes, {s:.0f} seconds"
     elif h:
-        msg = f"{msg}: " f"{h:.0f} hours, {m:.0f} minutes, {s:.0f} seconds"
+        msg = f"{msg}: {h:.0f} hours, {m:.0f} minutes, {s:.0f} seconds"
     elif m:
         msg = f"{msg}: {m:.0f} minutes, {s:.0f} seconds"
     else:
