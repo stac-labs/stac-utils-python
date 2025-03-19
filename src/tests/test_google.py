@@ -310,7 +310,7 @@ class TestGoogle(unittest.TestCase):
 
         mock_df = pd.DataFrame([{"foo": 1, "bar": 2.5, "spam": "spam", "baz": False}])
 
-        table_definition_sql = f"""
+        table_definition_sql = """
         DROP TABLE IF EXISTS 
             foo.bar.spam 
         ;
@@ -530,9 +530,9 @@ class TestGoogle(unittest.TestCase):
         mock_download_complete = MagicMock(progress=lambda: 1)
 
         # downloader start case (at 1)
-        mock_downloader.next_chunk.return_value[0].progress.return_value = (
-            mock_download_progress
-        )
+        mock_downloader.next_chunk.return_value[
+            0
+        ].progress.return_value = mock_download_progress
 
         # side effect to handle downloader range
         # ("if side_effect is an iterable then each call to the mock will return the next value from the iterable")

@@ -60,7 +60,7 @@ class ChromeDriver:
         options.add_argument("--window-size=1280x1696")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-dev-tools")
-        options.add_argument("--disable-blink-features=AutomationControlled") 
+        options.add_argument("--disable-blink-features=AutomationControlled")
         options.add_argument("--no-zygote")
         options.add_argument(f"--user-data-dir={tempfile.mkdtemp()}")
         options.add_argument(f"--data-path={tempfile.mkdtemp()}")
@@ -68,7 +68,7 @@ class ChromeDriver:
         options.add_experimental_option(
             "prefs", {"download.default_directory": self.download_directory}
         )
-        options.add_experimental_option("useAutomationExtension", False) 
+        options.add_experimental_option("useAutomationExtension", False)
 
         self.driver = webdriver.Chrome(service=service, options=options)
 
@@ -77,7 +77,9 @@ class ChromeDriver:
         """
         self.driver.download_directory = self.download_directory
 
-        self.driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})") 
+        self.driver.execute_script(
+            "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
+        )
 
         return self.driver
 

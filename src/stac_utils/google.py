@@ -11,10 +11,15 @@ from google.api_core.retry import if_exception_type, Retry
 from google.cloud import storage, bigquery
 from google.cloud.bigquery.table import Table
 from google.oauth2 import service_account
-from googleapiclient.discovery import build, Resource
+from googleapiclient.discovery import Resource
 from googleapiclient.http import MediaIoBaseDownload
 from googleapiclient.errors import HttpError
 from inflection import parameterize, underscore
+
+try:
+    import pandas as pd
+except ImportError:
+    pass
 
 from .listify import listify
 
@@ -523,6 +528,7 @@ def send_data_to_sheets(
     :param input_option: Specified input option, `RAW` by default
     :param client: Google Sheets client
     :param is_overwrite: Overwrite option, defaults to `True`
+    :param is_fill_in_nulls: replace nulls with blanks, default to `False`
     :return: Google Sheets API response
     """
 
@@ -597,21 +603,25 @@ def copy_file(file_id: str, new_file_name: str = None, client: Resource = None) 
 
     return new_file_id
 
-def upload_file_to_drive(local_path: str,
-                         gdrive_file_name: str,
-                         existing_mime_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                         gdrive_mime_type = 'application/vnd.google-apps.spreadsheet',
-                         permissions = [{
-                            "type": "domain",
-                            "role": "reader",
-                            "domain": "staclabs.io",
-                            }],
-                        client: Resource = None
-                        ) -> str:
+
+def upload_file_to_drive(
+    local_path: str,
+    gdrive_file_name: str,
+    existing_mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    gdrive_mime_type="application/vnd.google-apps.spreadsheet",
+    permissions=[
+        {
+            "type": "domain",
+            "role": "reader",
+            "domain": "staclabs.io",
+        }
+    ],
+    client: Resource = None,
+) -> str:
     """
-    Uploads a local file to Google Drive. 
-    
-    By default, it uploads an Excel file and converts it to a Google Sheet. Specify the 
+    Uploads a local file to Google Drive.
+
+    By default, it uploads an Excel file and converts it to a Google Sheet. Specify the
     Mime Type parameters if you want to upload a CSV to a Google Sheet, a Word doc to a
     Google Doc, etc.
 
@@ -623,25 +633,20 @@ def upload_file_to_drive(local_path: str,
     :param gdrive_file_name: Name we should give the uploaded file
     :param existing_mime_type: Mime type of the local file (defaults to Excel)
     :param gdrive_mime_type: Mime type of the resulting file (defaults to Google Sheets)
-    :param permissions: Array of Google permissions objects specifying who should access the 
+    :param permissions: Array of Google permissions objects specifying who should access the
     new file. Defaults to giving everyone at stac labs read-only permissions.
     :param client: Google Drive client
     :return: id of the file on Google drive
     """
     client = client or auth_drive()
-    file_metadata = {
-            "name": gdrive_file_name,
-            "mimeType": gdrive_mime_type
-        }
-    media = MediaFileUpload(local_path,
-                            mimetype=existing_mime_type,
-                            resumable=True)
+    file_metadata = {"name": gdrive_file_name, "mimeType": gdrive_mime_type}
+    media = MediaFileUpload(local_path, mimetype=existing_mime_type, resumable=True)
     file = (
-            client.files()
-            .create(body=file_metadata, media_body=media, fields="id")
-            .execute()
-        )
-    fileId = file['id']
+        client.files()
+        .create(body=file_metadata, media_body=media, fields="id")
+        .execute()
+    )
+    fileId = file["id"]
 
     batch = client.new_batch_http_request()
     for perm in permissions:

@@ -1,7 +1,6 @@
 import os
 import unittest
 
-import requests
 
 from json.decoder import JSONDecodeError
 from unittest.mock import MagicMock, patch

@@ -39,7 +39,7 @@ class TestEmailer(unittest.TestCase):
         mock_post.return_value = mock_response
         test_emailer.send_email("foo", body="bar", emails=["spam@foo.bar"])
         mock_post.assert_called_once_with(
-            f"https://api.mailgun.net/v3/foo/messages",
+            "https://api.mailgun.net/v3/foo/messages",
             auth=("api", "bar"),
             data={
                 "to": "spam@foo.bar",
@@ -73,7 +73,7 @@ class TestEmailer(unittest.TestCase):
             emails=["spam@foo.bar"],
         )
         mock_post.assert_called_once_with(
-            f"https://api.mailgun.net/v3/foo/messages",
+            "https://api.mailgun.net/v3/foo/messages",
             auth=("api", "bar"),
             data={
                 "to": "spam@foo.bar",
@@ -97,7 +97,7 @@ class TestEmailer(unittest.TestCase):
             "foo", body="bar", emails=["spam@foo.bar"], reply_to="yes@foo.bar"
         )
         mock_post.assert_called_once_with(
-            f"https://api.mailgun.net/v3/foo/messages",
+            "https://api.mailgun.net/v3/foo/messages",
             auth=("api", "bar"),
             data={
                 "to": "spam@foo.bar",
@@ -121,7 +121,7 @@ class TestEmailer(unittest.TestCase):
             "foo", body="bar", emails=["spam@foo.bar"], from_addr="yes@foo.bar"
         )
         mock_post.assert_called_once_with(
-            f"https://api.mailgun.net/v3/foo/messages",
+            "https://api.mailgun.net/v3/foo/messages",
             auth=("api", "bar"),
             data={
                 "to": "spam@foo.bar",
