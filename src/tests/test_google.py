@@ -310,7 +310,7 @@ class TestGoogle(unittest.TestCase):
 
         mock_df = pd.DataFrame([{"foo": 1, "bar": 2.5, "spam": "spam", "baz": False}])
 
-        table_definition_sql = f"""
+        table_definition_sql = """
         DROP TABLE IF EXISTS 
             foo.bar.spam 
         ;

@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock, patch
 
 from src.stac_utils.bsd import BSDClient
 

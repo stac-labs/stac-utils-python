@@ -11,10 +11,15 @@ from google.api_core.retry import if_exception_type, Retry
 from google.cloud import storage, bigquery
 from google.cloud.bigquery.table import Table
 from google.oauth2 import service_account
-from googleapiclient.discovery import build, Resource
+from googleapiclient.discovery import Resource
 from googleapiclient.http import MediaIoBaseDownload
 from googleapiclient.errors import HttpError
 from inflection import parameterize, underscore
+
+try:
+    import pandas as pd
+except ImportError:
+    pass
 
 from .listify import listify
 
