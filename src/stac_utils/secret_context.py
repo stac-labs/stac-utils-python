@@ -56,26 +56,27 @@ def secrets(
 
     for secret_key in secret_names:
         if secret_key not in values["LOADED_SECRET_NAMES"]:
-            logger.info(f'Loading secret {secret_key} from region {secret_region}')
+            key_from_environ = os.environ.get(secret_key)
+            logger.info(f'Loading secret {key_from_environ} from region {secret_region}')
 
             secret_vals = get_secret(
                 secret_region,
-                secret_key,
+                key_from_environ,
             )
 
             overlapping_keys = set(values) & set(secret_vals)
 
             if overlapping_keys: 
-                err_msg = f'Loading secret {secret_key} would overwrite the following keys: {overlapping_keys}. Execution will stop to prevent any unwanted behavior.'
+                err_msg = f'Loading secret {key_from_environ} would overwrite the following keys: {overlapping_keys}. Execution will stop to prevent any unwanted behavior.'
                 logger.error(err_msg)
                 raise ValueError(err_msg)
             
             values.update(secret_vals)
-            values["LOADED_SECRET_NAMES"].append(secret_key)
+            values["LOADED_SECRET_NAMES"].append(key_from_environ)
 
-            logger.info(f'Successfully loaded {len(secret_vals)} values from secret {secret_key}')
+            logger.info(f'Successfully loaded {len(secret_vals)} values from secret {key_from_environ}')
         else:
-            logger.info(f'Secret {secret_key} already loaded - skipping')
+            logger.info(f'Secret {key_from_environ} already loaded - skipping')
 
     if not s3_url and os.environ.get("SECRET_S3_URL"):
         s3_url = os.environ.get("SECRET_S3_URL")
