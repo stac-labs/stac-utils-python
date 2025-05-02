@@ -39,7 +39,7 @@ def secrets(
     secret_region = aws_region or os.environ.get("AWS_REGION") or "us-east-1"
 
     values = {}
-    values["LOADED_SECRET_NAMES"] = json.loads(os.environ.get("LOADED_SECRET_NAMES", []))
+    values["LOADED_SECRET_NAMES"] = json.loads(os.environ.get("LOADED_SECRET_NAMES", "[]"))
 
     # if not secret_name and os.environ.get("SECRET_NAME"):
     #     secret_name = os.environ.get("SECRET_NAME")
