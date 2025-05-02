@@ -5,6 +5,7 @@ import logging
 from unittest.mock import patch
 
 from .aws import get_secret, split_s3_url, load_from_s3
+from .listify import listify
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,7 @@ def secrets(
     secret_region = aws_region or os.environ.get("AWS_REGION") or "us-east-1"
 
     values = {}
-    values["LOADED_SECRET_NAMES"] = os.environ.get("LOADED_SECRET_NAMES", [])
+    values["LOADED_SECRET_NAMES"] = listify(os.environ.get("LOADED_SECRET_NAMES", []))
 
     # if not secret_name and os.environ.get("SECRET_NAME"):
     #     secret_name = os.environ.get("SECRET_NAME")
