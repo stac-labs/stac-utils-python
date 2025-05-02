@@ -41,15 +41,18 @@ def secrets(
     values = {}
     values["LOADED_SECRET_NAMES"] = os.environ.get("LOADED_SECRET_NAMES", [])
 
-    if not secret_name and os.environ.get("SECRET_NAME"):
-        secret_name = os.environ.get("SECRET_NAME")
-        # blank secret name in the context, so it doesn't get loaded a second time
-        # if we nest secrets
-        values["SECRET_NAME"] = ""
+    # if not secret_name and os.environ.get("SECRET_NAME"):
+    #     secret_name = os.environ.get("SECRET_NAME")
+    #     # blank secret name in the context, so it doesn't get loaded a second time
+    #     # if we nest secrets
+    #     values["SECRET_NAME"] = ""
 
     # Find secret names 
     pattern = re.compile(r'^SECRET_NAME_')
     secret_names = [key for key in os.environ if pattern.match(key)]
+
+    if "SECRET_NAME" in os.environ:
+        secret_names.insert(0, "SECRET_NAME")
 
     if secret_name:
         secret_names.insert(0, secret_name)
