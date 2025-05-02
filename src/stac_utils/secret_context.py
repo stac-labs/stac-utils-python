@@ -75,7 +75,7 @@ def secrets(
                 raise ValueError(err_msg)
             
             values.update(secret_vals)
-            values["LOADED_SECRET_NAMES"].append(key_from_environ)
+            values["LOADED_SECRET_NAMES"].append(secret_key)
 
             logger.info(f'Successfully loaded {len(secret_vals)} values from secret {key_from_environ}')
         else:
