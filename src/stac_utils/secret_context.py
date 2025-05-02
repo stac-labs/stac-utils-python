@@ -79,7 +79,7 @@ def secrets(
 
             logger.info(f'Successfully loaded {len(secret_vals)} values from secret {key_from_environ}')
         else:
-            logger.info(f'Secret {key_from_environ} already loaded - skipping')
+            logger.info(f'Secret {secret_key} already loaded - skipping')
 
     if not s3_url and os.environ.get("SECRET_S3_URL"):
         s3_url = os.environ.get("SECRET_S3_URL")
