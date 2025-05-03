@@ -6,7 +6,7 @@ import sys
 
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
-from google.api_core.exceptions import InternalServerError, NotFound
+from google.api_core.exceptions import InternalServerError, NotFound, ServiceUnavailable
 from google.api_core.retry import if_exception_type, Retry
 from google.cloud import storage, bigquery
 from google.cloud.bigquery.table import Table
@@ -23,7 +23,7 @@ except ImportError:
 
 from .listify import listify
 
-RETRY_EXCEPTIONS = [InternalServerError]
+RETRY_EXCEPTIONS = [InternalServerError, ServiceUnavailable]
 
 logging.basicConfig()
 
