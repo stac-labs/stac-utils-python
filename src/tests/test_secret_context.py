@@ -1,6 +1,6 @@
 import os
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import call, patch, MagicMock
 
 from src.stac_utils.secret_context import (
     secrets,
@@ -113,20 +113,50 @@ class TestSecretsContext(unittest.TestCase):
 
     @patch("src.stac_utils.secret_context.get_secret")
     def test_secrets_nested_aws_secret(self, mock_get_secret: MagicMock):
-        """Test that SECRET_NAME gets popped off os.environ once an AWS secret has been loaded"""
+        """Test that SECRET_NAME is only loaded once """
 
         mock_get_secret.return_value = {"FOO": "BAR"}
         test_dict = {"FOO": "SPAM"}
+
         with patch.dict(
             os.environ,
             values={"AWS_REGION": "us-east-1", "SECRET_NAME": "spam-credentials"},
         ):
             with secrets():
-                self.assertEqual(os.environ["SECRET_NAME"], "")
                 with secrets(dictionary=test_dict):
                     self.assertEqual("SPAM", os.environ["FOO"])
 
         mock_get_secret.assert_called_once_with("us-east-1", "spam-credentials")
+
+    @patch("src.stac_utils.secret_context.get_secret")
+    def test_secrets_overwriting_disallowed(self, mock_get_secret: MagicMock):
+        """Test that one secret cannot override an already set key """
+
+        mock_get_secret.return_value = {"FOO": "BAR"}
+        with patch.dict(
+            os.environ,
+            values={"AWS_REGION": "us-east-1", "SECRET_NAME": "spam-credentials"},
+        ):
+            with secrets():
+                self.assertEqual("[\"spam-credentials\"]", os.environ["LOADED_SECRET_NAMES"])
+                self.assertEqual("BAR", os.environ["FOO"])
+
+                with patch.dict(
+                    os.environ,
+                    values={"SECRET_NAME_AGAIN": "spam-credentials-again", "FOO": "BAR"},
+                ):
+                    mock_get_secret.return_value = {"FOO": "BAZ"}
+
+                    with self.assertRaises(ValueError) as context:
+                        with secrets():
+                            self.assertEqual("BAZ", os.environ["FOO"])
+
+                        self.assertIn("Loading secret spam-credentials-again would overwrite the following keys: {'FOO'}. Execution will stop to prevent any unwanted behavior.", str(context.exception))
+
+        mock_get_secret.assert_has_calls(calls=[
+            call.call("us-east-1", "spam-credentials"),
+            call.call("us-east-1", "spam-credentials-again"),
+        ])
 
     def test_secrets_null(self):
         """Test that null secrets don't break everything"""
