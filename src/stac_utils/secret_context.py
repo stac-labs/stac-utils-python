@@ -1,9 +1,12 @@
 import json
 import os
+import re
+import logging
 from unittest.mock import patch
 
 from .aws import get_secret, split_s3_url, load_from_s3
 
+logger = logging.getLogger(__name__)
 
 def secrets(
     file_name: str = None,
@@ -33,20 +36,60 @@ def secrets(
     :return:
     """
 
-    values = {}
-    if not secret_name and os.environ.get("SECRET_NAME"):
-        secret_name = os.environ.get("SECRET_NAME")
-        # blank secret name in the context, so it doesn't get loaded a second time
-        # if we nest secrets
-        values["SECRET_NAME"] = ""
+    secret_region = aws_region or os.environ.get("AWS_REGION") or "us-east-1"
 
-    if secret_name:
-        values.update(
-            get_secret(
-                aws_region or os.environ.get("AWS_REGION") or "us-east-1",
-                secret_name or os.environ["SECRET_NAME"],
-            )
+    values = {}
+    values["LOADED_SECRET_NAMES"] = json.loads(os.environ.get("LOADED_SECRET_NAMES", "[]"))
+
+    # Find secret names 
+    pattern = re.compile(r'^SECRET_NAME_')
+    secret_names = [key for key in os.environ if pattern.match(key)]
+
+    if secret_name and secret_name not in values["LOADED_SECRET_NAMES"]:
+        secret_vals = get_secret(
+            secret_region,
+            secret_name,
         )
+
+        overlapping_keys = (set(values.keys()) | set(os.environ.keys())) & set(secret_vals.keys())
+
+        if overlapping_keys: 
+            err_msg = f'Loading secret {secret_name} would overwrite the following keys: {overlapping_keys}. Execution will stop to prevent any unwanted behavior.'
+            logger.error(err_msg)
+            raise ValueError(err_msg)
+        
+        values.update(secret_vals)
+        values["LOADED_SECRET_NAMES"].append(secret_name)
+
+        logger.info(f'Successfully loaded {len(secret_vals)} values from secret {secret_name}')
+    elif "SECRET_NAME" in os.environ:
+        secret_names.insert(0, "SECRET_NAME")
+
+    for secret_key in secret_names:
+        key_from_environ = os.environ.get(secret_key)
+
+        if key_from_environ not in values["LOADED_SECRET_NAMES"]:
+            logger.info(f'Loading secret {key_from_environ} from region {secret_region}')
+
+            secret_vals = get_secret(
+                secret_region,
+                key_from_environ,
+            )
+
+            overlapping_keys = (set(values.keys()) | set(os.environ.keys())) & set(secret_vals.keys())
+
+            if overlapping_keys: 
+                err_msg = f'Loading secret {key_from_environ} would overwrite the following keys: {overlapping_keys}. Execution will stop to prevent any unwanted behavior.'
+                logger.error(err_msg)
+                raise ValueError(err_msg)
+            
+            values.update(secret_vals)
+            values["LOADED_SECRET_NAMES"].append(key_from_environ)
+
+            logger.info(f'Successfully loaded {len(secret_vals)} values from secret {key_from_environ}')
+        else:
+            logger.info(f'Secret {key_from_environ} already loaded - skipping')
+
     if not s3_url and os.environ.get("SECRET_S3_URL"):
         s3_url = os.environ.get("SECRET_S3_URL")
         # blank secret s3 url in the context, so it doesn't get loaded a second time
