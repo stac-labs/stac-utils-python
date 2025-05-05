@@ -129,6 +129,23 @@ class TestSecretsContext(unittest.TestCase):
         mock_get_secret.assert_called_once_with("us-east-1", "spam-credentials")
 
     @patch("src.stac_utils.secret_context.get_secret")
+    def test_secrets_overwriting_disallowed_in_first_load(self, mock_get_secret: MagicMock):
+        """Test that one secret cannot override an already set key """
+
+        mock_get_secret.return_value = {"FOO": "BAR"}
+        with patch.dict(
+            os.environ,
+            values={"AWS_REGION": "us-east-1", "FOO": "BAZ"},
+        ):
+            with self.assertRaises(ValueError) as context:
+                with secrets(secret_name="spam-credentials-secret"):
+                    self.assertEqual("BAZ", os.environ["FOO"])
+
+                self.assertIn("Loading secret spam-credentials-secret would overwrite the following keys: {'FOO'}. Execution will stop to prevent any unwanted behavior.", str(context.exception))
+
+        mock_get_secret.assert_called_once_with("us-east-1", "spam-credentials-secret")
+
+    @patch("src.stac_utils.secret_context.get_secret")
     def test_secrets_overwriting_disallowed(self, mock_get_secret: MagicMock):
         """Test that one secret cannot override an already set key """
 
