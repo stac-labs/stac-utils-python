@@ -226,7 +226,7 @@ class TestActionNetworkClient(unittest.TestCase):
         mock_get.assert_not_called()
 
     @patch.object(ActionNetworkClient, "get")
-    def test_fetch_related_people_link_info_none(self, mock_get):
+    def test_fetch_related_people_href_empty_or_missing_correct_endpoint(self, mock_get):
         """Test that fetch_related_people skips if href key is missing or doesn't contain 'people/'."""
         resource = {
             "_links": {
