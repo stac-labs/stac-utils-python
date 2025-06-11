@@ -11,7 +11,7 @@ def normalize_email(email) -> str:
     :return: email
     """
     # Set regex pattern
-    html_pattern = re.compile("[\<\>]+|&#")
+    html_pattern = re.compile(r"[\<\>]+|&#")
 
     # Handle NoneType
     email = email or ""
@@ -27,7 +27,7 @@ def normalize_email(email) -> str:
         # Check that the email address is valid.
         validation = validate_email(email)
         # Return the normalized form of the email address
-        email = validation.email
+        email = validation.normalized
     except EmailNotValidError:
         email = ""
     finally:
