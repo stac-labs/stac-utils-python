@@ -50,6 +50,11 @@ class TestActionNetworkClient(unittest.TestCase):
         output = self.test_client.extract_action_network_id(identifiers)
         self.assertEqual(output, "foo12bar")
 
+        # test for empty string when no Action Network ID
+        identifiers = ["not_an:123aabb", "random_id:120930a"]
+        output = self.test_client.extract_action_network_id(identifiers)
+        self.assertEqual(output, "")
+
     def test_create_people_dataframe(self):
         """Test that create_people_dataframe function correctly extracts/maps all fields from person record into
         the resultant DataFrame."""
