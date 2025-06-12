@@ -148,7 +148,7 @@ class ActionNetworkClient(HTTPClient):
 
         :param resource: the resource dict containing `_links`
         :param person_link_keys: optional list of keys in `_links` that indicate person links;
-                                 defaults to ['osdi:person'] but can include others in the list like 'osdi:guest_person'
+                                 defaults to ['osdi:person'] but can include others if relevant (i.e. osdi:creator)
         :return: list of person dicts fetched
         """
         # default to 'osdi:person'

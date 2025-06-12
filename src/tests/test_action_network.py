@@ -160,7 +160,7 @@ class TestActionNetworkClient(unittest.TestCase):
                 "osdi:person": {
                     "href": "https://actionnetwork.org/api/v2/people/12ab234"
                 },
-                "osdi:guest_person": {
+                "osdi:creator": {
                     "href": "https://actionnetwork.org/api/v2/people/182awe"
                 },
             }
@@ -168,7 +168,7 @@ class TestActionNetworkClient(unittest.TestCase):
 
         # get output of function
         people = self.test_client.fetch_related_people(
-            resource, person_link_keys=["osdi:person", "osdi:guest_person"]
+            resource, person_link_keys=["osdi:person", "osdi:creator"]
         )
 
         # check for GET request
@@ -231,13 +231,13 @@ class TestActionNetworkClient(unittest.TestCase):
         resource = {
             "_links": {
                 "osdi:person": {"href": None},
-                "osdi:guest_person": {
+                "osdi:creator": {
                     "href": "https://actionnetwork.org/api/v2/superfake/spam"
                 },
             }
         }
         people = self.test_client.fetch_related_people(
-            resource, person_link_keys=["osdi:person", "osdi:guest_person"]
+            resource, person_link_keys=["osdi:person", "osdi:creator"]
         )
         self.assertEqual(people, [])
         mock_get.assert_not_called()
