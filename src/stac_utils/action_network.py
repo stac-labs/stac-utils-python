@@ -102,7 +102,8 @@ class ActionNetworkClient(HTTPClient):
         self, base_endpoint: str, embedded_key: str, max_pages: int = None, **kwargs
     ) -> list[dict]:
         """
-        Generic pagination helper for Action Network endpoints that return the "_embedded" resource (which they all do)
+        Generic pagination helper for Action Network endpoints that return the "_embedded" resource, which all endpoints
+        that are collections of items (i.e. forms, events, submissions, etc.) do
 
         :param base_endpoint: the endpoint to paginate (i.e "forms" )
         :param embedded_key: the expected key inside the "_embedded" object
