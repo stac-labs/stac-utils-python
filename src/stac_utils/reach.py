@@ -20,6 +20,7 @@ class ReachClient(HTTPClient):
     """
 
     base_url = "https://api.reach.vote/api/v1"
+    actual_base_url = "https://api.reach.vote"
 
     def __init__(self, api_user: str = None, api_password: str = None, *args, **kwargs):
         self.api_user = api_user or os.environ["REACH_API_USER"]
@@ -35,7 +36,7 @@ class ReachClient(HTTPClient):
         }
         endpoint = "/oauth/token"
         session = requests.Session()
-        response = session.post(self.base_url + endpoint, data=body)
+        response = session.post(self.actual_base_url + endpoint, data=body)
         self.access_token = json.loads(response.text)["access_token"]
 
     def create_session(self) -> requests.Session:

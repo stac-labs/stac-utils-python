@@ -41,7 +41,7 @@ class TestReachClient(unittest.TestCase):
         }
         endpoint = "/oauth/token"
         mock_session.return_value.post.assert_called_once_with(
-            test_client.base_url + endpoint, data=test_body
+            test_client.actual_base_url + endpoint, data=test_body
         )
 
     def test_create_session(self):
