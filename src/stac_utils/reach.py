@@ -22,7 +22,6 @@ class ReachClient(HTTPClient):
     base_url = "https://api.reach.vote/api/v1"
     actual_base_url = "https://api.reach.vote"
 
-
     def __init__(self, api_user: str = None, api_password: str = None, *args, **kwargs):
         self.api_user = api_user or os.environ["REACH_API_USER"]
         self.api_password = api_password or os.environ["REACH_API_PASSWORD"]
