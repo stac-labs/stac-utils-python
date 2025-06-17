@@ -39,9 +39,10 @@ class TestReachClient(unittest.TestCase):
             "username": test_client.api_user,
             "password": test_client.api_password,
         }
+        actual_base_url = "https://api.reach.vote"
         endpoint = "/oauth/token"
         mock_session.return_value.post.assert_called_once_with(
-            test_client.base_url + endpoint, data=test_body
+            actual_base_url + endpoint, data=test_body
         )
 
     def test_create_session(self):
