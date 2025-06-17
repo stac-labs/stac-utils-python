@@ -47,7 +47,11 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">stac_utils.action_network</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#stac_utils.action_network.ActionNetworkClient"><code class="docutils literal notranslate"><span class="pre">ActionNetworkClient</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#stac_utils.action_network.ActionNetworkClient.check_response_for_rate_limit"><code class="docutils literal notranslate"><span class="pre">ActionNetworkClient.check_response_for_rate_limit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.action_network.ActionNetworkClient.create_people_dataframe"><code class="docutils literal notranslate"><span class="pre">ActionNetworkClient.create_people_dataframe()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stac_utils.action_network.ActionNetworkClient.create_session"><code class="docutils literal notranslate"><span class="pre">ActionNetworkClient.create_session()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.action_network.ActionNetworkClient.extract_action_network_id"><code class="docutils literal notranslate"><span class="pre">ActionNetworkClient.extract_action_network_id()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.action_network.ActionNetworkClient.fetch_related_people"><code class="docutils literal notranslate"><span class="pre">ActionNetworkClient.fetch_related_people()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.action_network.ActionNetworkClient.paginate_endpoint"><code class="docutils literal notranslate"><span class="pre">ActionNetworkClient.paginate_endpoint()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stac_utils.action_network.ActionNetworkClient.transform_response"><code class="docutils literal notranslate"><span class="pre">ActionNetworkClient.transform_response()</span></code></a></li>
 </ul>
 </li>
@@ -110,9 +114,104 @@
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.action_network.ActionNetworkClient.create_people_dataframe">
+<span class="sig-name descname"><span class="pre">create_people_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">people_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#stac_utils.action_network.ActionNetworkClient.create_people_dataframe" title="Permalink to this definition"></a></dt>
+<dd><p>Given an iterable of Action Network people from the Action Network people endpoint, returns a pandas dataframe
+with fields:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>action_network_id</p></li>
+<li><p>first_name</p></li>
+<li><p>last_name</p></li>
+<li><p>email_address</p></li>
+<li><p>phone</p></li>
+<li><p>zip5</p></li>
+<li><p>street_name</p></li>
+<li><p>city</p></li>
+<li><p>state</p></li>
+</ul>
+</div></blockquote>
+<p>Refer to <a class="reference external" href="https://actionnetwork.org/docs/v2/people">https://actionnetwork.org/docs/v2/people</a> for more information</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>people_data</strong> – A list of people dictionaries returned by the Action Network API, from the people endpoint</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Pandas dataframe with person fields</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="stac_utils.action_network.ActionNetworkClient.create_session">
 <span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Session</span></span></span><a class="headerlink" href="#stac_utils.action_network.ActionNetworkClient.create_session" title="Permalink to this definition"></a></dt>
 <dd><p>Creates ActionNetwork session</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.action_network.ActionNetworkClient.extract_action_network_id">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">extract_action_network_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifiers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#stac_utils.action_network.ActionNetworkClient.extract_action_network_id" title="Permalink to this definition"></a></dt>
+<dd><p>Action Network may have a list of identifiers for a given person.
+This function grabs the Action Network ID.
+Refer to <a class="reference external" href="https://actionnetwork.org/docs/v2/">https://actionnetwork.org/docs/v2/</a> for more information</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>identifiers</strong> – A list of Action Network identifier strings associated with a person.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The extracted Action Network ID, or an empty string if an Action Network ID is not found.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.action_network.ActionNetworkClient.fetch_related_people">
+<span class="sig-name descname"><span class="pre">fetch_related_people</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">person_link_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stac_utils.action_network.ActionNetworkClient.fetch_related_people" title="Permalink to this definition"></a></dt>
+<dd><p>Given a resource dict (i.e. a submission or signup), fetches all related person records
+from the Action Network API by following links in the <cite>_links</cite> section.</p>
+<p>Note this will only work for Action Network resources that have a person reference in the _links section</p>
+<dl class="simple">
+<dt>When using this function, please add error handling in the caller function, for action_network_ids not found</dt><dd><ul class="simple">
+<li><p>requests.exceptions.HTTPError: 404 Client Error</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resource</strong> – the resource dict containing <cite>_links</cite></p></li>
+<li><p><strong>person_link_keys</strong> – optional list of keys in <cite>_links</cite> that indicate person links;
+defaults to [‘osdi:person’] but can include others if relevant (i.e. osdi:creator)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of person dicts fetched</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.action_network.ActionNetworkClient.paginate_endpoint">
+<span class="sig-name descname"><span class="pre">paginate_endpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_endpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedded_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_pages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stac_utils.action_network.ActionNetworkClient.paginate_endpoint" title="Permalink to this definition"></a></dt>
+<dd><p>Generic pagination helper for Action Network endpoints that return the “_embedded” resource, which all endpoints
+that are collections of items (i.e. forms, events, submissions, etc.) do</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_endpoint</strong> – the endpoint to paginate (i.e “forms” )</p></li>
+<li><p><strong>embedded_key</strong> – <p>the expected key inside the “_embedded” object
+(i.e “osdi:submissions” for base_endpoint “forms/{form_id}/submissions”</p>
+<blockquote>
+<div><p>or   “osdi:forms” for base_endpoint “forms”)</p>
+</div></blockquote>
+</p></li>
+<li><p><strong>max_pages</strong> – optional parameter to limit the number of pages (can be used for testing)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of embedded items from all pages</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
