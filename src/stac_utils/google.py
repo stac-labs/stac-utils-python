@@ -50,8 +50,8 @@ def get_credentials(
         try:
             service_account_blob = json.loads(os.environ[service_account_env_name])
         except (json.JSONDecodeError, KeyError) as e:
-            print("Service account did not load correctly")
-            print(e)
+            logger.error(f"Service account did not load correctly from environment named {service_account_env_name}")
+            logger.error(e)
             return None
 
     if isinstance(scopes, str):
