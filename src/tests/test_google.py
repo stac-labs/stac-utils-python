@@ -63,7 +63,10 @@ class TestGoogle(unittest.TestCase):
     def test_get_credentials_missing(self):
         """Test credentials returns None because no credentials were provided"""
 
-        self.assertIsNone(get_credentials(scopes="foo"))
+        with self.assertLogs(None, level="INFO") as cm:
+            self.assertIsNone(get_credentials(scopes="foo"))
+
+        self.assertIn('ERROR:src.stac_utils.google:Service account did not load correctly from environment named SERVICE_ACCOUNT', cm.output[0])
 
     @patch("src.stac_utils.google.get_credentials")
     def test_get_client(self, mock_get_credentials: MagicMock):
