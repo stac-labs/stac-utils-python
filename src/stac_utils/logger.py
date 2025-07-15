@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timezone
 import json
 import logging
 import os
@@ -42,7 +42,7 @@ class StacSysLogFormatter(logging.Formatter):
 class StacJsonFormatter(logging.Formatter):
     def format(self, record):
 
-        log_time = datetime.datetime.fromtimestamp(record.created, datetime.timezone.utc).isoformat()
+        log_time = datetime.fromtimestamp(record.created, timezone.utc).isoformat()
 
         log_record = {
             'timestamp': log_time,
@@ -73,9 +73,24 @@ class StacLogFilter(logging.Filter):
     def filter(self, record) -> bool:
         setattr(record, self.field_name, os.getenv(self.env_var_name, self.default))
         return True
+    
+class StateLogFilter(StacLogFilter):
+
+    def __init__(self):
+        super().__init__(env_var_name = "STATE", default = "XX")
+
+    def filter(self, record) -> bool:
+        state = os.getenv(self.env_var_name, self.default)
+
+        setattr(record, self.field_name, state.upper() if state else self.default)
+        return True
 
 
-def configure_logger(stage: str = None, formatter: logging.Formatter = None) -> logging.Logger:
+def configure_logger(
+        stage: str = None, 
+        sys_formatter: StacSysLogFormatter = None, 
+        json_Formatter: StacJsonFormatter = None
+    ) -> logging.Logger:
 
     log_stage = stage or os.getenv('STAGE', 'dev').lower()
 
@@ -85,32 +100,26 @@ def configure_logger(stage: str = None, formatter: logging.Formatter = None) -> 
 
     logger.handlers.clear()
 
-    if not formatter:
-            
-        if log_stage == "production":
-            formatter = StacJsonFormatter()
-        else:
-            formatter = StacSysLogFormatter(
+    if log_stage == "production":
+        formatter = json_Formatter or StacJsonFormatter()
+    else:
+        formatter = sys_formatter or StacSysLogFormatter(
                 default_fmt="",
                 datefmt='%H:%M:%S.%f'
             )
-
+        
     if not logger.handlers:
         console_handler = logging.StreamHandler()
         console_handler.setFormatter(formatter)
 
-        console_handler.addFilter(StacLogFilter(env_var_name = "STATE", default = 'XX'))
+        console_handler.addFilter(StateLogFilter())
 
         logger.addHandler(console_handler)
 
     return logger
 
 
-def get_default_logger() -> logging.Logger:
-    return configure_logger()
-
-
 if __name__ == "__main__":
-    logger = get_default_logger()
+    logger = configure_logger()
 
     logger.info('testing this thing')    
