@@ -20,7 +20,11 @@ class StacSysLogFormatter(logging.Formatter):
 
     def formatTime(self, record, datefmt=None):
         ct = datetime.fromtimestamp(record.created)
-        return ct.strftime(datefmt or self.datefmt or "%Y-%m-%d %H:%M:%S.%3f")[:-3]
+
+        if datefmt or self.datefmt:
+            return ct.strftime(datefmt or self.datefmt)
+        else:
+            return ct.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
     
     def format(self, record):
 
