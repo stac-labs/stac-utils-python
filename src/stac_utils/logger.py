@@ -92,7 +92,8 @@ class StateLogFilter(StacLogFilter):
 def configure_logger(
         stage: str = None, 
         sys_formatter: StacSysLogFormatter = None, 
-        json_Formatter: StacJsonFormatter = None
+        json_Formatter: StacJsonFormatter = None,
+        filters: list[StacLogFilter] = []
     ) -> logging.Logger:
 
     log_stage = stage or os.getenv('STAGE', 'dev').lower()
@@ -114,6 +115,9 @@ def configure_logger(
         console_handler.setFormatter(formatter)
 
         console_handler.addFilter(StateLogFilter())
+
+        for filter in filters:
+            console_handler.addFilter(filter)
 
         logger.addHandler(console_handler)
 
