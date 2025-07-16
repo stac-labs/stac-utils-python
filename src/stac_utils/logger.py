@@ -1,3 +1,24 @@
+"""
+Custom logging utilities for stac code.
+
+The module includes:
+- StacSysLogFormatter:  Human-readable console logging with state information
+- StacJsonFormatter:    Structured JSON logging, intended for DataDog
+- StacLogFilter:        Filter for adding environment variables to log records
+- StateLogFilter:       Specialized filter for adding state information to logs
+- configure_logger:     Setting up loggers with appropriate formatters
+
+Example:
+    Basic usage:
+    >>> logger = configure_logger()
+    >>> logger.info("Processing a log item")
+    
+    Production usage:
+    >>> assumes os.getenv('STAGE') returns 'production'
+    >>> logger = configure_logger()
+    >>> logger.info("DataDog logs updated")
+"""
+
 from datetime import datetime, timezone
 import json
 import logging
@@ -13,6 +34,9 @@ STANDARD_LOG_RECORD_FIELDS = [
 ]
 
 class StacSysLogFormatter(logging.Formatter):
+    """
+        Logging formatter ideal for producing human readable logs to sys.out including a level name, state (if provided), and message.
+    """
     def __init__(self, default_fmt, datefmt=None):
         super().__init__(fmt=default_fmt, datefmt=datefmt, style='{')
         self.default_fmt = default_fmt
@@ -27,7 +51,6 @@ class StacSysLogFormatter(logging.Formatter):
             return ct.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
     
     def format(self, record):
-
         record.asctime = self.formatTime(record, self.datefmt)
         record.message = record.getMessage()
 
@@ -44,6 +67,10 @@ class StacSysLogFormatter(logging.Formatter):
 
 
 class StacJsonFormatter(logging.Formatter):
+    """
+        Logging formatter ideal for producing JSON parsable logs including state and some stac-specific fields. Intended to be useful for DataDog log ingestion and parsing.
+    """
+        
     def format(self, record):
 
         log_time = datetime.fromtimestamp(record.created, timezone.utc).isoformat()
@@ -70,6 +97,9 @@ class StacJsonFormatter(logging.Formatter):
     
 
 class StacLogFilter(logging.Filter):
+    """
+        Generic filter to pull an environment variable into logs for use.
+    """
 
     def __init__(self, env_var_name, field_name = None, default = "unknown"):
         super().__init__()
@@ -82,6 +112,9 @@ class StacLogFilter(logging.Filter):
         return True
     
 class StateLogFilter(StacLogFilter):
+    """
+        Extends StacLogFilter to pull STATE environment information into logs for use. 
+    """
 
     def __init__(self):
         super().__init__(env_var_name = "STATE", default = "XX")
@@ -99,6 +132,22 @@ def configure_logger(
         json_Formatter: StacJsonFormatter = None,
         filters: list[StacLogFilter] = []
     ) -> logging.Logger:
+    """
+        Configure and return a logger with appropriate formatters and filters.
+        
+        Args:
+            stage (str, optional): Deployment stage ("production" or other).
+                if None, reads from STAGE environment variable (default: "dev")
+            sys_formatter (StacSysLogFormatter, optional): Custom system formatter.
+                if None, creates default formatter for non-production stages
+            json_Formatter (StacJsonFormatter, optional): Custom JSON formatter.
+                if None, creates default formatter for production stage
+            filters (list[StacLogFilter], optional): Additional filters to apply.
+                StateLogFilter is always added automatically
+        
+        Returns:
+            logging.Logger: Configured logger instance
+    """
 
     log_stage = stage or os.getenv('STAGE', 'dev').lower()
 
