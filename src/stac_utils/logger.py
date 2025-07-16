@@ -48,9 +48,12 @@ class StacJsonFormatter(logging.Formatter):
             'timestamp': log_time,
             'level': record.levelname,
             'message': record.getMessage(),
-            'filename': record.filename,
-            'line': record.lineno,
-            'function': record.funcName,
+            'stac': {
+                'filename': record.filename,
+                'line': record.lineno,
+                'function': record.funcName,
+                'message': record.getMessage(),
+            },
             'state': record.state
         }
 
@@ -97,8 +100,6 @@ def configure_logger(
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
     logger.propagate = False 
-
-    logger.handlers.clear()
 
     if log_stage == "production":
         formatter = json_Formatter or StacJsonFormatter()
