@@ -126,9 +126,3 @@ def configure_logger(
         logger.addHandler(console_handler)
 
     return logger
-
-
-if __name__ == "__main__":
-    logger = configure_logger()
-
-    logger.info('testing this thing')    
