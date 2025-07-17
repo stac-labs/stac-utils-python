@@ -18,6 +18,7 @@ Welcome to stac-utils-python's documentation!
    stac_utils.http
    stac_utils.jira
    stac_utils.listify
+   stac_utils.logger
    stac_utils.ngpvan
    stac_utils.normalize
    stac_utils.pandas_utils

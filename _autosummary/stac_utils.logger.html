@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>stac_utils.logger &mdash; stac-utils-python 0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="stac_utils.ngpvan" href="stac_utils.ngpvan.html" />
+    <link rel="prev" title="stac_utils.listify" href="stac_utils.listify.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            stac-utils-python
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.action_network.html">stac_utils.action_network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.aws.html">aws</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.benchmark.html">stac_utils.benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.bsd.html">stac_utils.bsd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.convert.html">convert</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.eid.html">eid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.email.html">stac_utils.email</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.google.html">stac_utils.google</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.http.html">http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.jira.html">stac_utils.jira</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.listify.html">stac_utils.listify</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">stac_utils.logger</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.logger.StacJsonFormatter"><code class="docutils literal notranslate"><span class="pre">StacJsonFormatter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.logger.StacJsonFormatter.format"><code class="docutils literal notranslate"><span class="pre">StacJsonFormatter.format()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.logger.StacLogFilter"><code class="docutils literal notranslate"><span class="pre">StacLogFilter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.logger.StacLogFilter.filter"><code class="docutils literal notranslate"><span class="pre">StacLogFilter.filter()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.logger.StacSysLogFormatter"><code class="docutils literal notranslate"><span class="pre">StacSysLogFormatter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.logger.StacSysLogFormatter.format"><code class="docutils literal notranslate"><span class="pre">StacSysLogFormatter.format()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.logger.StacSysLogFormatter.formatTime"><code class="docutils literal notranslate"><span class="pre">StacSysLogFormatter.formatTime()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.logger.StateLogFilter"><code class="docutils literal notranslate"><span class="pre">StateLogFilter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.logger.StateLogFilter.filter"><code class="docutils literal notranslate"><span class="pre">StateLogFilter.filter()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.logger.configure_logger"><code class="docutils literal notranslate"><span class="pre">configure_logger()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.ngpvan.html">stac_utils.ngpvan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.normalize.html">stac_utils.normalize</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.pandas_utils.html">stac_utils.pandas_utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.reach.html">stac_utils.reach</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.secret_context.html">secret_context</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.secret_factory.html">secret_factory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.ticker_request.html">stac_utils.ticker_request</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.time.html">stac_utils.time</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.truthy.html">stac_utils.truthy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">stac-utils-python</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">stac_utils.logger</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_autosummary/stac_utils.logger.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-stac_utils.logger">
+<span id="stac-utils-logger"></span><h1>stac_utils.logger<a class="headerlink" href="#module-stac_utils.logger" title="Permalink to this heading"></a></h1>
+<p>Custom logging utilities for stac code.</p>
+<p>The module includes:
+- StacSysLogFormatter:  Human-readable console logging with state information
+- StacJsonFormatter:    Structured JSON logging, intended for DataDog
+- StacLogFilter:        Filter for adding environment variables to log records
+- StateLogFilter:       Specialized filter for adding state information to logs
+- configure_logger:     Setting up loggers with appropriate formatters</p>
+<p class="rubric">Example</p>
+<p>Basic usage:
+&gt;&gt;&gt; logger = configure_logger()
+&gt;&gt;&gt; logger.info(“Processing a log item”)</p>
+<p>Production usage:
+&gt;&gt;&gt; assumes os.getenv(‘STAGE’) returns ‘production’
+&gt;&gt;&gt; logger = configure_logger()
+&gt;&gt;&gt; logger.info(“DataDog logs updated”)</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="stac_utils.logger.StacJsonFormatter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stac_utils.logger.</span></span><span class="sig-name descname"><span class="pre">StacJsonFormatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datefmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.logger.StacJsonFormatter" title="Permalink to this definition"></a></dt>
+<dd><p>Logging formatter ideal for producing JSON parsable logs including state and some stac-specific fields. Intended to be useful for DataDog log ingestion and parsing.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.logger.StacJsonFormatter.format">
+<span class="sig-name descname"><span class="pre">format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.logger.StacJsonFormatter.format" title="Permalink to this definition"></a></dt>
+<dd><p>Format the specified record as text.</p>
+<p>The record’s attribute dictionary is used as the operand to a
+string formatting operation which yields the returned string.
+Before formatting the dictionary, a couple of preparatory steps
+are carried out. The message attribute of the record is computed
+using LogRecord.getMessage(). If the formatting string uses the
+time (as determined by a call to usesTime(), formatTime() is
+called to format the event time. If there is exception information,
+it is formatted using formatException() and appended to the message.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stac_utils.logger.StacLogFilter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stac_utils.logger.</span></span><span class="sig-name descname"><span class="pre">StacLogFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env_var_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'unknown'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.logger.StacLogFilter" title="Permalink to this definition"></a></dt>
+<dd><p>Generic filter to pull an environment variable into logs for use.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.logger.StacLogFilter.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#stac_utils.logger.StacLogFilter.filter" title="Permalink to this definition"></a></dt>
+<dd><p>Determine if the specified record is to be logged.</p>
+<p>Returns True if the record should be logged, or False otherwise.
+If deemed appropriate, the record may be modified in-place.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stac_utils.logger.StacSysLogFormatter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stac_utils.logger.</span></span><span class="sig-name descname"><span class="pre">StacSysLogFormatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">default_fmt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datefmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.logger.StacSysLogFormatter" title="Permalink to this definition"></a></dt>
+<dd><p>Logging formatter ideal for producing human readable logs to sys.out including a level name, state (if provided), and message.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.logger.StacSysLogFormatter.format">
+<span class="sig-name descname"><span class="pre">format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.logger.StacSysLogFormatter.format" title="Permalink to this definition"></a></dt>
+<dd><p>Format the specified record as text.</p>
+<p>The record’s attribute dictionary is used as the operand to a
+string formatting operation which yields the returned string.
+Before formatting the dictionary, a couple of preparatory steps
+are carried out. The message attribute of the record is computed
+using LogRecord.getMessage(). If the formatting string uses the
+time (as determined by a call to usesTime(), formatTime() is
+called to format the event time. If there is exception information,
+it is formatted using formatException() and appended to the message.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.logger.StacSysLogFormatter.formatTime">
+<span class="sig-name descname"><span class="pre">formatTime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datefmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.logger.StacSysLogFormatter.formatTime" title="Permalink to this definition"></a></dt>
+<dd><p>Return the creation time of the specified LogRecord as formatted text.</p>
+<p>This method should be called from format() by a formatter which
+wants to make use of a formatted time. This method can be overridden
+in formatters to provide for any specific requirement, but the
+basic behaviour is as follows: if datefmt (a string) is specified,
+it is used with time.strftime() to format the creation time of the
+record. Otherwise, an ISO8601-like (or RFC 3339-like) format is used.
+The resulting string is returned. This function uses a user-configurable
+function to convert the creation time to a tuple. By default,
+time.localtime() is used; to change this for a particular formatter
+instance, set the ‘converter’ attribute to a function with the same
+signature as time.localtime() or time.gmtime(). To change it for all
+formatters, for example if you want all logging times to be shown in GMT,
+set the ‘converter’ attribute in the Formatter class.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="stac_utils.logger.StateLogFilter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stac_utils.logger.</span></span><span class="sig-name descname"><span class="pre">StateLogFilter</span></span><a class="headerlink" href="#stac_utils.logger.StateLogFilter" title="Permalink to this definition"></a></dt>
+<dd><p>Extends StacLogFilter to pull STATE environment information into logs for use.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.logger.StateLogFilter.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#stac_utils.logger.StateLogFilter.filter" title="Permalink to this definition"></a></dt>
+<dd><p>Determine if the specified record is to be logged.</p>
+<p>Returns True if the record should be logged, or False otherwise.
+If deemed appropriate, the record may be modified in-place.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stac_utils.logger.configure_logger">
+<span class="sig-prename descclassname"><span class="pre">stac_utils.logger.</span></span><span class="sig-name descname"><span class="pre">configure_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sys_formatter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#stac_utils.logger.StacSysLogFormatter" title="stac_utils.logger.StacSysLogFormatter"><span class="pre">StacSysLogFormatter</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">json_Formatter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#stac_utils.logger.StacJsonFormatter" title="stac_utils.logger.StacJsonFormatter"><span class="pre">StacJsonFormatter</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#stac_utils.logger.StacLogFilter" title="stac_utils.logger.StacLogFilter"><span class="pre">stac_utils.logger.StacLogFilter</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Logger</span></span></span><a class="headerlink" href="#stac_utils.logger.configure_logger" title="Permalink to this definition"></a></dt>
+<dd><p>Configure and return a logger with appropriate formatters and filters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stage</strong> (<em>str</em><em>, </em><em>optional</em>) – Deployment stage (“production” or other).
+if None, reads from STAGE environment variable (default: “dev”)</p></li>
+<li><p><strong>sys_formatter</strong> (<a class="reference internal" href="#stac_utils.logger.StacSysLogFormatter" title="stac_utils.logger.StacSysLogFormatter"><em>StacSysLogFormatter</em></a><em>, </em><em>optional</em>) – Custom system formatter.
+if None, creates default formatter for non-production stages</p></li>
+<li><p><strong>json_Formatter</strong> (<a class="reference internal" href="#stac_utils.logger.StacJsonFormatter" title="stac_utils.logger.StacJsonFormatter"><em>StacJsonFormatter</em></a><em>, </em><em>optional</em>) – Custom JSON formatter.
+if None, creates default formatter for production stage</p></li>
+<li><p><strong>filters</strong> (<em>list</em><em>[</em><a class="reference internal" href="#stac_utils.logger.StacLogFilter" title="stac_utils.logger.StacLogFilter"><em>StacLogFilter</em></a><em>]</em><em>, </em><em>optional</em>) – Additional filters to apply.
+StateLogFilter is always added automatically</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Configured logger instance</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>logging.Logger</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="stac_utils.listify.html" class="btn btn-neutral float-left" title="stac_utils.listify" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="stac_utils.ngpvan.html" class="btn btn-neutral float-right" title="stac_utils.ngpvan" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Stac Labs.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
