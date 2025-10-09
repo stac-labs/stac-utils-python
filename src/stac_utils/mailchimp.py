@@ -384,7 +384,7 @@ class MailChimpClient(HTTPClient):
 
         # Validate required fields
         if not (addr1 and city and state and zip):
-            raise ValueError(f"Address missing required fields")
+            raise ValueError("Address missing required fields")
 
         # Build final payload: include optionals only if non-empty
         val_formatted = {"addr1": addr1, "city": city, "state": state, "zip": zip}
