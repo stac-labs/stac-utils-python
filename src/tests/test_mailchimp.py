@@ -1,7 +1,7 @@
 import os
 import json
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch, MagicMock
 from src.stac_utils.mailchimp import MailChimpClient, logger
 
 
@@ -344,3 +344,43 @@ class TestMailChimpClient(unittest.TestCase):
         mock_put.assert_not_called()
         # no transform_response call for upsert should have occurred
         mock_transform.assert_not_called()
+
+    @patch.object(MailChimpClient, "paginate_endpoint")
+    def test_get_merge_fields_data_type_map_success(self, mock_paginate):
+        """Test that get_merge_fields_data_type_map returns correct mapping on success"""
+        mock_paginate.return_value = [
+            {"tag": "FNAME", "type": "text"},
+            {"tag": "LNAME", "type": "text"},
+            {"tag": "VAN_ID", "type": "number"},
+        ]
+
+        list_id = "98798798h"
+
+        result = self.test_client.get_merge_fields_data_type_map(list_id)
+
+        mock_paginate.assert_called_once_with(
+            base_endpoint=f"lists/{list_id}/merge-fields",
+            data_key="merge_fields"
+        )
+
+        expected_map = {"FNAME": "text", "LNAME": "text", "VAN_ID": "number"}
+        self.assertEqual(result, expected_map)
+
+    @patch.object(MailChimpClient, "paginate_endpoint")
+    def test_get_merge_fields_data_type_map_fail(self, mock_paginate):
+        """Test that get_merge_fields_data_type_map returns empty dict fail"""
+
+        # paginate_endpoint returns no data
+        mock_paginate.return_value = [{}]
+
+        list_id = "zzzz"
+        result = self.test_client.get_merge_fields_data_type_map(list_id)
+
+        # paginate_endpoint called once
+        mock_paginate.assert_called_once_with(
+            base_endpoint=f"lists/{list_id}/merge-fields",
+            data_key="merge_fields"
+        )
+
+        # empty dict for result
+        self.assertEqual(result, {})
