@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 class MailChimpClient(HTTPClient):
     """
-    Mailchimp Utils for working with the Mailchimp API
+    MailChimp Utils for working with the MailChimp API
     """
 
     def __init__(self, api_key: str = None, *args, **kwargs):
@@ -30,7 +30,7 @@ class MailChimpClient(HTTPClient):
         super().__init__(*args, **kwargs)
 
     def create_session(self) -> requests.Session:
-        """Creates Mailchimp session"""
+        """Creates MailChimp session"""
         session = requests.Session()
         #  https://mailchimp.com/developer/marketing/docs/fundamentals/#api-structure
         session.auth = ("anystring", self.api_key)
@@ -62,7 +62,7 @@ class MailChimpClient(HTTPClient):
         **kwargs,
     ) -> requests.Response:
         """
-        This method handles Mailchimp 429 (rate limit / Too Many Requests) responses with binary exponential backoff
+        This method handles MailChimp 429 (rate limit / Too Many Requests) responses with binary exponential backoff
 
         Retries up to max_retries times, applying a random delay between 0 and (2^(i+1)-1) seconds on each attempt
 
@@ -121,7 +121,7 @@ class MailChimpClient(HTTPClient):
         **kwargs,
     ) -> list[dict]:
         """
-        Generic pagination helper for Mailchimp endpoints that return
+        Generic pagination helper for MailChimp endpoints that return
         collections (i.e., lists, members, campaigns, etc.).
 
         :param base_endpoint: the endpoint to paginate (i.e "lists" or "lists/{list_id}/members").
@@ -181,7 +181,7 @@ class MailChimpClient(HTTPClient):
     @staticmethod
     def get_subscriber_hash(email: str) -> str:
         """
-        Return the Mailchimp subscriber hash for a given email.
+        Return the MailChimp subscriber hash for a given email.
         This is the unique identifier of the member, scoped to a given audience_id (list_id)
 
         :param email: the email to get the subscriber hash (MailChimp member id) for
@@ -345,7 +345,7 @@ class MailChimpClient(HTTPClient):
 
             data_type = merge_fields_data_type_map.get(tag)
 
-            # raise error if unknown tags (all tags should be valid)
+            # raise error if unknown merge tags (all merge tags should be valid)
             if data_type is None:
                 raise KeyError(f"Unknown merge tag for this audience: {list_id}: {tag}")
 
