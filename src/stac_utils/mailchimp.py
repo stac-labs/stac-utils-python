@@ -146,6 +146,7 @@ class MailChimpClient(HTTPClient):
         :param email_address: member email address.
         :param tags: list of exact names of tags to add or remove.
         :param active: flags whether to add or remove the tags. True adds the tags, and False removes the tags.
+        :return: dict with the API response. Always includes status_code, and on an empty tag list will include info
         """
         # clean & dedupe tags + skip blanks
         cleaned = [
