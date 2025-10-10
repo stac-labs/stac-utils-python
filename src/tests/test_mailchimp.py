@@ -4,6 +4,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 from src.stac_utils.mailchimp import MailChimpClient, logger
 
+
 class TestMailChimpClient(unittest.TestCase):
     def setUp(self) -> None:
         self.test_client = MailChimpClient(api_key="fake-us9")
@@ -17,9 +18,7 @@ class TestMailChimpClient(unittest.TestCase):
             self.assertEqual(test_api_key, test_client.api_key)
             # test the extracted data center and base_url
             self.assertEqual("us20", test_client.data_center)
-            self.assertEqual(
-                "https://us20.api.mailchimp.com/3.0", test_client.base_url
-            )
+            self.assertEqual("https://us20.api.mailchimp.com/3.0", test_client.base_url)
 
     def test_create_session(self):
         """Test that API token and content type is set in headers for a Mailchimp session"""
@@ -42,7 +41,10 @@ class TestMailChimpClient(unittest.TestCase):
         mock_response.json.return_value = mock_data
         result = self.test_client.transform_response(mock_response)
         # make sure output matches expected dict
-        self.assertEqual(result, {"foo_bar": "spam", "email_address": "fake@none.com", "status_code": 200})
+        self.assertEqual(
+            result,
+            {"foo_bar": "spam", "email_address": "fake@none.com", "status_code": 200},
+        )
 
     def test_transform_response_empty_content(self):
         """Test that empty content or a 204 response returns only the status code"""
@@ -59,7 +61,9 @@ class TestMailChimpClient(unittest.TestCase):
         mock_response.status_code = 500
         mock_response.content = b"not a valid json"
         # bad json
-        mock_response.json.side_effect = json.decoder.JSONDecodeError("error", "not a valid json", 0)
+        mock_response.json.side_effect = json.decoder.JSONDecodeError(
+            "error", "not a valid json", 0
+        )
         result = self.test_client.transform_response(mock_response)
         self.assertEqual(result, {"status_code": 500})
 
@@ -73,14 +77,20 @@ class TestMailChimpClient(unittest.TestCase):
         mock_response_limit.status_code = 429
 
         # should always return 1
-        result_valid = self.test_client.check_response_for_rate_limit(mock_response_valid)
-        result_limit = self.test_client.check_response_for_rate_limit(mock_response_limit)
+        result_valid = self.test_client.check_response_for_rate_limit(
+            mock_response_valid
+        )
+        result_limit = self.test_client.check_response_for_rate_limit(
+            mock_response_limit
+        )
 
         self.assertEqual(result_valid, 1)
         self.assertEqual(result_limit, 1)
 
         # verify that the logger warning called once (occurs when 429)
-        mock_warning.assert_called_once_with("Mailchimp rate limit hit (HTTP 429: Too Many Requests)")
+        mock_warning.assert_called_once_with(
+            "Mailchimp rate limit hit (HTTP 429: Too Many Requests)"
+        )
 
     @patch.object(MailChimpClient, "transform_response")
     @patch.object(logger, "debug")
@@ -114,7 +124,9 @@ class TestMailChimpClient(unittest.TestCase):
     @patch.object(MailChimpClient, "transform_response")
     @patch.object(logger, "debug")
     @patch("requests.Session.get")
-    def test_paginate_endpoint_debug_logs_when_empty(self, mock_get, mock_debug, mock_transform):
+    def test_paginate_endpoint_debug_logs_when_empty(
+        self, mock_get, mock_debug, mock_transform
+    ):
         """Test that paginate_endpoint logs debug message and stops when no items are found"""
         # mock first page has data, second page empty (triggers debug...)
         mock_transform.side_effect = [
@@ -127,7 +139,6 @@ class TestMailChimpClient(unittest.TestCase):
         fake_response_2 = MagicMock()
         mock_get.side_effect = [fake_response_1, fake_response_2]
 
-
         self.test_client.paginate_endpoint(
             base_endpoint="lists/898/members",
             data_key="members",
@@ -135,14 +146,18 @@ class TestMailChimpClient(unittest.TestCase):
         )
 
         # should log debug once when second page is empty
-        mock_debug.assert_called_once_with("No items found at offset 2 for key 'members'")
+        mock_debug.assert_called_once_with(
+            "No items found at offset 2 for key 'members'"
+        )
         # two calls
         self.assertEqual(mock_get.call_count, 2)
 
     @patch.object(MailChimpClient, "transform_response")
     @patch.object(logger, "debug")
     @patch("requests.Session.get")
-    def test_paginate_endpoint_stops_when_total_items_reached(self, mock_get, mock_debug, mock_transform):
+    def test_paginate_endpoint_stops_when_total_items_reached(
+        self, mock_get, mock_debug, mock_transform
+    ):
         """Test that paginate_endpoint stops paginating when offset >= total_items"""
         mock_transform.side_effect = [
             {"members": [{"id": "1"}, {"id": "2"}], "total_items": 3},
@@ -176,5 +191,80 @@ class TestMailChimpClient(unittest.TestCase):
         self.assertEqual(result, expected_subscriber_hash)
 
         # lowercase version
-        self.assertEqual(result, MailChimpClient.get_subscriber_hash("weird@staclabs.com"))
+        self.assertEqual(
+            result, MailChimpClient.get_subscriber_hash("weird@staclabs.com")
+        )
 
+    @patch.object(MailChimpClient, "transform_response")
+    @patch("requests.Session.post")
+    def test_update_member_tags_success_active(self, mock_post, mock_transform):
+        """Test that update_member_tags correctly handles a 204 No Content Mailchimp success response"""
+        fake_response = MagicMock()
+        fake_response.status_code = 204
+        fake_response.content = b""
+        mock_post.return_value = fake_response
+
+        mock_transform.return_value = {"status_code": 204}
+
+        result = self.test_client.update_member_tags(
+            list_id="102930al",
+            email_address="fake@none.com",
+            tags=["NEWS  ", "DONOR", " "],
+            active=True,
+        )
+
+        expected_hash = self.test_client.get_subscriber_hash("fake@none.com")
+        expected_url = f"https://us9.api.mailchimp.com/3.0/lists/102930al/members/{expected_hash}/tags"
+
+        mock_post.assert_called_once_with(
+            expected_url,
+            json={
+                "tags": [
+                    {"name": "NEWS", "status": "active"},
+                    {"name": "DONOR", "status": "active"},
+                ]
+            },
+        )
+
+        # transform_response called once
+        mock_transform.assert_called_once_with(fake_response)
+
+        # no body in this call, just the status code
+        self.assertEqual(result, {"status_code": 204})
+
+    @patch.object(MailChimpClient, "transform_response")
+    @patch("requests.Session.post")
+    def test_update_member_tags_success_inactive(self, mock_post, mock_transform):
+        """Test that update_member_tags correctly handles a 204 No Content Mailchimp success response"""
+        fake_response = MagicMock()
+        fake_response.status_code = 204
+        fake_response.content = b""
+        mock_post.return_value = fake_response
+
+        mock_transform.return_value = {"status_code": 204}
+
+        result = self.test_client.update_member_tags(
+            list_id="102930al",
+            email_address="fake@none.com",
+            tags=["NEWS  ", "DONOR", " "],
+            active=False,
+        )
+
+        expected_hash = self.test_client.get_subscriber_hash("fake@none.com")
+        expected_url = f"https://us9.api.mailchimp.com/3.0/lists/102930al/members/{expected_hash}/tags"
+
+        mock_post.assert_called_once_with(
+            expected_url,
+            json={
+                "tags": [
+                    {"name": "NEWS", "status": "inactive"},
+                    {"name": "DONOR", "status": "inactive"},
+                ]
+            },
+        )
+
+        # transform_response called once
+        mock_transform.assert_called_once_with(fake_response)
+
+        # no body in this call, just the status code
+        self.assertEqual(result, {"status_code": 204})
