@@ -359,8 +359,7 @@ class TestMailChimpClient(unittest.TestCase):
         result = self.test_client.get_merge_fields_data_type_map(list_id)
 
         mock_paginate.assert_called_once_with(
-            base_endpoint=f"lists/{list_id}/merge-fields",
-            data_key="merge_fields"
+            base_endpoint=f"lists/{list_id}/merge-fields", data_key="merge_fields"
         )
 
         expected_map = {"FNAME": "text", "LNAME": "text", "VAN_ID": "number"}
@@ -378,9 +377,74 @@ class TestMailChimpClient(unittest.TestCase):
 
         # paginate_endpoint called once
         mock_paginate.assert_called_once_with(
-            base_endpoint=f"lists/{list_id}/merge-fields",
-            data_key="merge_fields"
+            base_endpoint=f"lists/{list_id}/merge-fields", data_key="merge_fields"
         )
 
         # empty dict for result
         self.assertEqual(result, {})
+
+    @patch.object(MailChimpClient, "get_merge_fields_data_type_map")
+    def test_format_merge_fields_for_list_skips_blank_and_none(self, mock_get_types):
+        """Test that None and blank strings are ignored"""
+        mock_get_types.return_value = {"FNAME": "text", "LNAME": "text"}
+
+        merge_fields = {"FNAME": None, "LNAME": " "}
+        result = self.test_client.format_merge_fields_for_list("llll", merge_fields)
+        # should be an empty dict
+        self.assertEqual(result, {})
+
+    @patch.object(MailChimpClient, "get_merge_fields_data_type_map")
+    def test_format_merge_fields_for_list_text_success(self, mock_get_types):
+        """Test that text fields are handled correctly."""
+        mock_get_types.return_value = {"FNAME": "text", "LNAME": "text"}
+
+        merge_fields = {"FNAME": "  John  ", "LNAME": "Doe"}
+        result = self.test_client.format_merge_fields_for_list("oapao1", merge_fields)
+
+        mock_get_types.assert_called_once_with("oapao1")
+        self.assertEqual(result, {"FNAME": "John", "LNAME": "Doe"})
+
+    @patch.object(MailChimpClient, "get_merge_fields_data_type_map")
+    def test_format_merge_fields_for_list_zip_fail(self, mock_get_types):
+        """Test that zip type over 5 digits raise error"""
+        mock_get_types.return_value = {"ZIP": "zip"}
+
+        merge_fields = {"ZIP": "1111122"}
+
+        with self.assertRaises(ValueError):
+            self.test_client.format_merge_fields_for_list("some_id", merge_fields)
+
+    @patch.object(MailChimpClient, "get_merge_fields_data_type_map")
+    def test_format_merge_fields_for_list_with_helpers(self, mock_get_types):
+        """Test that date, birthday, address, and number fields are pushed to the correct helper function"""
+        mock_get_types.return_value = {
+            "DATE": "date",
+            "BIRTHDAY": "birthday",
+            "ADDRESS": "address",
+            "NUMBER": "number",
+        }
+
+        # replace methods with mocks
+        with patch.object(self.test_client, "format_date") as mock_date, patch.object(
+            self.test_client, "format_birthday"
+        ) as mock_bday, patch.object(
+            self.test_client,
+            "format_address",
+        ) as mock_addr, patch.object(
+            self.test_client,
+            "format_number",
+        ) as mock_num:
+            # placeholder fake data
+            merge_fields = {
+                "DATE": "2022-10-09",
+                "BIRTHDAY": "10/09",
+                "ADDRESS": {},
+                "NUMBER": 0,
+            }
+
+            self.test_client.format_merge_fields_for_list("some_id", merge_fields)
+            # just test if helper methods were called
+            mock_date.assert_called_once()
+            mock_bday.assert_called_once()
+            mock_addr.assert_called_once()
+            mock_num.assert_called_once()
