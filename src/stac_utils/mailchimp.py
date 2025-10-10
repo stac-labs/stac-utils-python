@@ -6,6 +6,8 @@ import logging
 import hashlib
 from datetime import datetime, date
 from typing import Any
+import time
+import random
 
 # logging
 logger = logging.getLogger(__name__)
@@ -23,6 +25,8 @@ class MailChimpClient(HTTPClient):
         # see: https://mailchimp.com/developer/marketing/docs/fundamentals/#api-structure
         self.data_center = self.api_key.split("-")[-1]
         self.base_url = f"https://{self.data_center}.api.mailchimp.com/3.0"
+        # set total amount of retries for endpoints
+        self.max_retries = 3
         super().__init__(*args, **kwargs)
 
     def create_session(self) -> requests.Session:
@@ -51,17 +55,62 @@ class MailChimpClient(HTTPClient):
         data["status_code"] = response.status_code
         return data
 
-    def check_response_for_rate_limit(self, response: requests.Response) -> int:
+    def request_with_retry(
+        self,
+        method: str,
+        endpoint_url: str,
+        **kwargs,
+    ) -> requests.Response:
         """
-        Checks Mailchimp response for rate limit, always returns 1
+        This method handles Mailchimp 429 (rate limit / Too Many Requests) responses with binary exponential backoff
 
-        :param response: the HTTP response object returned by requests
-        :return: always returns 1
+        Retries up to max_retries times, applying a random delay between 0 and (2^(i+1)-1) seconds on each attempt
+
+        see: https://en.wikipedia.org/wiki/Exponential_backoff
+        see: https://staclabs.atlassian.net/browse/DATA-4171
+
+        :param method: HTTP method used ('GET', 'POST', 'PUT',etc)
+        :param endpoint_url: full API endpoint URL
+        :param kwargs: any other params accepted by requests (json, etc)
+        :return: requests response object
         """
-        # added basic logging in this method...
-        if response.status_code == 429:
-            logger.warning("Mailchimp rate limit hit (HTTP 429: Too Many Requests)")
-        return 1
+        method = method.upper().strip()
+        response = None
+
+        for attempt in range(1, self.max_retries + 1):
+            try:
+                response = self.session.request(
+                    method=method, url=endpoint_url, **kwargs
+                )
+            except requests.exceptions.RequestException:
+                continue
+
+            # return response if not 429
+            if response.status_code != 429:
+                return response
+
+            # exponential backoff
+            delay = random.randint(0, (2 ** (attempt + 1)) - 1)
+            logger.warning(
+                f"MailChimp rate limit hit (HTTP 429) for HTTP {method} for endpoint: {endpoint_url}. "
+                f"Attempt: {attempt}"
+            )
+
+            # delay!
+            time.sleep(delay)
+
+        # exhausted retries (returned 429 every time)
+        logger.error(
+            f"All {self.max_retries} retries for HTTP {method} for endpoint {endpoint_url} failed "
+        )
+
+        # specific handling if response is still None
+        if response is None:
+            raise requests.exceptions.RequestException(
+                f"All {self.max_retries} retries for HTTP {method} for endpoint {endpoint_url} failed"
+            )
+
+        return response
 
     def paginate_endpoint(
         self,
@@ -91,7 +140,13 @@ class MailChimpClient(HTTPClient):
         while True:
             params = {"count": count, "offset": offset, **kwargs}
             url = f"{self.base_url}/{base_endpoint}"
-            response = self.session.get(url, params=params)
+
+            # use request_with_retry
+            response = self.request_with_retry(
+                method="GET",
+                endpoint_url=url,
+                params=params,
+            )
             data = self.transform_response(response)
 
             items = data.get(data_key, [])
@@ -173,7 +228,12 @@ class MailChimpClient(HTTPClient):
                 for tag in cleaned
             ]
         }
-        response = self.session.post(url, json=payload)
+        # use request_with_retry
+        response = self.request_with_retry(
+            method="POST",
+            endpoint_url=url,
+            json=payload,
+        )
         return self.transform_response(response)
 
     def upsert_member(
@@ -232,7 +292,12 @@ class MailChimpClient(HTTPClient):
         }
         payload.update(other_params)
 
-        response = self.session.put(url, json=payload)
+        # use request_with_retry
+        response = self.request_with_retry(
+            method="PUT",
+            endpoint_url=url,
+            json=payload,
+        )
         return self.transform_response(response)
 
     def get_merge_fields_data_type_map(self, list_id: str, **kwargs) -> dict[str, str]:
