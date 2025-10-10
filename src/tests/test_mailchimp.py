@@ -198,7 +198,7 @@ class TestMailChimpClient(unittest.TestCase):
     @patch.object(MailChimpClient, "transform_response")
     @patch("requests.Session.post")
     def test_update_member_tags_success_active(self, mock_post, mock_transform):
-        """Test that update_member_tags correctly handles a 204 No Content Mailchimp success response"""
+        """Test that update_member_tags correctly handles a 204 MailChimp success response for adding tags"""
         fake_response = MagicMock()
         fake_response.status_code = 204
         fake_response.content = b""
@@ -235,7 +235,7 @@ class TestMailChimpClient(unittest.TestCase):
     @patch.object(MailChimpClient, "transform_response")
     @patch("requests.Session.post")
     def test_update_member_tags_success_inactive(self, mock_post, mock_transform):
-        """Test that update_member_tags correctly handles a 204 No Content Mailchimp success response"""
+        """Test that update_member_tags correctly handles a 204 MailChimp success response for removing tags"""
         fake_response = MagicMock()
         fake_response.status_code = 204
         fake_response.content = b""
@@ -268,3 +268,79 @@ class TestMailChimpClient(unittest.TestCase):
 
         # no body in this call, just the status code
         self.assertEqual(result, {"status_code": 204})
+
+    # have to include this, as otherwise tests will fail as no datatype mapping
+    @patch.object(
+        MailChimpClient,
+        "get_merge_fields_data_type_map",
+        return_value={"FNAME": "text", "LNAME": "text"},
+    )
+    @patch.object(MailChimpClient, "transform_response")
+    @patch("requests.Session.put")
+    def test_upsert_member_success(
+        self, mock_put, mock_transform, mock_merge_fields_map
+    ):
+        """Test that upsert_member sends correct payload and handles MailChimp 200 JSON response"""
+
+        fake_response = MagicMock()
+        fake_response.status_code = 200
+
+        mock_put.return_value = fake_response
+        mock_transform.return_value = {
+            "id": "8121stac",
+            "email_address": "fake@none.com",
+            "status_code": 200,
+        }
+
+        list_id = "102930al"
+        email_address = "fake@none.com"
+        merge_fields = {"FNAME": "Fake", "LNAME": "Dude"}
+
+        result = self.test_client.upsert_member(
+            list_id=list_id, email_address=email_address, merge_fields=merge_fields
+        )
+
+        expected_hash = self.test_client.get_subscriber_hash(email_address)
+        expected_url = (
+            f"https://us9.api.mailchimp.com/3.0/lists/{list_id}/members/{expected_hash}"
+        )
+
+        expected_payload = {
+            "email_address": email_address,
+            "status_if_new": "subscribed",
+            "merge_fields": merge_fields,
+        }
+        # put called once
+        mock_put.assert_called_once_with(expected_url, json=expected_payload)
+        # return is called once
+        mock_transform.assert_called_once_with(fake_response)
+        # success
+        self.assertEqual(result["status_code"], 200)
+        # compare final email val to expected
+        self.assertEqual(result["email_address"], "fake@none.com")
+
+    # have to include this, as otherwise tests will fail as no datatype mapping
+    @patch.object(
+        MailChimpClient,
+        "get_merge_fields_data_type_map",
+        return_value={"FNAME": "text"},
+    )
+    @patch.object(MailChimpClient, "transform_response")
+    @patch("requests.Session.put")
+    def test_upsert_member_fail(self, mock_put, mock_transform, mock_merge_fields_map):
+        """Test that upsert_member raises error when merge fields contain fake tags"""
+        list_id = "102930al"
+        email_address = "fake@none.com"
+
+        # test KeyError is raised
+        with self.assertRaises(KeyError):
+            self.test_client.upsert_member(
+                list_id=list_id,
+                email_address=email_address,
+                merge_fields={"FAKE_MERGE_TAG": "some_val"},
+            )
+
+        # no put call for upsert should have occurred
+        mock_put.assert_not_called()
+        # no transform_response call for upsert should have occurred
+        mock_transform.assert_not_called()
