@@ -415,6 +415,18 @@ class TestMailChimpClient(unittest.TestCase):
             self.test_client.format_merge_fields_for_list("some_id", merge_fields)
 
     @patch.object(MailChimpClient, "get_merge_fields_data_type_map")
+    def test_format_merge_fields_for_list_zip_success(self, mock_get_types):
+        """Test that zip with exactly 5 digits succeeds"""
+        mock_get_types.return_value = {"ZIP": "zip"}
+
+        merge_fields = {"ZIP": "11111"}
+
+        result = self.test_client.format_merge_fields_for_list("oapao1", merge_fields)
+
+        mock_get_types.assert_called_once_with("oapao1")
+        self.assertEqual(result, {"ZIP": "11111"})
+
+    @patch.object(MailChimpClient, "get_merge_fields_data_type_map")
     def test_format_merge_fields_for_list_with_helpers(self, mock_get_types):
         """Test that date, birthday, address, and number fields are pushed to the correct helper function"""
         mock_get_types.return_value = {
