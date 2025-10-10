@@ -79,7 +79,7 @@ class MailChimpClient(HTTPClient):
         :param data_key: the expected key in the response dict (i.e "lists", "members").
         :param count: number of items to fetch per page (default set to 1000, which is MailChimp's max).
         :param max_pages: optional parameter to limit the number of pages (can be used for testing)
-        :return:  a list of all collected items from the paginated responses
+        :return: a list of all collected items from the paginated responses
         """
         results = []
         page = 1
@@ -114,6 +114,12 @@ class MailChimpClient(HTTPClient):
             # if everything is fetched, stop!
             if offset >= total:
                 break
+
+        # include logging flagging completion of pagination and how many total records were fetched
+        logger.info(
+            f"Pagination complete for endpoint {base_endpoint}, spanning {page} pages. "
+            f"Fetched a total of {len(results)} total {data_key} records"
+        )
 
         return results
 
