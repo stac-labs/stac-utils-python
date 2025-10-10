@@ -152,6 +152,11 @@ class MailChimpClient(HTTPClient):
             tag.strip() for tag in (tags or []) if isinstance(tag, str) and tag.strip()
         ]
 
+        # return for empty tag list (MailChimp returns 204 even with an empty tag payload, so this mimics that)
+        if not cleaned:
+            logger.info(f"No valid tags provided for email: {email_address}")
+            return {"status_code": 204, "info": "No valid tags provided"}
+
         subscriber_hash = self.get_subscriber_hash(email_address)
         url = f"{self.base_url}/lists/{list_id}/members/{subscriber_hash}/tags"
 
