@@ -4,6 +4,7 @@ import unittest
 import requests
 from unittest.mock import patch, MagicMock, PropertyMock
 from src.stac_utils.mailchimp import MailChimpClient, logger
+from datetime import datetime, date
 
 
 class TestMailChimpClient(unittest.TestCase):
@@ -616,3 +617,27 @@ class TestMailChimpClient(unittest.TestCase):
             mock_bday.assert_called_once()
             mock_addr.assert_called_once()
             mock_num.assert_called_once()
+
+    def test_format_date(self):
+        """Test where input value is a date/datetime or string instance"""
+        # using datetime
+        datetime_value = datetime(2025, 1, 1)
+        function_datetime = self.test_client.format_date(datetime_value)
+        self.assertEqual(function_datetime, "2025-01-01")
+
+        # using date
+        date_value = date(2025, 1, 1)
+        function_date = self.test_client.format_date(date_value)
+        self.assertEqual(function_date, "2025-01-01")
+
+        # using string
+        function_string = self.test_client.format_date(" 2025-01-01   ")
+        self.assertEqual(function_string, "2025-01-01")
+
+        # covers some other string formatted cases
+        self.assertEqual(self.test_client.format_date("01/01/2025"), "2025-01-01")
+        self.assertEqual(self.test_client.format_date("01-01-2025"), "2025-01-01")
+
+        # ValueError raised when not a date
+        with self.assertRaises(ValueError):
+            self.test_client.format_date("not a date, obviously")
