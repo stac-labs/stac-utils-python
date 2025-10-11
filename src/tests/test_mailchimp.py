@@ -641,3 +641,28 @@ class TestMailChimpClient(unittest.TestCase):
         # ValueError raised when not a date
         with self.assertRaises(ValueError):
             self.test_client.format_date("not a date, obviously")
+
+    def test_format_birthday(self):
+        """Test where input value is a date/datetime or string instance"""
+        # using datetime
+        datetime_value = datetime(2025, 1, 1)
+        function_datetime = self.test_client.format_birthday(datetime_value)
+        self.assertEqual(function_datetime, "01/01")
+
+        # using date
+        date_value = date(2025, 1, 1)
+        function_date = self.test_client.format_birthday(date_value)
+        self.assertEqual(function_date, "01/01")
+
+        # using string
+        function_string = self.test_client.format_birthday(" 01/01 ")
+        self.assertEqual(function_string, "01/01")
+
+        # covers some other string formatted cases
+        self.assertEqual(self.test_client.format_birthday("01-01"), "01/01")
+        self.assertEqual(self.test_client.format_birthday("2025-01-01"), "01/01")
+        self.assertEqual(self.test_client.format_birthday("2025/01/01"), "01/01")
+
+        # ValueError raised when not a date
+        with self.assertRaises(ValueError):
+            self.test_client.format_birthday("not a date, obviously")
