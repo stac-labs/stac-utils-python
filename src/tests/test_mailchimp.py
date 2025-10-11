@@ -132,6 +132,31 @@ class TestMailChimpClient(unittest.TestCase):
         # sleep called once with the set delay
         mock_sleep.assert_called_once_with(3)
 
+    @patch("src.stac_utils.mailchimp.time.sleep")
+    @patch.object(MailChimpClient, "session", new_callable=PropertyMock)
+    def test_request_with_retry_hits_max_retries(
+        self, mock_session_property, mock_sleep
+    ):
+        """Test that function retries max_retries times then returns the last 429 response"""
+        # one mock per retry attempt
+        mock_responses = [
+            MagicMock(status_code=429) for _ in range(self.test_client.max_retries)
+        ]
+        mock_session = MagicMock()
+        mock_session.request.side_effect = mock_responses
+        mock_session_property.return_value = mock_session
+
+        with patch("src.stac_utils.mailchimp.random.randint", return_value=3):
+            response = self.test_client.request_with_retry(
+                "GET", "www.fake_endpoint.com/mail"
+            )
+        # the final response should be the last of the mock_responses
+        self.assertIs(response, mock_responses[-1])
+        # times the mock object has been called should == the max_retries set
+        self.assertEqual(mock_session.request.call_count, self.test_client.max_retries)
+        # check to make sure number of delays == max_retries
+        self.assertEqual(mock_sleep.call_count, self.test_client.max_retries)
+
 
 #     @patch.object(MailChimpClient, "transform_response")
 #     @patch.object(logger, "debug")
