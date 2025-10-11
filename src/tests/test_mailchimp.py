@@ -399,16 +399,36 @@ class TestMailChimpClient(unittest.TestCase):
         # no body in this call, just the status code
         self.assertEqual(result, {"status_code": 204})
 
-    # have to include this, as otherwise tests will fail as no datatype mapping
-    @patch.object(
-        MailChimpClient,
-        "get_merge_fields_data_type_map",
-        return_value={"FNAME": "text", "LNAME": "text"},
-    )
+    @patch.object(logger, "info")
+    @patch.object(MailChimpClient, "request_with_retry")
+    def test_update_member_tags_empty_tag_payload(
+        self, mock_request_with_retry, mock_info
+    ):
+        """Test that update_member_tags returns early when no valid tags exist"""
+        # no good tags in the payload
+        result = self.test_client.update_member_tags(
+            list_id="102930al",
+            email_address="fake@none.com",
+            tags=["   ", "", None],
+            active=True,
+        )
+
+        # check the return
+        self.assertEqual(result, {"status_code": 204, "info": "No valid tags provided"})
+
+        # no retries
+        mock_request_with_retry.assert_not_called()
+
+        # check the log message
+        mock_info.assert_called_once_with(
+            "No valid tags provided for email: fake@none.com"
+        )
+
     @patch.object(MailChimpClient, "transform_response")
+    @patch.object(MailChimpClient, "format_merge_fields_for_list")
     @patch.object(MailChimpClient, "request_with_retry")
     def test_upsert_member_success(
-        self, mock_request_with_retry, mock_transform, mock_merge_fields_map
+        self, mock_request_with_retry, mock_format, mock_transform
     ):
         """Test that upsert_member sends correct payload and handles MailChimp 200 JSON response"""
 
@@ -421,6 +441,8 @@ class TestMailChimpClient(unittest.TestCase):
             "email_address": "fake@none.com",
             "status_code": 200,
         }
+
+        mock_format.return_value = {"FNAME": "Fake", "LNAME": "Dude"}
 
         list_id = "102930al"
         email_address = "fake@none.com"
@@ -446,33 +468,33 @@ class TestMailChimpClient(unittest.TestCase):
         )
         # return is called once
         mock_transform.assert_called_once_with(fake_response)
+        # format_merge_fields_for_list called once
+        mock_format.assert_called_once_with(list_id, merge_fields)
         # success
         self.assertEqual(result["status_code"], 200)
         # compare final email val to expected
         self.assertEqual(result["email_address"], "fake@none.com")
 
-    # have to include this, as otherwise tests will fail as no datatype mapping
-    @patch.object(
-        MailChimpClient,
-        "get_merge_fields_data_type_map",
-        return_value={"FNAME": "text"},
-    )
     @patch.object(MailChimpClient, "transform_response")
     @patch.object(MailChimpClient, "request_with_retry")
-    def test_upsert_member_fail(
-        self, mock_request_with_retry, mock_transform, mock_merge_fields_map
-    ):
+    def test_upsert_member_fail(self, mock_request_with_retry, mock_transform):
         """Test that upsert_member raises error when merge fields contain fake tags"""
         list_id = "102930al"
         email_address = "fake@none.com"
 
-        # test KeyError is raised
-        with self.assertRaises(KeyError):
-            self.test_client.upsert_member(
-                list_id=list_id,
-                email_address=email_address,
-                merge_fields={"FAKE_MERGE_TAG": "some_val"},
-            )
+        # have to include this, as otherwise tests will fail as no datatype mapping
+        with patch.object(
+            MailChimpClient,
+            "get_merge_fields_data_type_map",
+            return_value={"FNAME": "text"},
+        ):
+            # test KeyError is raised
+            with self.assertRaises(KeyError):
+                self.test_client.upsert_member(
+                    list_id=list_id,
+                    email_address=email_address,
+                    merge_fields={"FAKE_MERGE_TAG": "some_val"},
+                )
 
         # no put call for upsert should have occurred
         mock_request_with_retry.assert_not_called()
