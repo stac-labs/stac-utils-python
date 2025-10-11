@@ -666,3 +666,34 @@ class TestMailChimpClient(unittest.TestCase):
         # ValueError raised when not a date
         with self.assertRaises(ValueError):
             self.test_client.format_birthday("not a date, obviously")
+
+    def test_format_address(self):
+        """Test format_address returns the correct values"""
+        # when input val is not a dict
+        with self.assertRaises(ValueError):
+            self.test_client.format_address("not a dict, obviously")
+
+        # create a dict to test the normalize_string function nested in format_address
+        function_address_valid = self.test_client.format_address(
+            {
+                "addr1": "999 Dolly Ave",
+                "addr2": " Apt 3   ",
+                "city": "Delaware",
+                "state": "PA",
+                "zip": 90210,
+                "country": "USA ",
+            }
+        )
+
+        # check if one req element exists
+        self.assertIn("addr1", function_address_valid)
+        # check formatted val of addr1
+        self.assertEqual(function_address_valid["addr1"], "999 Dolly Ave")
+        # check that a numeric val is now string
+        self.assertEqual(function_address_valid["zip"], "90210")
+        # coverage on the string trimming
+        self.assertEqual(function_address_valid["addr2"], "Apt 3")
+
+        # creating an invalid req
+        with self.assertRaises(ValueError):
+            self.test_client.format_address({"addr2": "999 Dolly Ave "})
