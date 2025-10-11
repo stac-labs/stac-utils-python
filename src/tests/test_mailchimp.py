@@ -697,3 +697,32 @@ class TestMailChimpClient(unittest.TestCase):
         # creating an invalid req
         with self.assertRaises(ValueError):
             self.test_client.format_address({"addr2": "999 Dolly Ave "})
+
+    def test_format_number(self):
+        """Test format_number returns the correct values"""
+        # test bool raises ValueError
+        with self.assertRaises(ValueError):
+            self.test_client.format_number(True)
+
+        # test empty string raises ValueError
+        with self.assertRaises(ValueError):
+            self.test_client.format_number("   ")
+
+        # test non-numeric string raises value error
+        with self.assertRaises(ValueError):
+            self.test_client.format_number("not a number, obviously")
+
+        # integer input is valid
+        self.assertEqual(self.test_client.format_number(1), 1)
+
+        # float input is valid
+        self.assertEqual(self.test_client.format_number(9.99), 9.99)
+
+        # integer string is valid
+        self.assertEqual(self.test_client.format_number("1"), 1)
+
+        # signed integer string is valid
+        self.assertEqual(self.test_client.format_number("-1"), -1)
+
+        # float string is valid
+        self.assertEqual(self.test_client.format_number("9.99"), 9.99)
