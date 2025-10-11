@@ -1,97 +1,138 @@
-# import os
-# import json
-# import unittest
-# from unittest.mock import patch, MagicMock
-# from src.stac_utils.mailchimp import MailChimpClient, logger
-#
-#
-# class TestMailChimpClient(unittest.TestCase):
-#     def setUp(self) -> None:
-#         self.test_client = MailChimpClient(api_key="fake-us9")
-#         self.test_logger = logger
-#
-#     def test_init_env_keys(self):
-#         """Test that client initializes with environmental keys"""
-#         test_api_key = "hgd1204-us20"
-#         with patch.dict(os.environ, values={"MAILCHIMP_API_KEY": test_api_key}):
-#             test_client = MailChimpClient()
-#             self.assertEqual(test_api_key, test_client.api_key)
-#             # test the extracted data center and base_url
-#             self.assertEqual("us20", test_client.data_center)
-#             self.assertEqual("https://us20.api.mailchimp.com/3.0", test_client.base_url)
-#
-#     def test_create_session(self):
-#         """Test that API token and content type is set in headers for a Mailchimp session"""
-#         session = self.test_client.create_session()
-#
-#         # check that the auth tuple is correctly set
-#         self.assertEqual(session.auth, ("anystring", self.test_client.api_key))
-#
-#         # check that the "Content-Type" header exists and has a value of "application/json"
-#         self.assertIn("Content-Type", session.headers)
-#         self.assertEqual(session.headers["Content-Type"], "application/json")
-#
-#     def test_transform_response_valid_json(self):
-#         """Test that response is transformed and includes status code"""
-#         mock_data = {"foo_bar": "spam", "email_address": "fake@none.com"}
-#         mock_response = MagicMock()
-#         mock_response.status_code = 200
-#         # http response body contains bytes
-#         mock_response.content = json.dumps(mock_data).encode()
-#         mock_response.json.return_value = mock_data
-#         result = self.test_client.transform_response(mock_response)
-#         # make sure output matches expected dict
-#         self.assertEqual(
-#             result,
-#             {"foo_bar": "spam", "email_address": "fake@none.com", "status_code": 200},
-#         )
-#
-#     def test_transform_response_empty_content(self):
-#         """Test that empty content or a 204 response returns only the status code"""
-#         mock_response = MagicMock()
-#         mock_response.status_code = 204
-#         # no data returned in 204 response
-#         mock_response.content = b""
-#         result = self.test_client.transform_response(mock_response)
-#         self.assertEqual(result, {"status_code": 204})
-#
-#     def test_transform_response_invalid_json(self):
-#         """Test that response for invalid JSON returns an empty dict with the status code"""
-#         mock_response = MagicMock()
-#         mock_response.status_code = 500
-#         mock_response.content = b"not a valid json"
-#         # bad json
-#         mock_response.json.side_effect = json.decoder.JSONDecodeError(
-#             "error", "not a valid json", 0
-#         )
-#         result = self.test_client.transform_response(mock_response)
-#         self.assertEqual(result, {"status_code": 500})
-#
-#     # @patch.object(logger, "warning")
-#     # def test_check_response_for_rate_limit(self, mock_warning):
-#     #     """Test that check_response_for_rate_limit always returns 1 and actually logs warning on 429"""
-#     #     mock_response_valid = MagicMock()
-#     #     mock_response_valid.status_code = 200
-#     #
-#     #     mock_response_limit = MagicMock()
-#     #     mock_response_limit.status_code = 429
-#     #
-#     #     # should always return 1
-#     #     result_valid = self.test_client.check_response_for_rate_limit(
-#     #         mock_response_valid
-#     #     )
-#     #     result_limit = self.test_client.check_response_for_rate_limit(
-#     #         mock_response_limit
-#     #     )
-#     #
-#     #     self.assertEqual(result_valid, 1)
-#     #     self.assertEqual(result_limit, 1)
-#     #
-#     #     # verify that the logger warning called once (occurs when 429)
-#     #     mock_warning.assert_called_once_with(
-#     #         "Mailchimp rate limit hit (HTTP 429: Too Many Requests)"
-#     #     )
-#
+import os
+import json
+import unittest
+from unittest.mock import patch, MagicMock, PropertyMock
+from src.stac_utils.mailchimp import MailChimpClient, logger
+
+
+class TestMailChimpClient(unittest.TestCase):
+    def setUp(self) -> None:
+        self.test_client = MailChimpClient(api_key="fake-us9")
+        self.test_logger = logger
+
+    def test_init_env_keys(self):
+        """Test that client initializes with environmental keys"""
+        test_api_key = "hgd1204-us20"
+        with patch.dict(os.environ, values={"MAILCHIMP_API_KEY": test_api_key}):
+            test_client = MailChimpClient()
+            self.assertEqual(test_api_key, test_client.api_key)
+            # test the extracted data center and base_url
+            self.assertEqual("us20", test_client.data_center)
+            self.assertEqual("https://us20.api.mailchimp.com/3.0", test_client.base_url)
+
+    def test_create_session(self):
+        """Test that API token and content type is set in headers for a Mailchimp session"""
+        session = self.test_client.create_session()
+
+        # check that the auth tuple is correctly set
+        self.assertEqual(session.auth, ("anystring", self.test_client.api_key))
+
+        # check that the "Content-Type" header exists and has a value of "application/json"
+        self.assertIn("Content-Type", session.headers)
+        self.assertEqual(session.headers["Content-Type"], "application/json")
+
+    def test_transform_response_valid_json(self):
+        """Test that response is transformed and includes status code"""
+        mock_data = {"foo_bar": "spam", "email_address": "fake@none.com"}
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        # http response body contains bytes
+        mock_response.content = json.dumps(mock_data).encode()
+        mock_response.json.return_value = mock_data
+        result = self.test_client.transform_response(mock_response)
+        # make sure output matches expected dict
+        self.assertEqual(
+            result,
+            {"foo_bar": "spam", "email_address": "fake@none.com", "status_code": 200},
+        )
+
+    def test_transform_response_empty_content(self):
+        """Test that empty content or a 204 response returns only the status code"""
+        mock_response = MagicMock()
+        mock_response.status_code = 204
+        # no data returned in 204 response
+        mock_response.content = b""
+        result = self.test_client.transform_response(mock_response)
+        self.assertEqual(result, {"status_code": 204})
+
+    def test_transform_response_invalid_json(self):
+        """Test that response for invalid JSON returns an empty dict with the status code"""
+        mock_response = MagicMock()
+        mock_response.status_code = 500
+        mock_response.content = b"not a valid json"
+        # bad json
+        mock_response.json.side_effect = json.decoder.JSONDecodeError(
+            "error", "not a valid json", 0
+        )
+        result = self.test_client.transform_response(mock_response)
+        self.assertEqual(result, {"status_code": 500})
+
+    @patch("src.stac_utils.mailchimp.time.sleep")
+    # note the session is a property in the parent Client class, so can't use MagicMock
+    @patch.object(MailChimpClient, "session", new_callable=PropertyMock)
+    def test_request_with_retry_return_success(self, mock_session_property, mock_sleep):
+        """Successful request should not delay in the loop"""
+        mock_response = MagicMock(status_code=200)
+        mock_session = MagicMock()
+        mock_session.request.return_value = mock_response
+
+        # property returns the mock session
+        mock_session_property.return_value = mock_session
+
+        response = self.test_client.request_with_retry(
+            method="GET", endpoint_url="www.fake_endpoint.com/mail"
+        )
+
+        # client returns session object as given
+        self.assertIs(response, mock_response)
+        # request method called once
+        mock_session.request.assert_called_once_with(
+            method="GET", url="www.fake_endpoint.com/mail"
+        )
+        # retry not called
+        mock_sleep.assert_not_called()
+
+    @patch("src.stac_utils.mailchimp.time.sleep")
+    # note the session is a property in the parent Client class, so can't use MagicMock
+    @patch.object(MailChimpClient, "session", new_callable=PropertyMock)
+    def test_request_with_retry_429_then_success(
+        self, mock_session_property, mock_sleep
+    ):
+        """Should sleep and retry once after a 429 rate limit flag before succeeding"""
+
+        # first response = 429
+        mock_response_429 = MagicMock(status_code=429)
+        # second response = 200
+        mock_response_200 = MagicMock(status_code=200)
+
+        # mock session that returns 429 once and then returns 200
+        mock_session = MagicMock()
+        mock_session.request.side_effect = [mock_response_429, mock_response_200]
+
+        # MailChimpClient.session property returns mock session
+        mock_session_property.return_value = mock_session
+
+        # patching random.randint to return a set delay
+        with patch(
+            "src.stac_utils.mailchimp.random.randint", return_value=3
+        ) as mock_rand:
+            response = self.test_client.request_with_retry(
+                method="GET", endpoint_url="www.fake_endpoint.com/mail"
+            )
+
+        # the function should return the 200 response
+        self.assertIs(response, mock_response_200)
+
+        # .request() method should have been called twice, first 429 then retried (200)
+        self.assertEqual(mock_session.request.call_count, 2)
+
+        # rand called once
+        mock_rand.assert_called_once()
+
+        # sleep called once with the set delay
+        mock_sleep.assert_called_once_with(3)
+
+
 #     @patch.object(MailChimpClient, "transform_response")
 #     @patch.object(logger, "debug")
 #     @patch("requests.Session.get")
