@@ -1,6 +1,7 @@
 import os
 import json
 import unittest
+import requests
 from unittest.mock import patch, MagicMock, PropertyMock
 from src.stac_utils.mailchimp import MailChimpClient, logger
 
@@ -156,6 +157,62 @@ class TestMailChimpClient(unittest.TestCase):
         self.assertEqual(mock_session.request.call_count, self.test_client.max_retries)
         # check to make sure number of delays == max_retries
         self.assertEqual(mock_sleep.call_count, self.test_client.max_retries)
+
+    @patch("src.stac_utils.mailchimp.time.sleep")
+    @patch.object(MailChimpClient, "session", new_callable=PropertyMock)
+    def test_request_with_retry_handles_request_exception(
+        self, mock_session_property, mock_sleep
+    ):
+        """Test when RequestException is raised before success"""
+        # mock session
+        mock_session = MagicMock()
+        mock_response_200 = MagicMock(status_code=200)
+        # first: raise exception
+        # second: success
+        mock_session.request.side_effect = [
+            requests.exceptions.RequestException(),
+            mock_response_200,
+        ]
+        mock_session_property.return_value = mock_session
+
+        with patch("src.stac_utils.mailchimp.random.randint", return_value=3):
+            response = self.test_client.request_with_retry(
+                method="GET", endpoint_url="www.fake_endpoint.com/mail"
+            )
+
+        # final response should be success
+        self.assertIs(response, mock_response_200)
+        # function retries once after catching RequestException, and another ends in success
+        self.assertEqual(mock_session.request.call_count, 2)
+        # delay not called (only called if 429)
+        mock_sleep.assert_not_called()
+
+    @patch("src.stac_utils.mailchimp.time.sleep")
+    @patch.object(MailChimpClient, "session", new_callable=PropertyMock)
+    def test_request_with_retry_exception_when_complete_failure(
+        self, mock_session_property, mock_sleep
+    ):
+        """Makes sure function raises RequestException when all retries fail with no response"""
+        mock_session = MagicMock()
+        # every call raises RequestException
+        mock_session.request.side_effect = [
+            requests.exceptions.RequestException(),
+            requests.exceptions.RequestException(),
+            requests.exceptions.RequestException(),
+        ]
+        mock_session_property.return_value = mock_session
+
+        with patch("src.stac_utils.mailchimp.random.randint", return_value=3):
+            # the final call will raise RequestException...
+            with self.assertRaises(requests.exceptions.RequestException):
+                self.test_client.request_with_retry(
+                    method="GET", endpoint_url="www.fake_endpoint.com/mail"
+                )
+
+        # check to make sure number of delays == max_retries
+        self.assertEqual(mock_session.request.call_count, self.test_client.max_retries)
+        # delay not called (only called if 429)
+        mock_sleep.assert_not_called()
 
 
 #     @patch.object(MailChimpClient, "transform_response")
