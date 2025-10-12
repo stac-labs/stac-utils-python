@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>stac_utils.mailchimp &mdash; stac-utils-python 0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="stac_utils.ngpvan" href="stac_utils.ngpvan.html" />
+    <link rel="prev" title="stac_utils.logger" href="stac_utils.logger.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            stac-utils-python
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.action_network.html">stac_utils.action_network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.aws.html">aws</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.benchmark.html">stac_utils.benchmark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.bsd.html">stac_utils.bsd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.convert.html">convert</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.eid.html">eid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.email.html">stac_utils.email</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.google.html">stac_utils.google</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.http.html">http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.jira.html">stac_utils.jira</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.listify.html">stac_utils.listify</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.logger.html">stac_utils.logger</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">stac_utils.mailchimp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#stac_utils.mailchimp.MailChimpClient"><code class="docutils literal notranslate"><span class="pre">MailChimpClient</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.mailchimp.MailChimpClient.create_session"><code class="docutils literal notranslate"><span class="pre">MailChimpClient.create_session()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.mailchimp.MailChimpClient.format_address"><code class="docutils literal notranslate"><span class="pre">MailChimpClient.format_address()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.mailchimp.MailChimpClient.format_birthday"><code class="docutils literal notranslate"><span class="pre">MailChimpClient.format_birthday()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.mailchimp.MailChimpClient.format_date"><code class="docutils literal notranslate"><span class="pre">MailChimpClient.format_date()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.mailchimp.MailChimpClient.format_merge_fields_for_list"><code class="docutils literal notranslate"><span class="pre">MailChimpClient.format_merge_fields_for_list()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.mailchimp.MailChimpClient.format_number"><code class="docutils literal notranslate"><span class="pre">MailChimpClient.format_number()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.mailchimp.MailChimpClient.get_merge_fields_data_type_map"><code class="docutils literal notranslate"><span class="pre">MailChimpClient.get_merge_fields_data_type_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.mailchimp.MailChimpClient.get_subscriber_hash"><code class="docutils literal notranslate"><span class="pre">MailChimpClient.get_subscriber_hash()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.mailchimp.MailChimpClient.paginate_endpoint"><code class="docutils literal notranslate"><span class="pre">MailChimpClient.paginate_endpoint()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.mailchimp.MailChimpClient.request_with_retry"><code class="docutils literal notranslate"><span class="pre">MailChimpClient.request_with_retry()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.mailchimp.MailChimpClient.transform_response"><code class="docutils literal notranslate"><span class="pre">MailChimpClient.transform_response()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.mailchimp.MailChimpClient.update_member_tags"><code class="docutils literal notranslate"><span class="pre">MailChimpClient.update_member_tags()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stac_utils.mailchimp.MailChimpClient.upsert_member"><code class="docutils literal notranslate"><span class="pre">MailChimpClient.upsert_member()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.ngpvan.html">stac_utils.ngpvan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.normalize.html">stac_utils.normalize</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.pandas_utils.html">stac_utils.pandas_utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.reach.html">stac_utils.reach</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.secret_context.html">secret_context</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.secret_factory.html">secret_factory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.ticker_request.html">stac_utils.ticker_request</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.time.html">stac_utils.time</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stac_utils.truthy.html">stac_utils.truthy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">stac-utils-python</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">stac_utils.mailchimp</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_autosummary/stac_utils.mailchimp.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-stac_utils.mailchimp">
+<span id="stac-utils-mailchimp"></span><h1>stac_utils.mailchimp<a class="headerlink" href="#module-stac_utils.mailchimp" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="stac_utils.mailchimp.MailChimpClient">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stac_utils.mailchimp.</span></span><span class="sig-name descname"><span class="pre">MailChimpClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stac_utils.mailchimp.MailChimpClient" title="Permalink to this definition"></a></dt>
+<dd><p>MailChimp Utils for working with the MailChimp API</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.mailchimp.MailChimpClient.create_session">
+<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Session</span></span></span><a class="headerlink" href="#stac_utils.mailchimp.MailChimpClient.create_session" title="Permalink to this definition"></a></dt>
+<dd><p>Creates MailChimp session</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.mailchimp.MailChimpClient.format_address">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">format_address</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#stac_utils.mailchimp.MailChimpClient.format_address" title="Permalink to this definition"></a></dt>
+<dd><p>Helper method to ensure MailChimp address format is met
+Required fields are: addr1, city, state, zip
+Optional fields are: addr2, country</p>
+<p>see: <a class="reference external" href="https://mailchimp.com/developer/marketing/docs/merge-fields/#add-merge-data-to-contacts">https://mailchimp.com/developer/marketing/docs/merge-fields/#add-merge-data-to-contacts</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>val</strong> – address dict value</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>address dict value formatted</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.mailchimp.MailChimpClient.format_birthday">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">format_birthday</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#stac_utils.mailchimp.MailChimpClient.format_birthday" title="Permalink to this definition"></a></dt>
+<dd><p>Helper method to normalize to MM/DD, which is the MailChimp birthday format</p>
+<p>see: <a class="reference external" href="https://mailchimp.com/developer/marketing/docs/merge-fields/#add-merge-data-to-contacts">https://mailchimp.com/developer/marketing/docs/merge-fields/#add-merge-data-to-contacts</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>val</strong> – date value to normalize</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>normalized date in MM/DD</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.mailchimp.MailChimpClient.format_date">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">format_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#stac_utils.mailchimp.MailChimpClient.format_date" title="Permalink to this definition"></a></dt>
+<dd><p>Helper method to normalize date to YYYY-MM-DD</p>
+<p>see: <a class="reference external" href="https://mailchimp.com/developer/marketing/docs/merge-fields/#add-merge-data-to-contacts">https://mailchimp.com/developer/marketing/docs/merge-fields/#add-merge-data-to-contacts</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>val</strong> – date value to normalize</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>normalized date in YYYY-MM-DD</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.mailchimp.MailChimpClient.format_merge_fields_for_list">
+<span class="sig-name descname"><span class="pre">format_merge_fields_for_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge_fields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stac_utils.mailchimp.MailChimpClient.format_merge_fields_for_list" title="Permalink to this definition"></a></dt>
+<dd><p>This method formats MailChimp merge fields for a given audience (list_id).</p>
+<p>see: <a class="reference external" href="https://mailchimp.com/developer/marketing/docs/merge-fields/#add-merge-data-to-contacts">https://mailchimp.com/developer/marketing/docs/merge-fields/#add-merge-data-to-contacts</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>list_id</strong> – MailChimp audience (list) id</p></li>
+<li><p><strong>merge_fields</strong> – MailChimp merge fields dict</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>formatted MailChimp merge fields dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.mailchimp.MailChimpClient.format_number">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">format_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></span><a class="headerlink" href="#stac_utils.mailchimp.MailChimpClient.format_number" title="Permalink to this definition"></a></dt>
+<dd><p>Helper method to ensure MailChimp number format is met</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>val</strong> – number value to normalize</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>int or float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.mailchimp.MailChimpClient.get_merge_fields_data_type_map">
+<span class="sig-name descname"><span class="pre">get_merge_fields_data_type_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stac_utils.mailchimp.MailChimpClient.get_merge_fields_data_type_map" title="Permalink to this definition"></a></dt>
+<dd><p>This method provides a mapping of the merge field tags and data types for a given audience (list_id).
+i.e. {‘BIRTHDAY’: ‘birthday’, ‘FNAME’: ‘text’, ‘LNAME’: ‘text’}</p>
+<p>see: <a class="reference external" href="https://mailchimp.com/developer/marketing/api/list-merges/list-merge-fields/">https://mailchimp.com/developer/marketing/api/list-merges/list-merge-fields/</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>list_id</strong> – MailChimp audience (list) id</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict mapping {“Merge Tag”: “Data Type”}</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.mailchimp.MailChimpClient.get_subscriber_hash">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_subscriber_hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">email</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#stac_utils.mailchimp.MailChimpClient.get_subscriber_hash" title="Permalink to this definition"></a></dt>
+<dd><p>Return the MailChimp subscriber hash for a given email.
+This is the unique identifier of the member, scoped to a given audience_id (list_id)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>email</strong> – the email to get the subscriber hash (MailChimp member id) for</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>subscriber hash  (MailChimp member id)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.mailchimp.MailChimpClient.paginate_endpoint">
+<span class="sig-name descname"><span class="pre">paginate_endpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_endpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_pages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stac_utils.mailchimp.MailChimpClient.paginate_endpoint" title="Permalink to this definition"></a></dt>
+<dd><p>Generic pagination helper for MailChimp endpoints that return
+collections (i.e., lists, members, campaigns, etc.).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_endpoint</strong> – the endpoint to paginate (i.e “lists” or “lists/{list_id}/members”).</p></li>
+<li><p><strong>data_key</strong> – the expected key in the response dict (i.e “lists”, “members”).</p></li>
+<li><p><strong>count</strong> – number of items to fetch per page (default set to 1000, which is MailChimp’s max).</p></li>
+<li><p><strong>max_pages</strong> – optional parameter to limit the number of pages (can be used for testing)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a list of all collected items from the paginated responses</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.mailchimp.MailChimpClient.request_with_retry">
+<span class="sig-name descname"><span class="pre">request_with_retry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Response</span></span></span><a class="headerlink" href="#stac_utils.mailchimp.MailChimpClient.request_with_retry" title="Permalink to this definition"></a></dt>
+<dd><p>This method handles MailChimp 429 (rate limit / Too Many Requests) responses with binary exponential backoff</p>
+<p>Retries up to max_retries times, applying a random delay between 0 and (2^(i+1)-1) seconds on each attempt</p>
+<p>see: <a class="reference external" href="https://en.wikipedia.org/wiki/Exponential_backoff">https://en.wikipedia.org/wiki/Exponential_backoff</a>
+see: <a class="reference external" href="https://staclabs.atlassian.net/browse/DATA-4171">https://staclabs.atlassian.net/browse/DATA-4171</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> – HTTP method used (‘GET’, ‘POST’, ‘PUT’,etc)</p></li>
+<li><p><strong>endpoint_url</strong> – full API endpoint URL</p></li>
+<li><p><strong>kwargs</strong> – any other params accepted by requests (json, etc)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>requests response object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.mailchimp.MailChimpClient.transform_response">
+<span class="sig-name descname"><span class="pre">transform_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Response</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#stac_utils.mailchimp.MailChimpClient.transform_response" title="Permalink to this definition"></a></dt>
+<dd><p>Transforms MailChimp response into dict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>response</strong> – The HTTP response object returned by requests</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>response data as dict, always including a “status_code” key</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.mailchimp.MailChimpClient.update_member_tags">
+<span class="sig-name descname"><span class="pre">update_member_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email_address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#stac_utils.mailchimp.MailChimpClient.update_member_tags" title="Permalink to this definition"></a></dt>
+<dd><p>This method adds or removes tags for a member.</p>
+<p>See: <a class="reference external" href="https://mailchimp.com/developer/marketing/api/list-member-tags/add-or-remove-member-tags/">https://mailchimp.com/developer/marketing/api/list-member-tags/add-or-remove-member-tags/</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>list_id</strong> – MailChimp audience (list) id</p></li>
+<li><p><strong>email_address</strong> – member email address.</p></li>
+<li><p><strong>tags</strong> – list of exact names of tags to add or remove.</p></li>
+<li><p><strong>active</strong> – flags whether to add or remove the tags. True adds the tags, and False removes the tags.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict with the API response. Always includes status_code, and on an empty tag list will include info</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stac_utils.mailchimp.MailChimpClient.upsert_member">
+<span class="sig-name descname"><span class="pre">upsert_member</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email_address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status_if_new</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'subscribed'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge_fields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#stac_utils.mailchimp.MailChimpClient.upsert_member" title="Permalink to this definition"></a></dt>
+<dd><p>Add or update a MailChimp member (contact) in a given audience (list_id).
+This method creates the member if they don’t exist, using the status_if_new parameter
+If the member already exists, it will update only fields that are provided in merge_fields</p>
+<p>The merge_fields dict takes key:value pairs that update other fields (first name, last name, etc) for a given audience
+Because these fields are unique to a given audience id, you will have to find these in the “Audience fields
+and merge tags” section in MailChimp, and the keys will be the “Merge tag” without the <em>||</em>
+(i.e. (potentially) FNAME, LNAME, ADDRESS, etc). Tags must exist for the given audience or the
+request will error (HTTP 400)</p>
+<p>NOTE: by default, any merge fields that have “required” set to true in MailChimp MUST be included
+when adding a contact.</p>
+<p>Additional parameters you would like to add to the payload to pass to MailChimp API using <a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs can be found here:
+<a class="reference external" href="https://mailchimp.com/developer/marketing/api/list-members/add-or-update-list-member/">https://mailchimp.com/developer/marketing/api/list-members/add-or-update-list-member/</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>list_id</strong> – MailChimp audience (list) id</p></li>
+<li><p><strong>email_address</strong> – member email address.</p></li>
+<li><p><strong>merge_fields</strong> – PII fields unique to a MailChimp audience. Make sure to check the front end of MailChimp to get these fields</p></li>
+<li><p><strong>status_if_new</strong> – subscriber’s status that is used only when creating a new record. Valid values include “subscribed”, “unsubscribed”, “cleaned”, “pending”, or “transactional”. Defaults to “subscribed”.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict value from the transform_response() method</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="stac_utils.logger.html" class="btn btn-neutral float-left" title="stac_utils.logger" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="stac_utils.ngpvan.html" class="btn btn-neutral float-right" title="stac_utils.ngpvan" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Stac Labs.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

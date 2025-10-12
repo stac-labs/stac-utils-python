@@ -1,0 +1,5 @@
+﻿stac_utils.mailchimp
+====================
+
+.. automodule:: stac_utils.mailchimp
+    :members:

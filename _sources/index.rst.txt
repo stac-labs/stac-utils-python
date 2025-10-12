@@ -19,6 +19,7 @@ Welcome to stac-utils-python's documentation!
    stac_utils.jira
    stac_utils.listify
    stac_utils.logger
+   stac_utils.mailchimp
    stac_utils.ngpvan
    stac_utils.normalize
    stac_utils.pandas_utils
