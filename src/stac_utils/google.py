@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import sys
+import time
 
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
@@ -24,6 +25,7 @@ except ImportError:
 from .listify import listify
 
 RETRY_EXCEPTIONS = [InternalServerError, ServiceUnavailable]
+HTTP_RETRY_EXCEPTIONS = [429, 500, 503]
 
 logging.basicConfig()
 
@@ -489,7 +491,7 @@ def upload_data_to_gcs(
 
 
 def get_data_from_sheets(
-    spreadsheet_id: str, range: str, client: Resource = None, **kwargs
+    spreadsheet_id: str, range: str, client: Resource = None, num_retries: int = 3, **kwargs
 ) -> list[list]:
     """
     Returns the sheet data in the form of a list of lists
@@ -505,7 +507,7 @@ def get_data_from_sheets(
     request = (
         client.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=range)
     )
-    response = request.execute()
+    response = request.execute(num_retries = num_retries)
     return response.get("values")
 
 
@@ -517,6 +519,7 @@ def send_data_to_sheets(
     client: Resource = None,
     is_overwrite: bool = True,
     is_fill_in_nulls: bool = False,
+    num_retries: int = 3,
     **kwargs,
 ) -> dict:
     """
@@ -553,7 +556,7 @@ def send_data_to_sheets(
             valueInputOption=input_option,
             body={"values": data},
         )
-    response = request.execute()
+    response = request.execute(num_retries = num_retries)
     return response
 
 
@@ -592,14 +595,14 @@ def text_stream_from_drive(file_id: str, client: Resource = None, **kwargs) -> S
         print(f"An error occurred: {error}")
 
 
-def copy_file(file_id: str, new_file_name: str = None, client: Resource = None) -> str:
+def copy_file(file_id: str, new_file_name: str = None, client: Resource = None, num_retries: int = 3) -> str:
     client = client or auth_drive()
-    new_file = client.files().copy(fileId=file_id, supportsAllDrives=True).execute()
+    new_file = client.files().copy(fileId=file_id, supportsAllDrives=True).execute(num_retries = num_retries)
     new_file_id = new_file["id"]
     if new_file_name:
         client.files().update(
             fileId=new_file_id, supportsAllDrives=True, body={"name": new_file_name}
-        ).execute()
+        ).execute(num_retries = num_retries)
 
     return new_file_id
 
@@ -617,6 +620,7 @@ def upload_file_to_drive(
         }
     ],
     client: Resource = None,
+    num_retries: int = 3
 ) -> str:
     """
     Uploads a local file to Google Drive.
@@ -644,7 +648,7 @@ def upload_file_to_drive(
     file = (
         client.files()
         .create(body=file_metadata, media_body=media, fields="id")
-        .execute()
+        .execute(num_retries = num_retries)
     )
     fileId = file["id"]
 
@@ -657,7 +661,24 @@ def upload_file_to_drive(
                 fields="id",
             )
         )
-    batch.execute()
+
+    # batches cannot retry automatically, doing it live
+    for attempt in range(num_retries):
+        try:
+            batch.execute()
+            break
+        except HttpError as e:
+            if e.resp.status in HTTP_RETRY_EXCEPTIONS and attempt < num_retries - 1:
+                logger.warning(e)
+                # weak exponential backoff but something
+                wait_time = (2 ** attempt)
+                time.sleep(wait_time)
+            else:
+                logger.error(e)
+                raise
+        except Exception as e:
+            logger.error(e)
+            raise
 
     return fileId
 
