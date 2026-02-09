@@ -12,3 +12,4 @@ selenium
 webdriver-manager
 sphinx
 pre-commit
+usaddress

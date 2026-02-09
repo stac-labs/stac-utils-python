@@ -3,7 +3,10 @@ import logging
 import os
 import requests
 
-from .convert import convert_to_snake_case, strip_dict
+from .listify import listify
+from .address import parse_address
+
+from .convert import convert_to_snake_case, strip_dict, get_first_value, get_all_values
 from .http import HTTPClient
 
 logger = logging.getLogger(__name__)
@@ -178,36 +181,101 @@ class NGPVANClient(HTTPClient):
         else:
             print("No ID key used")
 
-        if row.get("email"):
-            formatted_json["emails"] = [{"email": row.get("email").strip()}]
+        emails = None
 
-        if row.get("phone"):
+        if row.get("emails"):
+            emails = listify(str(row.get("emails").strip()))
+        else:
+            email_keys = ["email", "email_address"]
+            email_value, _ = get_first_value(row, email_keys)
+
+            if email_value:
+                emails = listify(str(email_value).strip())
+
+        if emails:
+            formatted_json["emails"] = [{"email": e.strip()} for e in emails]
+
+        phones = None
+
+        if row.get("phones"):
+            phones = listify(str(row.get("phones").strip()))
+        else:
+            phone_keys = ["phone", "phone_number"]
+            phone_value, _ = get_first_value(row, phone_keys)
+
+            if phone_value:
+                phones = listify(str(phone_value).strip())
+
+        if phones:
             formatted_json["phones"] = [
-                {"phoneNumber": str(row.get("phone")).replace(".0", "")}
+                {"phoneNumber": p.replace(".0", "")} for p in phones
             ]
 
         if row.get("middle_name"):
             formatted_json["middleName"] = row.get("middle_name")
 
+        if row.get("suffix"):
+            formatted_json["suffix"] = row.get("suffix")
+
         address = {}
 
-        if row.get("street_address"):
-            address["addressLine1"] = row.get("street_address")
+        street_address_keys = ["street_address", "address", "address1", "address_1"]
+        street_values = get_all_values(row, street_address_keys)
 
-        if row.get("city"):
-            address["city"] = row.get("city")
+        if len(street_values) > 1:
+            logger.warning(
+                f"Multiple street address fields provided: {list(street_values.keys())}. "
+                f"Using first found value."
+            )
 
-        if row.get("state") or row.get("stateOrProvince"):
-            if row.get("state"):
-                address["stateOrProvince"] = row.get("state")
+        street_address, _ = get_first_value(row, street_address_keys)
+    
+        has_city = row.get("city")
+        has_state = row.get("state") or row.get("stateOrProvince")
+        has_zip = row.get("zip") or row.get("zipOrPostalCode")
+    
+        if street_address and not (has_city or has_state or has_zip):
+            parsed = parse_address(str(street_address))
+
+            if parsed.get('street_address'):
+                address["addressLine1"] = parsed['street_address']
+
+            if parsed.get('city'):
+                address["city"] = parsed['city']
+
+            if parsed.get('state'):
+                address["stateOrProvince"] = parsed['state']
+
+            if parsed.get('zip'):
+                address["zipOrPostalCode"] = parsed['zip']
+        else:
+            if street_address:
+                address["addressLine1"] = street_address
+
+            if row.get("city"):
+                address["city"] = row.get("city")
+
+            if row.get("state") or row.get("stateOrProvince"):
+                address["stateOrProvince"] = row.get("state") or row.get("stateOrProvince")
+
+            if row.get("zip") or row.get("zipOrPostalCode"):
+                address["zipOrPostalCode"] = row.get("zip") or row.get("zipOrPostalCode")
+
+            if row.get("street_address"):
+                address["addressLine1"] = row.get("street_address")
+
+        # Handle addressLine2 (multiple aliases supported)
+        address2_keys = ["address2", "address_2", "street_address_2"]
+        address2_value, address2_key = get_first_value(row, address2_keys)
+
+        if address2_value:
+            if not address.get("addressLine1"):
+                logger.error(
+                    f"addressLine2 field '{address2_key}' provided without addressLine1. "
+                    f"Value: '{address2_value}'"
+                )
             else:
-                address["stateOrProvince"] = row.get("stateOrProvince")
-
-        if row.get("zip") or row.get("zipOrPostalCode"):
-            if row.get("zip"):
-                address["zipOrPostalCode"] = row.get("zip")
-            else:
-                address["zipOrPostalCode"] = row.get("zipOrPostalCode")
+                address["addressLine2"] = address2_value
 
         if address:
             formatted_json["addresses"] = [address]
