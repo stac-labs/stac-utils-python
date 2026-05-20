@@ -317,6 +317,7 @@ def create_table_from_dataframe(
     project_name: str,
     dataset_name: str,
     table_name: str,
+    use_staging: bool = False,
 ):
     """
     Creates a BigQuery table from Pandas dataframe
@@ -326,7 +327,11 @@ def create_table_from_dataframe(
     :param project_name: Desired BigQuery project name
     :param dataset_name: Desired BigQuery dataset name
     :param table_name: Desired BigQuery table name
+    :param use_staging: If true, use a staging table for writes
     """
+
+    staging_table_name = f"{table_name}_staging"
+    load_target = staging_table_name if use_staging else table_name
 
     column_name_conversion = {}
     column_definitions = []
@@ -349,9 +354,9 @@ def create_table_from_dataframe(
     dataframe = dataframe.rename(columns=column_name_conversion)
     table_definition_sql = f"""
         DROP TABLE IF EXISTS 
-            {project_name}.{dataset_name}.{table_name} 
+            {project_name}.{dataset_name}.{load_target} 
         ;
-        CREATE TABLE {project_name}.{dataset_name}.{table_name} ( 
+        CREATE TABLE {project_name}.{dataset_name}.{load_target} ( 
             {", ".join(column_definitions)}
         );
     """
@@ -362,9 +367,24 @@ def create_table_from_dataframe(
         dataframe,
         project_name,
         dataset_name,
-        table_name,
+        load_target,
         retry_exceptions=[NotFound, *RETRY_EXCEPTIONS],
     )
+
+    if use_staging:
+        staging_ref = f"{project_name}.{dataset_name}.{staging_table_name}"
+        dest_ref = f"{project_name}.{dataset_name}.{table_name}"
+
+        copy_job = client.copy_table(
+            staging_ref,
+            dest_ref,
+            job_config=bigquery.CopyJobConfig(
+                write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE
+            ),
+        )
+        copy_job.result()
+
+        run_query(f"DROP TABLE IF EXISTS {staging_ref}", client=client)
 
 
 def get_table_for_loading(
