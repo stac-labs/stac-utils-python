@@ -14,6 +14,7 @@ Welcome to stac-utils-python's documentation!
    stac_utils.database_utils
    stac_utils.eid
    stac_utils.email
+   stac_utils.esri
    stac_utils.google
    stac_utils.http
    stac_utils.jira
